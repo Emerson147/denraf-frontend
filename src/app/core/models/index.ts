@@ -276,3 +276,73 @@ export interface AuthState {
   currentUser: User | null;
   isAuthenticated: boolean;
 }
+
+// ============================================
+// DASHBOARD
+// ============================================
+
+export interface TopProductoResponse {
+  nombre: string;
+  categoria: string;
+  unidadesVendidas: number;
+  ingresos: number;
+}
+
+export interface ActividadRecienteResponse {
+  saleNumber: string;
+  productoPrincipal: string; // Puede ser null si la venta no tuvo items o hubo error
+  paymentMethod: string;
+  total: number;
+  status: string;
+  createdAt: string;
+}
+
+export interface ProductoRentableResponse {
+  nombre: string;
+  categoria: string;
+  unidadesVendidas: number;
+  ingresos: number;
+  margen: number;
+  gananciaGenerada: number;
+}
+
+export interface StockBajoResponse {
+  nombre: string;
+  categoria: string;
+  stock: number;
+  minStock: number;
+}
+
+export interface ProyeccionResponse {
+  ingresosEstimados: number;
+  ventasEstimadas: number;
+  confianza: string;
+}
+
+export interface DashboardResponse {
+  ventasHoy: number;
+  ingresosHoy: number;
+  ingresosSemana: number;
+  gananciaNeta: number;
+  inversionTotal: number;
+
+  mejorDiaSemana: string;
+  ingresosMejorDia: number;
+
+  margenRentabilidad: number;
+  roi: number;
+  ticketPromedio: number;
+
+  ingresosSemanaAnterior: number;
+  crecimientoSemanal: number;
+
+  ventasPorDia: Record<string, number>;
+
+  topProductos: TopProductoResponse[];
+  actividadReciente: ActividadRecienteResponse[];
+  productosRentables: ProductoRentableResponse[];
+  productosStockBajo: StockBajoResponse[];
+  proyeccion: ProyeccionResponse;
+
+  conversion: number;
+}

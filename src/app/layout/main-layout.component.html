@@ -1,0 +1,722 @@
+<div class="flex flex-col h-screen w-full bg-stone-50 dark:bg-stone-950 transition-colors duration-100">
+  <!-- Sistema de Toasts -->
+  <app-ui-toast />
+
+  <!-- Backdrop Móvil -->
+  @if (mobileMenuOpen()) {
+    <div 
+      class="fixed inset-0 bg-stone-900/30 dark:bg-stone-950/50 z-40 md:hidden transition-opacity duration-150"
+      (click)="closeMobileMenu()"
+    ></div>
+  }
+
+  <!-- Contenedor Flex: Sidebar + Main -->
+  <div class="flex flex-1 overflow-hidden">
+    <!-- Sidebar Desktop (Colapsable) -->
+    <aside
+      class="hidden md:flex flex-col border-r border-stone-100 dark:border-stone-800 bg-white dark:bg-stone-900 py-6 transition-[width] duration-150 ease-out z-20 relative"
+      [ngClass]="sidebarCollapsed() ? 'w-20' : 'w-64'"
+    >
+    <!-- Header con Logo y Toggle -->
+    <div class="mb-8 px-4 flex items-center justify-between">
+      <div class="flex items-center gap-3 overflow-hidden">
+        <div
+          class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 font-serif italic text-lg shadow-lg transition-colors duration-100"
+        >
+          D
+        </div>
+        <span 
+          class="text-lg font-semibold tracking-tight text-stone-800 dark:text-stone-100 whitespace-nowrap transition-opacity duration-100"
+          [ngClass]="sidebarCollapsed() ? 'opacity-0 w-0' : 'opacity-100'"
+        >
+          Den<span class="text-stone-400 dark:text-stone-500">Raf</span>
+        </span>
+      </div>
+      
+      <!-- Botón Toggle -->
+      <button
+        (click)="toggleSidebar()"
+        class="h-8 w-8 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 flex items-center justify-center text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 transition-colors shrink-0"
+        [class.ml-0]="sidebarCollapsed()"
+      >
+        <span class="material-icons-outlined text-lg">
+          {{ sidebarCollapsed() ? 'chevron_right' : 'chevron_left' }}
+        </span>
+      </button>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="flex flex-1 flex-col gap-2 px-3">
+      <a
+        routerLink="/"
+        routerLinkActive="bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 shadow-md"
+        #rlaDashboard="routerLinkActive"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="group relative flex items-center gap-3 rounded-xl border border-transparent px-3 py-3 text-sm font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-all"
+        [title]="sidebarCollapsed() ? 'Dashboard' : ''"
+      >
+        <span
+          class="material-icons-outlined text-[22px] shrink-0"
+          [class.text-white]="rlaDashboard.isActive"
+          [class.dark:text-stone-900]="rlaDashboard.isActive"
+        >
+          dashboard
+        </span>
+        <span 
+          class="whitespace-nowrap transition-all duration-100"
+          [ngClass]="sidebarCollapsed() ? 'opacity-0 w-0 hidden' : 'opacity-100'"
+        >
+          Dashboard
+        </span>
+        
+        <!-- Tooltip cuando está colapsado -->
+        @if (sidebarCollapsed()) {
+          <div class="absolute left-full ml-2 px-3 py-2 bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 text-xs font-medium rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
+            Dashboard
+          </div>
+        }
+      </a>
+
+      <!-- Inventario con submenu expandible -->
+      <div class="relative">
+        <button
+          (click)="toggleInventorySubmenu()"
+          class="group relative flex items-center gap-3 w-full rounded-xl border border-transparent px-3 py-3 text-sm font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-all"
+          [class.bg-stone-100]="inventorySubmenuOpen() && !sidebarCollapsed()"
+          [class.dark:bg-stone-800]="inventorySubmenuOpen() && !sidebarCollapsed()"
+          [title]="sidebarCollapsed() ? 'Inventario' : ''"
+        >
+          <span class="material-icons-outlined text-[22px] shrink-0">checkroom</span>
+          <span 
+            class="whitespace-nowrap transition-all duration-100 flex-1 text-left"
+            [ngClass]="sidebarCollapsed() ? 'opacity-0 w-0 hidden' : 'opacity-100'"
+          >
+            Inventario
+          </span>
+          <span 
+            class="material-icons-outlined text-lg transition-transform duration-100"
+            [ngClass]="sidebarCollapsed() ? 'opacity-0 w-0 hidden' : 'opacity-100'"
+            [style.transform]="inventorySubmenuOpen() ? 'rotate(90deg)' : 'rotate(0deg)'"
+          >
+            chevron_right
+          </span>
+          
+          @if (sidebarCollapsed()) {
+            <div class="absolute left-full ml-2 px-3 py-2 bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 text-xs font-medium rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
+              Inventario
+            </div>
+          }
+        </button>
+
+        <!-- Submenu expandible -->
+        <div 
+          class="overflow-hidden transition-all duration-100 ease-in-out"
+          [style.max-height]="inventorySubmenuOpen() && !sidebarCollapsed() ? '200px' : '0px'"
+        >
+          <div class="pl-11 pr-3 py-2 space-y-1">
+            <a 
+              routerLink="/inventario/productos" 
+              routerLinkActive="bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900"
+              class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-stone-600 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800 transition-all"
+            >
+              <span class="material-icons-outlined text-[18px]">inventory_2</span>
+              <span>Productos</span>
+            </a>
+            <a 
+              routerLink="/inventario/analisis" 
+              routerLinkActive="bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900"
+              class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-stone-600 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800 transition-all"
+            >
+              <span class="material-icons-outlined text-[18px]">analytics</span>
+              <span>Análisis</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <a
+        routerLink="/clients"
+        routerLinkActive="bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 shadow-md"
+        #rlaClients="routerLinkActive"
+        class="group relative flex items-center gap-3 rounded-xl border border-transparent px-3 py-3 text-sm font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-all"
+        [title]="sidebarCollapsed() ? 'Clientes' : ''"
+      >
+        <span
+          class="material-icons-outlined text-[22px] shrink-0"
+          [class.text-white]="rlaClients.isActive"
+          [class.dark:text-stone-900]="rlaClients.isActive"
+        >
+          people
+        </span>
+        <span 
+          class="whitespace-nowrap transition-all duration-100"
+          [ngClass]="sidebarCollapsed() ? 'opacity-0 w-0 hidden' : 'opacity-100'"
+        >
+          Clientes
+        </span>
+        
+        @if (sidebarCollapsed()) {
+          <div class="absolute left-full ml-2 px-3 py-2 bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 text-xs font-medium rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
+            Clientes
+          </div>
+        }
+      </a>
+
+      <a 
+        routerLink="/pos"
+        routerLinkActive="bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 shadow-md"
+        #rlaPos="routerLinkActive"
+        class="group relative flex items-center gap-3 rounded-xl border border-transparent px-3 py-3 text-sm font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-all"
+        [title]="sidebarCollapsed() ? 'Punto de Venta' : ''"
+      >
+        <span
+          class="material-icons-outlined text-[22px] shrink-0"
+          [class.text-white]="rlaPos.isActive"
+          [class.dark:text-stone-900]="rlaPos.isActive"
+        >
+          point_of_sale
+        </span>
+        <span 
+          class="whitespace-nowrap transition-all duration-100"
+          [ngClass]="sidebarCollapsed() ? 'opacity-0 w-0 hidden' : 'opacity-100'"
+        >
+          Punto de Venta
+        </span>
+        
+        @if (sidebarCollapsed()) {
+          <div class="absolute left-full ml-2 px-3 py-2 bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 text-xs font-medium rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
+            Punto de Venta
+          </div>
+        }
+      </a>
+
+      <a
+        routerLink="/sales"
+        routerLinkActive="bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 shadow-md"
+        #rlaSales="routerLinkActive"
+        class="group relative flex items-center gap-3 rounded-xl border border-transparent px-3 py-3 text-sm font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-all"
+        [title]="sidebarCollapsed() ? 'Historial de Ventas' : ''"
+      >
+        <span
+          class="material-icons-outlined text-[22px] shrink-0"
+          [class.text-white]="rlaSales.isActive"
+          [class.dark:text-stone-900]="rlaSales.isActive"
+        >
+          receipt_long
+        </span>
+        <span 
+          class="whitespace-nowrap transition-all duration-100"
+          [ngClass]="sidebarCollapsed() ? 'opacity-0 w-0 hidden' : 'opacity-100'"
+        >
+          Historial
+        </span>
+        
+        @if (sidebarCollapsed()) {
+          <div class="absolute left-full ml-2 px-3 py-2 bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 text-xs font-medium rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
+            Historial de Ventas
+          </div>
+        }
+      </a>
+
+      <a
+        routerLink="/inventario/compras"
+        routerLinkActive="bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 shadow-md"
+        #rlaPurchases="routerLinkActive"
+        class="group relative flex items-center gap-3 rounded-xl border border-transparent px-3 py-3 text-sm font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-all"
+        [title]="sidebarCollapsed() ? 'Compras de Inventario' : ''"
+      >
+        <span
+          class="material-icons-outlined text-[22px] shrink-0"
+          [class.text-white]="rlaPurchases.isActive"
+          [class.dark:text-stone-900]="rlaPurchases.isActive"
+        >
+          shopping_cart
+        </span>
+        <span 
+          class="whitespace-nowrap transition-all duration-100"
+          [ngClass]="sidebarCollapsed() ? 'opacity-0 w-0 hidden' : 'opacity-100'"
+        >
+          Compras
+        </span>
+        
+        @if (sidebarCollapsed()) {
+          <div class="absolute left-full ml-2 px-3 py-2 bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 text-xs font-medium rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
+            Compras de Inventario
+          </div>
+        }
+      </a>
+
+      <a
+        routerLink="/reports"
+        routerLinkActive="bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 shadow-md"
+        #rlaReports="routerLinkActive"
+        class="group relative flex items-center gap-3 rounded-xl border border-transparent px-3 py-3 text-sm font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-all"
+        [title]="sidebarCollapsed() ? 'Reportes' : ''"
+      >
+        <span
+          class="material-icons-outlined text-[22px] shrink-0"
+          [class.text-white]="rlaReports.isActive"
+          [class.dark:text-stone-900]="rlaReports.isActive"
+        >
+          bar_chart
+        </span>
+        <span 
+          class="whitespace-nowrap transition-all duration-100"
+          [ngClass]="sidebarCollapsed() ? 'opacity-0 w-0 hidden' : 'opacity-100'"
+        >
+          Reportes
+        </span>
+        
+        @if (sidebarCollapsed()) {
+          <div class="absolute left-full ml-2 px-3 py-2 bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 text-xs font-medium rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
+            Reportes
+          </div>
+        }
+      </a>
+
+      <a
+        routerLink="/goals"
+        routerLinkActive="bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 shadow-md"
+        #rlaGoals="routerLinkActive"
+        class="group relative flex items-center gap-3 rounded-xl border border-transparent px-3 py-3 text-sm font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-all"
+        [title]="sidebarCollapsed() ? 'Metas y Logros' : ''"
+      >
+        <span
+          class="material-icons-outlined text-[22px] shrink-0"
+          [class.text-white]="rlaGoals.isActive"
+          [class.dark:text-stone-900]="rlaGoals.isActive"
+        >
+          emoji_events
+        </span>
+        <span 
+          class="whitespace-nowrap transition-all duration-100"
+          [ngClass]="sidebarCollapsed() ? 'opacity-0 w-0 hidden' : 'opacity-100'"
+        >
+          Metas
+        </span>
+        
+        @if (sidebarCollapsed()) {
+          <div class="absolute left-full ml-2 px-3 py-2 bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 text-xs font-medium rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
+            Metas y Logros
+          </div>
+        }
+      </a>
+
+      <!-- Solo visible para admin -->
+      @if (authService.currentUser()?.role === 'admin') {
+        <a
+          routerLink="/users"
+          routerLinkActive="bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 shadow-md"
+          #rlaUsers="routerLinkActive"
+          class="group relative flex items-center gap-3 rounded-xl border border-transparent px-3 py-3 text-sm font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-all"
+          [title]="sidebarCollapsed() ? 'Usuarios' : ''"
+        >
+          <span
+            class="material-icons-outlined text-[22px] shrink-0"
+            [class.text-white]="rlaUsers.isActive"
+            [class.dark:text-stone-900]="rlaUsers.isActive"
+          >
+            people
+          </span>
+          <span 
+            class="whitespace-nowrap transition-all duration-100"
+            [ngClass]="sidebarCollapsed() ? 'opacity-0 w-0 hidden' : 'opacity-100'"
+          >
+            Usuarios
+          </span>
+          
+          @if (sidebarCollapsed()) {
+            <div class="absolute left-full ml-2 px-3 py-2 bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 text-xs font-medium rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
+              Usuarios
+            </div>
+          }
+        </a>
+      }
+    </nav>
+
+    <!-- User Section (Logout) -->
+    <div class="mt-auto pt-4 border-t border-stone-100 dark:border-stone-800 px-3">
+      <div
+        class="group relative flex items-center gap-3 rounded-xl p-3 cursor-pointer hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+        (click)="logout()"
+        [title]="sidebarCollapsed() ? 'Cerrar Sesión' : ''"
+      >
+        <div class="h-10 w-10 shrink-0 rounded-full bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 flex items-center justify-center text-sm font-bold transition-colors duration-100">
+          SD
+        </div>
+        <div 
+          class="flex flex-col overflow-hidden transition-all duration-100"
+          [ngClass]="sidebarCollapsed() ? 'opacity-0 w-0 hidden' : 'opacity-100'"
+        >
+          <span class="text-sm font-semibold text-stone-800 dark:text-stone-100 whitespace-nowrap">Sensei Dev</span>
+          <span class="text-xs text-stone-400 dark:text-stone-500 whitespace-nowrap">Cerrar Sesión</span>
+        </div>
+        <span 
+          class="material-icons-outlined text-stone-400 dark:text-stone-500 ml-auto text-lg shrink-0"
+          [ngClass]="sidebarCollapsed() ? 'hidden' : ''"
+        >
+          logout
+        </span>
+        
+        @if (sidebarCollapsed()) {
+          <div class="absolute left-full ml-2 px-3 py-2 bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 text-xs font-medium rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
+            Cerrar Sesión
+          </div>
+        }
+      </div>
+    </div>
+  </aside>
+
+  <!-- Sidebar Móvil (Drawer Deslizable) -->
+  <aside
+    class="fixed top-0 left-0 h-full w-72 bg-white dark:bg-stone-900 border-r border-stone-100 dark:border-stone-800 py-6 z-50 md:hidden transition-transform duration-100 ease-out"
+    [ngClass]="mobileMenuOpen() ? 'translate-x-0' : '-translate-x-full'"
+  >
+    <!-- Header con Logo y Close -->
+    <div class="mb-8 px-4 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div
+          class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 font-serif italic text-lg shadow-lg transition-colors duration-100"
+        >
+          D
+        </div>
+        <span class="text-lg font-semibold tracking-tight text-stone-800 dark:text-stone-100">
+          Den<span class="text-stone-400 dark:text-stone-500">Raf</span>
+        </span>
+      </div>
+      
+      <!-- Botón Cerrar -->
+      <button
+        (click)="closeMobileMenu()"
+        class="h-8 w-8 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 flex items-center justify-center text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 transition-colors"
+      >
+        <span class="material-icons-outlined text-xl">close</span>
+      </button>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="flex flex-1 flex-col gap-2 px-3">
+      <a
+        routerLink="/"
+        routerLinkActive="bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 shadow-md"
+        #rlaDashboardMobile="routerLinkActive"
+        [routerLinkActiveOptions]="{ exact: true }"
+        (click)="closeMobileMenu()"
+        class="flex items-center gap-3 rounded-xl border border-transparent px-3 py-3 text-sm font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-all"
+      >
+        <span
+          class="material-icons-outlined text-[22px]"
+          [class.text-white]="rlaDashboardMobile.isActive"
+          [class.dark:text-stone-900]="rlaDashboardMobile.isActive"
+        >
+          dashboard
+        </span>
+        <span>Dashboard</span>
+      </a>
+
+      <!-- Inventario móvil con submenu -->
+      <div class="relative">
+        <button
+          (click)="toggleInventorySubmenu()"
+          class="flex items-center gap-3 w-full rounded-xl border border-transparent px-3 py-3 text-sm font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-all"
+          [class.bg-stone-100]="inventorySubmenuOpen()"
+          [class.dark:bg-stone-800]="inventorySubmenuOpen()"
+        >
+          <span class="material-icons-outlined text-[22px]">checkroom</span>
+          <span class="flex-1 text-left">Inventario</span>
+          <span 
+            class="material-icons-outlined text-lg transition-transform duration-100"
+            [style.transform]="inventorySubmenuOpen() ? 'rotate(90deg)' : 'rotate(0deg)'"
+          >
+            chevron_right
+          </span>
+        </button>
+
+        <!-- Submenu móvil -->
+        <div 
+          class="overflow-hidden transition-all duration-100 ease-in-out"
+          [style.max-height]="inventorySubmenuOpen() ? '200px' : '0px'"
+        >
+          <div class="pl-11 pr-3 py-2 space-y-1">
+            <a 
+              routerLink="/inventario/productos" 
+              routerLinkActive="bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900"
+              (click)="closeMobileMenu()"
+              class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-stone-600 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800 transition-all"
+            >
+              <span class="material-icons-outlined text-[18px]">inventory_2</span>
+              <span>Productos</span>
+            </a>
+            <a 
+              routerLink="/inventario/analisis" 
+              routerLinkActive="bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900"
+              (click)="closeMobileMenu()"
+              class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-stone-600 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800 transition-all"
+            >
+              <span class="material-icons-outlined text-[18px]">analytics</span>
+              <span>Análisis</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <a
+        routerLink="/clients"
+        routerLinkActive="bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 shadow-md"
+        #rlaClientsMobile="routerLinkActive"
+        (click)="closeMobileMenu()"
+        class="flex items-center gap-3 rounded-xl border border-transparent px-3 py-3 text-sm font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-all"
+      >
+        <span
+          class="material-icons-outlined text-[22px]"
+          [class.text-white]="rlaClientsMobile.isActive"
+          [class.dark:text-stone-900]="rlaClientsMobile.isActive"
+        >
+          people
+        </span>
+        <span>Clientes</span>
+      </a>
+
+      <a 
+        routerLink="/pos"
+        routerLinkActive="bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 shadow-md"
+        #rlaPosMobile="routerLinkActive"
+        (click)="closeMobileMenu()"
+        class="flex items-center gap-3 rounded-xl border border-transparent px-3 py-3 text-sm font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-all"
+      >
+        <span
+          class="material-icons-outlined text-[22px]"
+          [class.text-white]="rlaPosMobile.isActive"
+          [class.dark:text-stone-900]="rlaPosMobile.isActive"
+        >
+          point_of_sale
+        </span>
+        <span>Punto de Venta</span>
+      </a>
+
+      <a
+        routerLink="/sales"
+        routerLinkActive="bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 shadow-md"
+        #rlaSalesMobile="routerLinkActive"
+        (click)="closeMobileMenu()"
+        class="flex items-center gap-3 rounded-xl border border-transparent px-3 py-3 text-sm font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-all"
+      >
+        <span
+          class="material-icons-outlined text-[22px]"
+          [class.text-white]="rlaSalesMobile.isActive"
+          [class.dark:text-stone-900]="rlaSalesMobile.isActive"
+        >
+          receipt_long
+        </span>
+        <span>Historial</span>
+      </a>
+
+      <a
+        routerLink="/inventario/compras"
+        routerLinkActive="bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 shadow-md"
+        #rlaPurchasesMobile="routerLinkActive"
+        (click)="closeMobileMenu()"
+        class="flex items-center gap-3 rounded-xl border border-transparent px-3 py-3 text-sm font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-all"
+      >
+        <span
+          class="material-icons-outlined text-[22px]"
+          [class.text-white]="rlaPurchasesMobile.isActive"
+          [class.dark:text-stone-900]="rlaPurchasesMobile.isActive"
+        >
+          shopping_cart
+        </span>
+        <span>Compras</span>
+      </a>
+
+      <a
+        routerLink="/reports"
+        routerLinkActive="bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 shadow-md"
+        #rlaReportsMobile="routerLinkActive"
+        (click)="closeMobileMenu()"
+        class="flex items-center gap-3 rounded-xl border border-transparent px-3 py-3 text-sm font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-all"
+      >
+        <span
+          class="material-icons-outlined text-[22px]"
+          [class.text-white]="rlaReportsMobile.isActive"
+          [class.dark:text-stone-900]="rlaReportsMobile.isActive"
+        >
+          bar_chart
+        </span>
+        <span>Reportes</span>
+      </a>
+
+      <a
+        routerLink="/goals"
+        routerLinkActive="bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 shadow-md"
+        #rlaGoalsMobile="routerLinkActive"
+        (click)="closeMobileMenu()"
+        class="flex items-center gap-3 rounded-xl border border-transparent px-3 py-3 text-sm font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-all"
+      >
+        <span
+          class="material-icons-outlined text-[22px]"
+          [class.text-white]="rlaGoalsMobile.isActive"
+          [class.dark:text-stone-900]="rlaGoalsMobile.isActive"
+        >
+          emoji_events
+        </span>
+        <span>Metas</span>
+      </a>
+    </nav>
+
+    <!-- Theme Toggle -->
+    <div class="px-3 mb-3 mt-auto">
+      <button 
+        (click)="themeService.toggle()"
+        class="flex items-center gap-3 w-full rounded-xl px-3 py-3 text-sm font-medium transition-colors hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-600 dark:text-stone-300"
+      >
+        <span class="material-icons-outlined text-[22px]">
+          {{ themeService.darkMode() ? 'light_mode' : 'dark_mode' }}
+        </span>
+        <span>{{ themeService.darkMode() ? 'Modo Luz' : 'Modo Oscuro' }}</span>
+      </button>
+    </div>
+
+    <!-- User Section -->
+    <div class="pt-4 border-t border-stone-100 dark:border-stone-800 px-3">
+      <div
+        class="flex items-center gap-3 rounded-xl p-3 cursor-pointer hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+        (click)="logout()"
+      >
+        <div class="h-10 w-10 shrink-0 rounded-full bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 flex items-center justify-center text-sm font-bold transition-colors duration-100">
+          SD
+        </div>
+        <div class="flex flex-col">
+          <span class="text-sm font-semibold text-stone-800 dark:text-stone-100">Sensei Dev</span>
+          <span class="text-xs text-stone-400 dark:text-stone-500">Cerrar Sesión</span>
+        </div>
+        <span class="material-icons-outlined text-stone-400 dark:text-stone-500 ml-auto text-lg">logout</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="flex-1 flex flex-col overflow-hidden relative">
+    <!-- Header Móvil -->
+    <header
+      class="flex h-16 items-center justify-between border-b border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 px-4 shadow-sm md:hidden sticky top-0 z-30 transition-colors duration-100"
+    >
+      <button 
+        (click)="toggleMobileMenu()"
+        class="h-10 w-10 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 flex items-center justify-center text-stone-600 dark:text-stone-300 transition-colors"
+      >
+        <span class="material-icons-outlined text-2xl">menu</span>
+      </button>
+      
+      <div class="flex items-center gap-2">
+        <div
+          class="flex h-8 w-8 items-center justify-center rounded-lg bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 font-serif italic text-sm shadow-md transition-colors duration-100"
+        >
+          D
+        </div>
+        <span class="font-bold text-stone-800 dark:text-stone-100">DenRaf</span>
+      </div>
+
+      <!-- Notification Center -->
+      <app-ui-notification-center />
+    </header>
+
+    <div class="flex-1 overflow-y-auto">
+      <!-- Botones Flotantes Desktop (Efecto Vidrio iPhone) -->
+      <div 
+        class="hidden md:flex absolute top-6 right-6 z-40 items-center gap-2 rounded-2xl p-1.5 shadow-xl transition-all duration-700 ease-out hover:opacity-100"
+        [ngClass]="{
+          'opacity-100': floatingButtonsVisible(),
+          'opacity-0 pointer-events-none': !floatingButtonsVisible()
+        }"
+        [ngStyle]="{
+          'background': themeService.darkMode() ? 'rgba(28, 25, 23, 0.72)' : 'rgba(255, 255, 255, 0.72)',
+          'backdrop-filter': 'blur(20px) saturate(180%)',
+          '-webkit-backdrop-filter': 'blur(20px) saturate(180%)',
+          'border': themeService.darkMode() ? '1px solid rgba(68, 64, 60, 0.3)' : '1px solid rgba(209, 213, 219, 0.3)'
+        }"
+      >
+        <!-- Notificaciones -->
+        <app-ui-notification-center />
+
+        <!-- Divisor -->
+        <div class="w-px h-6 transition-colors duration-100" [class.bg-stone-300/40]="!themeService.darkMode()" [class.bg-stone-700/40]="themeService.darkMode()"></div>
+
+        <!-- User Switcher -->
+        <div class="relative" appClickOutside (clickedOutside)="closeUserMenu()">
+          <button 
+            (click)="toggleUserMenu()"
+            class="h-9 px-3 rounded-xl hover:bg-white/60 dark:hover:bg-stone-800/60 flex items-center gap-2 text-stone-600 dark:text-stone-300 hover:text-stone-800 dark:hover:text-stone-100 transition-all"
+          >
+            <span class="material-icons-outlined text-[19px]">person</span>
+            @if (authService.currentUser()) {
+              <span class="text-xs font-medium">{{ authService.currentUser()!.name }}</span>
+            }
+          </button>
+          
+          <!-- Dropdown Menu -->
+          @if (userMenuOpen()) {
+            <div class="absolute right-0 top-full mt-2 w-[calc(100vw-2rem)] sm:w-48 max-w-xs bg-white dark:bg-stone-800 rounded-xl shadow-2xl border border-stone-200 dark:border-stone-700 overflow-hidden z-50 animate-scale-in">
+              <div class="p-2 border-b border-stone-100 dark:border-stone-700">
+                <p class="text-xs text-stone-500 dark:text-stone-400 px-2 py-1">Cambiar vendedor</p>
+              </div>
+              <div class="p-2">
+                @for (user of authService.getAvailableUsers(); track user.id) {
+                  <button 
+                    (click)="switchUser(user.id)"
+                    class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-stone-700 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-700 transition-colors"
+                    [class.bg-stone-100]="authService.currentUser()?.id === user.id"
+                    [class.dark:bg-stone-700]="authService.currentUser()?.id === user.id"
+                  >
+                    <span class="material-icons-outlined text-[18px]">person</span>
+                    <span>{{ user.name }}</span>
+                    @if (authService.currentUser()?.id === user.id) {
+                      <span class="ml-auto material-icons-outlined text-[16px] text-green-600">check_circle</span>
+                    }
+                  </button>
+                }
+              </div>
+              <div class="p-2 border-t border-stone-100 dark:border-stone-700">
+                <button 
+                  (click)="logout()"
+                  class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                >
+                  <span class="material-icons-outlined text-[18px]">logout</span>
+                  <span>Cerrar sesión</span>
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+
+        <!-- Divisor -->
+        <div class="w-px h-6 transition-colors duration-100" [class.bg-stone-300/40]="!themeService.darkMode()" [class.bg-stone-700/40]="themeService.darkMode()"></div>
+
+        <!-- Modo Oscuro -->
+        <div class="relative group">
+          <button 
+            (click)="themeService.toggle()"
+            class="h-9 w-9 rounded-xl hover:bg-white/60 dark:hover:bg-stone-800/60 flex items-center justify-center text-stone-600 dark:text-stone-300 hover:text-stone-800 dark:hover:text-stone-100 transition-all"
+          >
+            <span class="material-icons-outlined text-[19px]">
+              {{ themeService.darkMode() ? 'light_mode' : 'dark_mode' }}
+            </span>
+          </button>
+          
+          <!-- Tooltip -->
+          <div class="absolute right-0 top-full mt-2 px-3 py-2 bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 text-xs font-medium rounded-xl shadow-xl opacity-0 group-hover:opacity-100 transition-all pointer-events-none whitespace-nowrap">
+            {{ themeService.darkMode() ? 'Modo Luz' : 'Modo Oscuro' }}
+          </div>
+        </div>
+      </div>
+
+      <router-outlet></router-outlet>
+    </div>
+  </main>
+  </div> <!-- Cierre flex container sidebar + main -->
+
+  <!-- Componentes globales -->
+  <app-connection-status />
+  <app-sync-indicator />
+  <app-pwa-install-prompt />
+  <app-ui-error-logger />
+</div> <!-- Cierre wrapper principal -->

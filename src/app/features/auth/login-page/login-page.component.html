@@ -1,0 +1,128 @@
+<div class="flex min-h-screen w-full bg-[#FBFbFA]">
+  <div class="hidden lg:block w-1/2 relative overflow-hidden bg-stone-200">
+    <img
+      src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=2070&auto=format&fit=crop"
+      alt="Denfar Collection"
+      class="absolute inset-0 h-full w-full object-cover"
+    />
+
+    <div class="absolute inset-0 bg-black/10"></div>
+
+    <div class="absolute bottom-12 left-12 text-white p-4">
+      <h2 class="text-4xl font-serif italic mb-2">DenRaf Collection.</h2>
+      <p class="text-sm font-light tracking-widest uppercase opacity-90">
+        Gestión de Inventario & Retail
+      </p>
+    </div>
+  </div>
+
+  <div class="w-full lg:w-1/2 flex items-center justify-center p-8 animate-fade-in-up">
+    <div class="w-full max-w-sm space-y-8">
+      <div class="text-center lg:text-left">
+        <div
+          class="mb-6 h-12 w-12 rounded-xl bg-stone-900 text-white flex items-center justify-center font-serif text-2xl mx-auto lg:mx-0 shadow-xl shadow-stone-200 transition-colors duration-300"
+        >
+          DR
+        </div>
+        <h1 class="text-3xl font-semibold text-stone-900 tracking-tight">
+          Bienvenido a <span class="font-serif italic text-stone-500">DenRaf</span>
+        </h1>
+        <p class="text-stone-500 mt-2 text-sm">
+          Ingresa tus credenciales para continuar. 
+        </p>
+      </div>
+
+      <!-- PASO: Ingreso de Credenciales -->
+      <form class="space-y-6" (ngSubmit)="login()">
+        <div class="space-y-5">
+          
+          <!-- Email Input -->
+          <div class="space-y-1.5">
+            <label class="block text-xs font-semibold text-stone-700 uppercase tracking-wider" for="email">
+              Correo Electrónico
+            </label>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400">
+                <span class="material-icons-outlined text-sm">mail</span>
+              </div>
+              <input
+                id="email"
+                type="email"
+                name="email"
+                [(ngModel)]="email"
+                class="w-full pl-10 pr-4 py-3 rounded-xl border border-stone-200 focus:border-stone-900 focus:ring-1 focus:ring-stone-900 outline-none transition-all bg-white text-stone-900 placeholder-stone-400 shadow-sm"
+                placeholder="usuario@ejemplo.com"
+                [disabled]="isLoggingIn()"
+                autocomplete="email"
+              />
+            </div>
+          </div>
+
+          <!-- Password Input -->
+          <div class="space-y-1.5">
+            <label class="block text-xs font-semibold text-stone-700 uppercase tracking-wider" for="password">
+              Contraseña
+            </label>
+            <div class="relative group">
+              <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400 group-focus-within:text-stone-600 transition-colors">
+                <span class="material-icons-outlined text-sm">lock</span>
+              </div>
+              
+              <input
+                id="password"
+                [type]="showPassword() ? 'text' : 'password'"
+                name="password"
+                [(ngModel)]="password"
+                class="w-full pl-10 pr-12 py-3 rounded-xl border border-stone-200 focus:border-stone-900 focus:ring-1 focus:ring-stone-900 outline-none transition-all bg-white text-stone-900 placeholder-stone-400 shadow-sm"
+                placeholder="••••••••"
+                [disabled]="isLoggingIn()"
+                autocomplete="current-password"
+              />
+              
+              <!-- Toggle Password Visibility -->
+              <button 
+                type="button"
+                (click)="togglePassword()"
+                tabindex="-1"
+                class="absolute inset-y-0 right-0 pr-3.5 flex items-center outline-none text-stone-400 hover:text-stone-700 transition-colors"
+                title="Mostrar/Ocultar contraseña"
+              >
+                <span class="material-icons-outlined text-sm select-none" [class.animate-pulse]="showPassword()">
+                  {{ showPassword() ? 'visibility' : 'visibility_off' }}
+                </span>
+              </button>
+            </div>
+          </div>
+          
+        </div>
+
+        <!-- Error -->
+        @if (error()) {
+        <div class="flex items-center justify-center gap-2 p-3.5 rounded-xl bg-red-50 text-red-600 text-sm font-medium animate-shake border border-red-100">
+          <span class="material-icons-outlined text-base">error_outline</span>
+          <span>{{ error() }}</span>
+        </div>
+        }
+
+        <!-- Botón Ingresar -->
+        <button
+          type="submit"
+          [disabled]="isLoggingIn()"
+          class="w-full flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl bg-stone-900 hover:bg-stone-800 text-white font-medium transition-all duration-200 disabled:opacity-70 disabled:cursor-not-allowed shadow-md focus:ring-2 focus:ring-stone-900 focus:ring-offset-2 active:scale-[0.98]"
+        >
+          @if (isLoggingIn()) {
+            <span class="material-icons-outlined text-lg animate-spin">sync</span>
+            <span>Accediendo...</span>
+          } @else {
+            <span>Ingresar al Sistema</span>
+            <span class="material-icons-outlined text-lg ml-1">arrow_forward</span>
+          }
+        </button>
+      </form>
+
+      <p class="text-center text-xs text-stone-400 mt-12 tracking-wide">
+        © 2025 Denraf System. Powered by <span class="text-stone-600 font-medium">Sensei</span>
+      </p>
+    </div>
+  </div>
+</div>

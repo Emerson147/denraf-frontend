@@ -1,0 +1,135 @@
+@if (searchService.isOpen()) {
+  <!-- Backdrop -->
+  <div 
+    class="fixed inset-0 bg-black/30 backdrop-blur-sm z-100 animate-fadeIn"
+    (click)="searchService.close()">
+  </div>
+
+  <!-- Command Palette -->
+  <div class="fixed inset-0 z-101 flex items-start justify-center pt-[20vh] px-4 pointer-events-none">
+    <div 
+      class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl pointer-events-auto animate-slideDown"
+      (click)="$event.stopPropagation()">
+      
+      <!-- Search Input -->
+      <div class="flex items-center gap-3 px-4 py-3 border-b border-stone-200">
+        <span class="material-icons-outlined text-stone-400">search</span>
+        <input
+          #searchInput
+          type="text"
+          [value]="query()"
+          (input)="onSearchInput($event)"
+          placeholder="Buscar productos, clientes, ventas o comandos..."
+          class="flex-1 bg-transparent outline-none text-stone-900 placeholder-stone-400"
+          autocomplete="off"
+          spellcheck="false"
+        />
+        <kbd class="px-2 py-1 text-xs bg-stone-100 text-stone-600 rounded border border-stone-300">
+          Esc
+        </kbd>
+      </div>
+
+      <!-- Results -->
+      <div class="max-h-[400px] overflow-y-auto">
+        @if (searchService.searchResults().length === 0) {
+          <!-- Empty State -->
+          <div class="px-4 py-12 text-center">
+            <span class="material-icons-outlined text-stone-300 text-5xl mb-3">
+              {{ query() ? 'search_off' : 'lightbulb' }}
+            </span>
+            <p class="text-stone-500 text-sm">
+              {{ query() ? 'No se encontraron resultados' : 'Escribe para buscar o usa los comandos rápidos' }}
+            </p>
+          </div>
+        } @else {
+          <!-- Grouped Results -->
+          @for (category of categories; track category.key) {
+            @if (getResultsByCategory(category.key).length > 0) {
+              <div class="px-2 py-2">
+                <div class="px-2 py-1 text-xs font-medium text-stone-500 uppercase tracking-wide">
+                  {{ category.label }}
+                </div>
+                @for (result of getResultsByCategory(category.key); track result.id; let i = $index) {
+                  <button
+                    [class]="getResultClass(result, i)"
+                    (click)="selectResult(result)"
+                    (mouseenter)="hoveredIndex.set(getGlobalIndex(result))">
+                    
+                    <div class="flex items-center gap-3 flex-1 min-w-0">
+                      <!-- Icon -->
+                      <div [class]="getIconClass(result.category)">
+                        <span class="material-icons-outlined text-base">{{ result.icon }}</span>
+                      </div>
+
+                      <!-- Content -->
+                      <div class="flex-1 min-w-0 text-left">
+                        <div class="font-medium text-stone-900 truncate">
+                          {{ result.title }}
+                        </div>
+                        <div class="text-xs text-stone-500 truncate">
+                          {{ result.subtitle }}
+                        </div>
+                      </div>
+
+                      <!-- Metadata -->
+                      @if (result.metadata) {
+                        <div class="flex items-center gap-2 text-xs">
+                          @if (result.metadata.price !== undefined) {
+                            <span class="text-emerald-700 font-medium">
+                              {{ formatPrice(result.metadata.price) }}
+                            </span>
+                          }
+                          @if (result.metadata.stock !== undefined) {
+                            <span class="px-2 py-0.5 bg-stone-100 text-stone-600 rounded">
+                              {{ result.metadata.stock }} unid.
+                            </span>
+                          }
+                          @if (result.metadata.tier) {
+                            <span class="px-2 py-0.5 bg-amber-100 text-amber-700 rounded">
+                              {{ result.metadata.tier }}
+                            </span>
+                          }
+                          @if (result.metadata.total !== undefined) {
+                            <span class="text-emerald-700 font-medium">
+                              {{ formatPrice(result.metadata.total) }}
+                            </span>
+                          }
+                        </div>
+                      }
+                    </div>
+
+                    <!-- Action Hint -->
+                    @if (isSelected(result)) {
+                      <kbd class="px-2 py-1 text-xs bg-stone-100 text-stone-600 rounded border border-stone-300">
+                        ↵
+                      </kbd>
+                    }
+                  </button>
+                }
+              </div>
+            }
+          }
+        }
+      </div>
+
+      <!-- Footer -->
+      @if (searchService.searchResults().length > 0) {
+        <div class="px-4 py-2 border-t border-stone-200 flex items-center gap-4 text-xs text-stone-500">
+          <div class="flex items-center gap-1">
+            <kbd class="px-1.5 py-0.5 bg-stone-100 rounded border border-stone-300">↑</kbd>
+            <kbd class="px-1.5 py-0.5 bg-stone-100 rounded border border-stone-300">↓</kbd>
+            <span>navegar</span>
+          </div>
+          <div class="flex items-center gap-1">
+            <kbd class="px-1.5 py-0.5 bg-stone-100 rounded border border-stone-300">↵</kbd>
+            <span>abrir</span>
+          </div>
+          <div class="flex items-center gap-1">
+            <kbd class="px-1.5 py-0.5 bg-stone-100 rounded border border-stone-300">Esc</kbd>
+            <span>cerrar</span>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+}

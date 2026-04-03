@@ -1,0 +1,570 @@
+<div
+  class="min-h-screen bg-stone-50 dark:bg-stone-950 p-4 sm:p-6 lg:p-8 transition-colors duration-150"
+>
+  <div class="max-w-[1600px] mx-auto space-y-4 sm:space-y-6">
+    <!-- Header Estandarizado con ui-page-header -->
+    <app-ui-page-header
+      title="Historial de Ventas"
+      subtitle="DenRaf · Registro completo de transacciones"
+      materialIcon="analytics"
+    >
+      <app-ui-export-menu [data]="exportData()" type="sales" (pdfExport)="exportToZenPDF()" />
+    </app-ui-page-header>
+
+    <!-- Filtros + Resumen (compacto) -->
+    <div
+      class="bg-white dark:bg-stone-900 rounded-2xl border border-stone-100 dark:border-stone-800 shadow-sm p-4 sm:p-6 space-y-4 transition-colors duration-150"
+    >
+      <!-- Búsqueda -->
+      <div class="relative max-w-md">
+        <span
+          class="absolute left-3 top-1/2 -translate-y-1/2 material-icons-outlined text-stone-400 dark:text-stone-500 text-xl"
+          >search</span
+        >
+        <input
+          #searchInput
+          type="text"
+          placeholder="Buscar por cliente, producto o número..."
+          [value]="searchQuery()"
+          (input)="searchQuery.set($any($event.target).value)"
+          class="w-full pl-10 pr-16 py-2.5 bg-stone-50 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-stone-400 dark:focus:ring-stone-600 focus:border-transparent transition-all duration-150 text-sm text-stone-900 dark:text-stone-100 placeholder:text-stone-500 dark:placeholder:text-stone-400"
+        />
+        <kbd
+          class="hidden md:inline-block absolute right-3 top-1/2 -translate-y-1/2 px-1.5 py-0.5 text-[10px] bg-stone-200 dark:bg-stone-600 text-stone-600 dark:text-stone-300 rounded border border-stone-300 dark:border-stone-500 font-mono font-semibold"
+          >F2</kbd
+        >
+      </div>
+
+      <!-- Filtros por periodo -->
+      <div class="flex flex-wrap gap-2">
+        <button
+          *ngFor="
+            let period of [
+              { value: 'today', label: 'Hoy' },
+              { value: 'week', label: 'Esta semana' },
+              { value: 'month', label: 'Este mes' },
+              { value: 'all', label: 'Todas' }
+            ]
+          "
+          (click)="selectedPeriod.set($any(period.value))"
+          [class.bg-stone-900]="selectedPeriod() === period.value"
+          [class.dark:bg-stone-100]="selectedPeriod() === period.value"
+          [class.text-white]="selectedPeriod() === period.value"
+          [class.dark:text-stone-900]="selectedPeriod() === period.value"
+          [class.bg-stone-100]="selectedPeriod() !== period.value"
+          [class.dark:bg-stone-800]="selectedPeriod() !== period.value"
+          [class.text-stone-600]="selectedPeriod() !== period.value"
+          [class.dark:text-stone-300]="selectedPeriod() !== period.value"
+          class="px-4 py-2 rounded-xl text-sm font-medium transition-all duration-150 ease-out hover:scale-[1.02] active:scale-95"
+        >
+          {{ period.label }}
+        </button>
+
+        <!-- Filtro por vendedor -->
+        <div class="ml-auto relative">
+          <div class="relative">
+            <span
+              class="material-icons-outlined absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 dark:text-stone-500 text-lg pointer-events-none"
+            >
+              person
+            </span>
+            <select
+              [value]="selectedVendor() || ''"
+              (change)="selectedVendor.set($any($event.target).value || null)"
+              class="pl-10 pr-4 py-2 rounded-xl text-sm font-medium bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 border-2 border-stone-200 dark:border-stone-700 focus:outline-none focus:border-stone-900 dark:focus:border-stone-100 transition-all appearance-none cursor-pointer hover:border-stone-400 dark:hover:border-stone-600"
+              style="min-width: 180px"
+            >
+              <option value="">Todos los vendedores</option>
+              <option *ngFor="let user of availableUsers()" [value]="user.id">
+                {{ user.name }}
+              </option>
+            </select>
+            <span
+              class="material-icons-outlined absolute right-2 top-1/2 -translate-y-1/2 text-stone-400 dark:text-stone-500 text-lg pointer-events-none"
+            >
+              expand_more
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Resumen compacto (inline) -->
+      <div
+        class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 border-t border-stone-100 dark:border-stone-800"
+      >
+        <div
+          class="group text-center sm:text-left p-4 rounded-xl hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-all duration-150 ease-out cursor-pointer hover:scale-[1.02]"
+        >
+          <p
+            class="text-xs text-stone-500 dark:text-stone-400 uppercase tracking-wide font-medium mb-1"
+          >
+            Total Ventas
+          </p>
+          <p
+            class="text-2xl font-bold text-stone-900 dark:text-stone-100 group-hover:scale-105 transition-transform duration-150 ease-out transform-gpu"
+          >
+            {{ summary().count }}
+          </p>
+        </div>
+        <div
+          class="group text-center sm:text-left p-4 rounded-xl hover:bg-emerald-50 dark:hover:bg-emerald-950/20 transition-all duration-150 ease-out cursor-pointer hover:scale-[1.02]"
+        >
+          <p
+            class="text-xs text-stone-500 dark:text-stone-400 uppercase tracking-wide font-medium mb-1"
+          >
+            Ingresos
+          </p>
+          <p
+            class="text-2xl font-bold text-amber-600 dark:text-amber-500 group-hover:scale-105 transition-transform duration-150 ease-out transform-gpu"
+          >
+            S/ {{ summary().total | number : '1.2-2' }}
+          </p>
+        </div>
+        <div
+          class="group text-center sm:text-left p-4 rounded-xl hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-all duration-150 ease-out cursor-pointer hover:scale-[1.02]"
+        >
+          <p
+            class="text-xs text-stone-500 dark:text-stone-400 uppercase tracking-wide font-medium mb-1"
+          >
+            Ticket Promedio
+          </p>
+          <p
+            class="text-2xl font-bold text-stone-900 dark:text-stone-100 group-hover:scale-105 transition-transform duration-150 ease-out transform-gpu"
+          >
+            S/ {{ summary().average | number : '1.2-2' }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lista de ventas -->
+    <div
+      class="bg-white dark:bg-stone-900 rounded-2xl border border-stone-100 dark:border-stone-800 shadow-sm overflow-hidden transition-colors duration-150"
+    >
+      @if (filteredSales().length === 0) {
+      <app-ui-empty-state
+        icon="receipt_long"
+        title="No hay ventas registradas"
+        description="Las ventas aparecerán aquí una vez que realices transacciones"
+      />
+      } @else {
+      <!-- Tabla responsive -->
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead
+            class="bg-stone-50 dark:bg-stone-950/50 border-b border-stone-100 dark:border-stone-800"
+          >
+            <tr>
+              <th
+                class="px-4 sm:px-6 py-4 text-left text-xs font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider"
+              >
+                Venta
+              </th>
+              <th
+                class="px-4 sm:px-6 py-4 text-left text-xs font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider"
+              >
+                Fecha
+              </th>
+              <th
+                class="px-4 sm:px-6 py-4 text-left text-xs font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider hidden sm:table-cell"
+              >
+                Cliente
+              </th>
+              <th
+                class="px-4 sm:px-6 py-4 text-left text-xs font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider"
+              >
+                Productos
+              </th>
+              <th
+                class="px-4 sm:px-6 py-4 text-left text-xs font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider hidden md:table-cell"
+              >
+                Pago
+              </th>
+              <th
+                class="px-4 sm:px-6 py-4 text-right text-xs font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider"
+              >
+                Total
+              </th>
+              <th
+                class="px-4 sm:px-6 py-4 text-center text-xs font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider hidden lg:table-cell"
+              >
+                Estado
+              </th>
+              <th
+                class="px-4 sm:px-6 py-4 text-center text-xs font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider"
+              >
+                Acción
+              </th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-stone-100 dark:divide-stone-800">
+            @for (sale of filteredSales(); track sale.id) {
+            <tr
+              class="hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-all duration-150 ease-out"
+            >
+              <!-- Número de venta -->
+              <td class="px-4 sm:px-6 py-4">
+                <div class="flex items-center gap-2">
+                  <span class="material-icons-outlined text-stone-400 dark:text-stone-500 text-lg"
+                    >receipt</span
+                  >
+                  <span class="text-sm font-medium text-stone-900 dark:text-stone-100">{{
+                    sale.saleNumber
+                  }}</span>
+                  <!-- Badge vendedor -->
+                  <div
+                    class="h-6 w-6 rounded-full flex items-center justify-center text-[10px] font-bold"
+                    [class]="getVendorColor(sale.vendedorId)"
+                    [title]="getVendorName(sale.vendedorId)"
+                  >
+                    {{ getVendorInitial(sale.vendedorId) }}
+                  </div>
+                </div>
+              </td>
+
+              <!-- Fecha -->
+              <td class="px-4 sm:px-6 py-4 text-sm text-stone-600 dark:text-stone-400">
+                {{ sale.date | date : 'dd/MM/yy, h:mm a' }}
+              </td>
+
+              <!-- Cliente -->
+              <td
+                class="px-4 sm:px-6 py-4 text-sm text-stone-600 dark:text-stone-400 hidden sm:table-cell"
+              >
+                {{ sale.customer?.name || 'Cliente casual' }}
+              </td>
+
+              <!-- Productos -->
+              <td class="px-4 sm:px-6 py-4">
+                <div class="flex flex-col gap-1">
+                  @for (item of (sale.items || []).slice(0, 2); track item.productId) {
+                  <span class="text-xs text-stone-600 dark:text-stone-400"
+                    >{{ item.quantity }}x {{ item.productName }}</span
+                  >
+                  } @if ((sale.items.length || 0) > 2) {
+                  <span class="text-xs text-stone-400 dark:text-stone-500"
+                    >+{{ (sale.items.length || 0) - 2 }} más</span
+                  >
+                  }
+                </div>
+              </td>
+
+              <!-- Método de pago -->
+              <td
+                class="px-4 sm:px-6 py-4 text-sm text-stone-600 dark:text-stone-400 hidden md:table-cell"
+              >
+                {{ getPaymentMethodLabel(sale.paymentMethod) }}
+              </td>
+
+              <!-- Total -->
+              <td class="px-4 sm:px-6 py-4 text-right">
+                <span class="text-sm font-bold text-stone-900 dark:text-stone-100"
+                  >S/ {{ sale.total | number : '1.2-2' }}</span
+                >
+              </td>
+
+              <!-- Estado -->
+              <td class="px-4 sm:px-6 py-4 text-center hidden lg:table-cell">
+                <span
+                  class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium"
+                  [class]="getStatusBadge(sale.status).class"
+                >
+                  {{ getStatusBadge(sale.status).label }}
+                </span>
+              </td>
+
+              <!-- Acciones -->
+              <td class="px-4 sm:px-6 py-4 text-center">
+                <div class="flex items-center justify-center gap-1">
+                  <!-- Ver detalles -->
+                  <button
+                    (click)="viewSaleDetails(sale)"
+                    class="group inline-flex items-center justify-center h-8 w-8 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 transition-all duration-150 ease-out hover:scale-110 active:scale-95"
+                    title="Ver detalles"
+                  >
+                    <span class="material-icons-outlined text-lg">visibility</span>
+                  </button>
+
+                  <!-- Reimprimir ticket -->
+                  <button
+                    (click)="reprintTicket(sale)"
+                    class="group inline-flex items-center justify-center h-8 w-8 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/30 text-stone-600 dark:text-stone-400 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-150 ease-out hover:scale-110 active:scale-95"
+                    title="Reimprimir ticket"
+                  >
+                    <span class="material-icons-outlined text-lg">print</span>
+                  </button>
+
+                  <!-- Anular venta (solo si no está cancelada) -->
+                  @if (sale.status !== 'cancelled') {
+                  <button
+                    (click)="openCancelModal(sale)"
+                    class="group inline-flex items-center justify-center h-8 w-8 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/30 text-stone-600 dark:text-stone-400 hover:text-red-600 dark:hover:text-red-400 transition-all duration-150 ease-out hover:scale-110 active:scale-95"
+                    title="Anular venta"
+                  >
+                    <span class="material-icons-outlined text-lg">cancel</span>
+                  </button>
+                  }
+                </div>
+              </td>
+            </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      }
+    </div>
+
+    <!-- Modal de detalles (si hay venta seleccionada) -->
+    @if (selectedSale()) {
+    <div
+      class="fixed inset-0 bg-stone-900/40 dark:bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200"
+      (click)="closeDetails()"
+    >
+      <div
+        class="bg-white dark:bg-stone-900 rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-200"
+        (click)="$event.stopPropagation()"
+      >
+        <!-- Header del modal -->
+        <div
+          class="sticky top-0 bg-white dark:bg-stone-900 border-b border-stone-100 dark:border-stone-800 p-6 flex items-center justify-between"
+        >
+          <div>
+            <h3 class="text-xl font-bold text-stone-900 dark:text-stone-100">
+              {{ selectedSale()!.saleNumber }}
+            </h3>
+            <p class="text-sm text-stone-500 dark:text-stone-400">
+              {{ selectedSale()!.date | date : 'medium' }}
+            </p>
+          </div>
+          <button
+            (click)="closeDetails()"
+            class="h-10 w-10 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 flex items-center justify-center text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 transition-all duration-150"
+          >
+            <span class="material-icons-outlined">close</span>
+          </button>
+        </div>
+
+        <!-- Contenido del modal -->
+        <div class="p-6 space-y-6">
+          <!-- Cliente -->
+          @if (selectedSale()!.customer) {
+          <div>
+            <p
+              class="text-xs text-stone-500 dark:text-stone-400 uppercase tracking-wide font-medium mb-2"
+            >
+              Cliente
+            </p>
+            <p class="text-sm font-medium text-stone-900 dark:text-stone-100">
+              {{ selectedSale()!.customer!.name }}
+            </p>
+            @if (selectedSale()!.customer!.phone) {
+            <p class="text-sm text-stone-600 dark:text-stone-400">
+              {{ selectedSale()!.customer!.phone }}
+            </p>
+            }
+          </div>
+          }
+
+          <!-- Productos -->
+          <div>
+            <p
+              class="text-xs text-stone-500 dark:text-stone-400 uppercase tracking-wide font-medium mb-3"
+            >
+              Productos
+            </p>
+            <div class="space-y-2">
+              @for (item of (selectedSale()!.items || []); track item.productId) {
+              <div
+                class="flex items-center justify-between py-2 border-b border-stone-100 dark:border-stone-800"
+              >
+                <div class="flex-1">
+                  <p class="text-sm font-medium text-stone-900 dark:text-stone-100">
+                    {{ item.productName }}
+                  </p>
+                  <p class="text-xs text-stone-500 dark:text-stone-400">
+                    Talla: {{ item.size }} • Cantidad: {{ item.quantity }}
+                  </p>
+                </div>
+                <p class="text-sm font-bold text-stone-900 dark:text-stone-100">
+                  S/ {{ item.subtotal | number : '1.2-2' }}
+                </p>
+              </div>
+              }
+            </div>
+          </div>
+
+          <!-- Totales -->
+          <div class="bg-stone-50 dark:bg-stone-950/50 rounded-xl p-4 space-y-2">
+            <div class="flex justify-between text-sm">
+              <span class="text-stone-600 dark:text-stone-400">Subtotal</span>
+              <span class="font-medium text-stone-900 dark:text-stone-100"
+                >S/ {{ selectedSale()!.subtotal | number : '1.2-2' }}</span
+              >
+            </div>
+            @if (selectedSale()!.discount > 0) {
+            <div class="flex justify-between text-sm">
+              <span class="text-stone-600 dark:text-stone-400">Descuento</span>
+              <span class="font-medium text-rose-600 dark:text-rose-400"
+                >-S/ {{ selectedSale()!.discount | number : '1.2-2' }}</span
+              >
+            </div>
+            }
+            <div
+              class="flex justify-between text-base font-bold pt-2 border-t border-stone-200 dark:border-stone-800"
+            >
+              <span class="text-stone-900 dark:text-stone-100">Total</span>
+              <span class="text-amber-600 dark:text-amber-500"
+                >S/ {{ selectedSale()!.total | number : '1.2-2' }}</span
+              >
+            </div>
+          </div>
+
+          <!-- Método de pago -->
+          <div class="flex items-center justify-between">
+            <p
+              class="text-xs text-stone-500 dark:text-stone-400 uppercase tracking-wide font-medium"
+            >
+              Método de pago
+            </p>
+            <span
+              class="px-3 py-1 bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 rounded-full text-sm font-medium"
+            >
+              {{ getPaymentMethodLabel(selectedSale()!.paymentMethod) }}
+            </span>
+          </div>
+
+          <!-- Notas -->
+          @if (selectedSale()!.notes) {
+          <div>
+            <p
+              class="text-xs text-stone-500 dark:text-stone-400 uppercase tracking-wide font-medium mb-2"
+            >
+              Notas
+            </p>
+            <p class="text-sm text-stone-600 dark:text-stone-400">{{ selectedSale()!.notes }}</p>
+          </div>
+          }
+        </div>
+      </div>
+    </div>
+    }
+
+    <!-- 🎫 Modal de Anulación de Venta -->
+    @if (cancelModalOpen()) {
+    <div
+      class="fixed inset-0 bg-stone-900/40 dark:bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200"
+      (click)="closeCancelModal()"
+    >
+      <div
+        class="bg-white dark:bg-stone-900 rounded-2xl shadow-2xl max-w-md w-full animate-in zoom-in-95 duration-200"
+        (click)="$event.stopPropagation()"
+      >
+        <!-- Header -->
+        <div class="p-6 border-b border-stone-100 dark:border-stone-800">
+          <div class="flex items-center gap-3">
+            <div
+              class="w-12 h-12 rounded-xl bg-red-100 dark:bg-red-900/40 flex items-center justify-center"
+            >
+              <span class="material-icons-outlined text-2xl text-red-600 dark:text-red-400"
+                >cancel</span
+              >
+            </div>
+            <div>
+              <h3 class="text-lg font-bold text-stone-900 dark:text-stone-100">Anular Venta</h3>
+              <p class="text-sm text-stone-500 dark:text-stone-400">
+                {{ saleToCancel()?.saleNumber }}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Contenido -->
+        <div class="p-6 space-y-4">
+          <div
+            class="p-4 bg-amber-50 dark:bg-amber-900/20 rounded-xl border border-amber-200 dark:border-amber-800"
+          >
+            <p
+              class="text-sm text-amber-800 dark:text-amber-300 font-medium flex items-center gap-2"
+            >
+              <span class="material-icons-outlined text-lg">warning</span>
+              Esta acción no se puede deshacer
+            </p>
+          </div>
+
+          <!-- Motivo de anulación -->
+          <div>
+            <label class="block text-xs font-medium text-stone-700 dark:text-stone-300 mb-2"
+              >Motivo de anulación</label
+            >
+            <select
+              [value]="cancelReason()"
+              (change)="cancelReason.set($any($event.target).value)"
+              class="w-full px-3 py-2.5 bg-stone-50 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-stone-400 dark:focus:ring-stone-600 text-sm text-stone-900 dark:text-stone-100 transition-all duration-150"
+            >
+              <option value="">Seleccionar motivo...</option>
+              <option value="Error en productos">Error en productos</option>
+              <option value="Cliente canceló compra">Cliente canceló compra</option>
+              <option value="Producto defectuoso">Producto defectuoso</option>
+              <option value="Error de precio">Error de precio</option>
+              <option value="Devolución">Devolución</option>
+              <option value="Otro">Otro</option>
+            </select>
+          </div>
+
+          <!-- Restaurar stock -->
+          <label
+            class="flex items-center gap-3 p-3 bg-stone-50 dark:bg-stone-800 rounded-xl cursor-pointer hover:bg-stone-100 dark:hover:bg-stone-700 transition-colors duration-150"
+          >
+            <input
+              type="checkbox"
+              [checked]="restoreStock()"
+              (change)="restoreStock.set($any($event.target).checked)"
+              class="w-5 h-5 rounded border-stone-300 dark:border-stone-600 text-emerald-600 focus:ring-emerald-500"
+            />
+            <div>
+              <p class="text-sm font-medium text-stone-900 dark:text-stone-100">Restaurar stock</p>
+              <p class="text-xs text-stone-500 dark:text-stone-400">
+                Devolver productos al inventario
+              </p>
+            </div>
+          </label>
+        </div>
+
+        <!-- Acciones -->
+        <div class="p-6 border-t border-stone-100 dark:border-stone-800 flex gap-3">
+          <button
+            (click)="closeCancelModal()"
+            class="flex-1 py-2.5 px-4 text-sm font-medium text-stone-700 dark:text-stone-300 bg-stone-100 dark:bg-stone-800 hover:bg-stone-200 dark:hover:bg-stone-700 rounded-xl transition-all duration-150"
+          >
+            Cancelar
+          </button>
+          <button
+            (click)="confirmCancelSale()"
+            [disabled]="!cancelReason()"
+            class="flex-1 py-2.5 px-4 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-xl transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          >
+            <span class="material-icons-outlined text-lg">delete_forever</span>
+            Anular Venta
+          </button>
+        </div>
+      </div>
+    </div>
+    }
+
+    <!-- 🖨️ Modal de Reimprimir Ticket -->
+    @if (showTicketModal() && ticketSale()) {
+    <app-ui-ticket
+      [isOpen]="showTicketModal()"
+      [items]="getTicketItems(ticketSale()!)"
+      [total]="ticketSale()!.total"
+      [ticketNumber]="getTicketNumber(ticketSale()!.saleNumber)"
+      [clientName]="ticketSale()!.customer?.name || 'Cliente'"
+      [clientPhone]="ticketSale()!.customer?.phone || ''"
+      [paymentMethod]="getPaymentMethodLabel(ticketSale()!.paymentMethod)"
+      [amountPaid]="ticketSale()!.total"
+      (closeTicket)="closeTicketModal()"
+      (ticketPrinted)="closeTicketModal()"
+    ></app-ui-ticket>
+    }
+  </div>
+</div>

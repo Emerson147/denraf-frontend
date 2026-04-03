@@ -1,0 +1,77 @@
+<div class="relative">
+  <!-- Botón Export -->
+  <button
+    type="button"
+    (click)="toggleDropdown()"
+    [class]="mini 
+      ? 'h-9 w-9 rounded-xl hover:bg-white/60 dark:hover:bg-stone-800/60 flex items-center justify-center text-stone-600 dark:text-stone-300 hover:text-stone-800 dark:hover:text-stone-100 transition-all'
+      : 'inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 hover:bg-stone-800 dark:hover:bg-stone-200 transition-all shadow-sm hover:shadow-md'"
+    [class.bg-white/80]="isOpen() && mini && !isDarkMode()"
+    [class.dark:bg-stone-800/80]="isOpen() && mini && isDarkMode()"
+  >
+    <span class="material-icons-outlined" [class.text-[19px]]="mini" [class.text-xl]="!mini">
+      file_download
+    </span>
+    @if (!mini) {
+      <span class="text-sm font-medium">Exportar</span>
+    }
+  </button>
+
+  <!-- Dropdown Menu -->
+  @if (isOpen()) {
+    <div 
+      class="absolute right-0 top-full mt-2 w-[calc(100vw-2rem)] sm:w-64 max-w-sm rounded-2xl shadow-2xl border z-50 animate-slideDown transition-colors duration-100"
+      [ngStyle]="{
+        'background': isDarkMode() ? 'rgba(28, 25, 23, 0.95)' : 'rgba(255, 255, 255, 0.95)',
+        'backdrop-filter': 'blur(20px) saturate(180%)',
+        '-webkit-backdrop-filter': 'blur(20px) saturate(180%)',
+        'border': isDarkMode() ? '1px solid rgba(68, 64, 60, 0.3)' : '1px solid rgba(209, 213, 219, 0.3)'
+      }"
+      appClickOutside
+      (clickOutside)="closeDropdown()"
+    >
+      <!-- Header -->
+      <div class="px-4 py-3 border-b border-stone-200/60 dark:border-stone-700/60">
+        <h3 class="font-semibold text-stone-900 dark:text-stone-100 text-sm">Exportar datos</h3>
+        <p class="text-xs text-stone-500 dark:text-stone-400 mt-0.5">Selecciona un formato</p>
+      </div>
+
+      <!-- Options -->
+      <div class="p-2">
+        @for (option of exportOptions; track option.id) {
+          <button
+            type="button"
+            (click)="handleExport(option)"
+            class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-stone-100/80 dark:hover:bg-stone-800/80 transition-all group"
+          >
+            <!-- Icon -->
+            <div class="h-9 w-9 rounded-lg bg-stone-100 dark:bg-stone-800 group-hover:bg-stone-900 dark:group-hover:bg-stone-100 flex items-center justify-center transition-colors shrink-0">
+              <span class="material-icons-outlined text-lg text-stone-600 dark:text-stone-300 group-hover:text-white dark:group-hover:text-stone-900 transition-colors">
+                {{ option.icon }}
+              </span>
+            </div>
+
+            <!-- Text -->
+            <div class="flex-1 text-left">
+              <p class="text-sm font-semibold text-stone-900 dark:text-stone-100">{{ option.label }}</p>
+              <p class="text-xs text-stone-500 dark:text-stone-400">{{ option.description }}</p>
+            </div>
+
+            <!-- Arrow -->
+            <span class="material-icons-outlined text-stone-400 dark:text-stone-500 group-hover:text-stone-600 dark:group-hover:text-stone-300 transition-colors text-lg">
+              arrow_forward
+            </span>
+          </button>
+        }
+      </div>
+
+      <!-- Footer -->
+      <div class="px-4 py-3 border-t border-stone-200/60 dark:border-stone-700/60 bg-stone-50/50 dark:bg-stone-950/50">
+        <p class="text-xs text-stone-400 dark:text-stone-500 flex items-center gap-1">
+          <span class="material-icons-outlined text-sm">info</span>
+          <span>{{ data.length }} registros disponibles</span>
+        </p>
+      </div>
+    </div>
+  }
+</div>

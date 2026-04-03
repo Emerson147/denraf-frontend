@@ -1,0 +1,80 @@
+{
+  "$schema": "./node_modules/@angular/service-worker/config/schema.json",
+  "index": "/index.html",
+  "assetGroups": [
+    {
+      "name": "app",
+      "installMode": "prefetch",
+      "resources": {
+        "files": [
+          "/favicon.ico",
+          "/index.csr.html",
+          "/index.html",
+          "/manifest.webmanifest",
+          "/*.css",
+          "/*.js"
+        ]
+      }
+    },
+    {
+      "name": "assets",
+      "installMode": "lazy",
+      "updateMode": "prefetch",
+      "resources": {
+        "files": [
+          "/**/*.(svg|cur|jpg|jpeg|png|apng|webp|avif|gif|otf|ttf|woff|woff2)"
+        ]
+      },
+      "cacheConfig": {
+        "maxSize": 500,
+        "maxAge": "7d"
+      }
+    }
+  ],
+  "dataGroups": [
+    {
+      "name": "api-freshness",
+      "urls": [
+        "/api/sales/**",
+        "/api/inventory/**",
+        "/api/clients/**",
+        "/api/reports/**",
+        "https://*.supabase.co/rest/v1/sales*",
+        "https://*.supabase.co/rest/v1/inventory*"
+      ],
+      "cacheConfig": {
+        "maxSize": 200,
+        "maxAge": "30m",
+        "timeout": "3s",
+        "strategy": "freshness"
+      }
+    },
+    {
+      "name": "api-performance",
+      "urls": [
+        "/api/products/**",
+        "/api/categories/**",
+        "/api/settings/**",
+        "https://*.supabase.co/rest/v1/products*",
+        "https://*.supabase.co/rest/v1/categories*"
+      ],
+      "cacheConfig": {
+        "maxSize": 100,
+        "maxAge": "24h",
+        "timeout": "2s",
+        "strategy": "performance"
+      }
+    },
+    {
+      "name": "cloudinary-images",
+      "urls": [
+        "https://res.cloudinary.com/**"
+      ],
+      "cacheConfig": {
+        "maxSize": 500,
+        "maxAge": "30d",
+        "strategy": "performance"
+      }
+    }
+  ]
+}

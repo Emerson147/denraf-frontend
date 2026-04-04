@@ -72,6 +72,7 @@ export class PosPageComponent {
   toastMessage = signal('');
   toastIcon = signal('check_circle');
   showMobileCart = signal(false); // 📱 Control del bottom sheet móvil
+  showClearConfirm = signal(false); // 🗑️ Confirmación para vaciar
 
   // 🎯 Tipo de venta (auto-detectado por día)
   saleType = signal<'feria-acobamba' | 'feria-paucara' | 'tienda'>('tienda');
@@ -459,10 +460,17 @@ export class PosPageComponent {
   }
 
   clearCart() {
-    if (confirm('¿Estás seguro de vaciar el carrito?')) {
-      this.cart.set([]);
-      this.toastService.info('Carrito vaciado');
-    }
+    this.showClearConfirm.set(true); // Levanta el modal tipo Zen
+  }
+
+  confirmClearCart() {
+    this.cart.set([]);
+    this.showClearConfirm.set(false);
+    this.toastService.info('Carrito vaciado exitosamente');
+  }
+
+  cancelClearCart() {
+    this.showClearConfirm.set(false);
   }
 
   clearFilters() {

@@ -718,3 +718,41 @@
         </div>
       }
     </app-ui-animated-dialog>
+
+    <!-- Modal Confirmador de Limpieza de Carrito (Zen Style) -->
+    <app-ui-animated-dialog 
+      [isOpen]="showClearConfirm()" 
+      (isOpenChange)="showClearConfirm.set($event)"
+      [maxWidth]="'sm'"
+    >
+      <div class="space-y-6 text-center">
+        <!-- Ícono Destacado -->
+        <div class="mx-auto h-20 w-20 rounded-full bg-red-50 dark:bg-red-900/20 flex items-center justify-center border border-red-100 dark:border-red-900/50 shadow-sm">
+          <span class="material-icons-outlined text-4xl text-red-500">remove_shopping_cart</span>
+        </div>
+        
+        <!-- Texto Moderno -->
+        <div class="space-y-2">
+          <h3 class="text-xl font-bold text-stone-900 dark:text-stone-100">¿Vaciar carrito?</h3>
+          <p class="text-sm text-stone-500 dark:text-stone-400 max-w-[250px] mx-auto">
+            Esta acción removerá los <strong class="text-stone-700 dark:text-stone-300">{{ cart().length }} artículos</strong> puestos en la bandeja.
+          </p>
+        </div>
+
+        <!-- Botones Bento -->
+        <div class="grid grid-cols-2 gap-3 pt-2">
+          <button 
+            (click)="cancelClearCart()"
+            class="py-3.5 rounded-xl font-bold text-sm bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-stone-700 transition-all active:scale-95"
+          >
+            Cancelar
+          </button>
+          <button 
+            (click)="confirmClearCart()"
+            class="py-3.5 rounded-xl font-bold text-sm bg-red-500 text-white hover:bg-red-600 shadow-md shadow-red-500/20 transition-all active:scale-95"
+          >
+            Sí, Vaciar
+          </button>
+        </div>
+      </div>
+    </app-ui-animated-dialog>

@@ -1,5 +1,8 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
-import { Sale, SaleItem, Customer } from '../models';
+import { Sale, SaleItem, Customer, VentaRequest, VentaResponse } from '../models';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
+import { firstValueFrom } from 'rxjs';
 import { NotificationService } from './notification.service';
 import { ToastService } from './toast.service';
 import { ProductService } from './product.service';
@@ -21,6 +24,8 @@ export class SalesService {
   private errorHandler = inject(ErrorHandlerService);
   private syncService = inject(SyncService);
   private localDb = inject(LocalDbService);
+  private http = inject(HttpClient);
+  private apiUrl = `${environment.apiUrl}/ventas`;
 
   // Estado de ventas
   private salesSignal = signal<Sale[]>([]);
@@ -352,6 +357,25 @@ export class SalesService {
       'Registro de venta',
       'No se pudo completar la venta'
     );
+  }
+
+  // ✅ NUEVO METODO PARA ENVIAR AL BACKEND SPRING BOOT
+  async createVenta(request: VentaRequest): Promise<VentaResponse> {
+    try {
+      this.isLoading.set(true);
+      const req = this.http.post<VentaResponse>(this.apiUrl, request);
+      const res = await firstValueFrom(req);
+      
+      this.toastService.success(`✅ Venta HTTP registrada en Spring Boot con ID: ${res.saleNumber}`);
+      
+      return res;
+    } catch (error) {
+      console.error('Error enviando venta al backend:', error);
+      this.toastService.error('Error registrando venta HTTP en backend');
+      throw error;
+    } finally {
+      this.isLoading.set(false);
+    }
   }
 
   // 🔧 Respaldo síncrono de ventas pendientes (localStorage)

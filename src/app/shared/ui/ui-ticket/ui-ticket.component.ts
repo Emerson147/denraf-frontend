@@ -24,161 +24,180 @@ export interface CartItem {
         (keydown.escape)="close()"
       >
         
-        <!-- Backdrop suave y zen -->
+        <!-- Backdrop Glassmorphism Bento -->
         <div 
-          class="absolute inset-0 bg-stone-900/40 backdrop-blur-[2px] transition-all duration-300" 
+          class="absolute inset-0 bg-stone-900/40 dark:bg-black/60 backdrop-blur-md transition-all duration-500" 
           (click)="close()"
         ></div>
 
         <!-- Toast de éxito -->
         @if (showSuccess) {
-          <div class="fixed top-6 right-6 bg-green-600 text-white px-5 py-3 rounded-xl shadow-2xl animate-in slide-in-from-top-2 text-sm font-medium flex items-center gap-2 z-70">
+          <div class="fixed top-6 right-6 bg-emerald-500/90 backdrop-blur-sm text-white px-5 py-3 rounded-2xl shadow-2xl animate-in slide-in-from-top-2 text-sm font-bold flex items-center gap-2 z-70 border border-emerald-400">
             <span class="material-icons-outlined text-lg">check_circle</span>
             {{ successMessage }}
           </div>
         }
 
-        <!-- Ticket Container -->
-        <div class="relative z-10 w-full max-w-sm bg-white shadow-2xl animate-print-in overflow-hidden ticket-shape">
+        <!-- Ticket Container Zen Bento con fusión de Papel Térmico Elegante -->
+        <div class="relative z-10 w-full max-w-[380px] bg-white dark:bg-stone-900 shadow-2xl shadow-stone-900/30 animate-print-in overflow-hidden ticket-shape border border-stone-200 dark:border-stone-800">
             
-            <!-- Header -->
-            <div class="p-8 pb-4 text-center border-b-2 border-dashed border-stone-200">
-                <div class="mx-auto h-14 w-14 bg-stone-900 text-white rounded-full flex items-center justify-center mb-3 text-2xl font-serif italic shadow-md">D</div>
-                <h2 class="text-xl font-bold text-stone-900 uppercase tracking-widest">DENFAR</h2>
-                <p class="text-xs text-stone-500 font-mono mt-1">RUC: 20123456789</p>
-                <p class="text-xs text-stone-500 font-mono">Jr. La Moda 123, Huancayo</p>
-                <p class="text-xs text-stone-400 font-mono mt-2">{{ date | date:'dd/MM/yyyy HH:mm' }}</p>
-                <p class="text-xs text-stone-600 font-bold font-mono mt-1">Ticket #{{ ticketNumber.toString().padStart(6, '0') }}</p>
+            <!-- Botón X Elegante para Cancelar -->
+            <button 
+                (click)="cancel()"
+                class="absolute top-4 right-4 z-50 w-8 h-8 flex items-center justify-center rounded-full bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700 text-stone-500 hover:text-stone-800 dark:text-stone-400 dark:hover:text-stone-100 transition-colors shadow-sm no-print"
+                aria-label="Cancelar venta"
+            >
+                <span class="material-icons-outlined text-sm font-bold">close</span>
+            </button>
+
+            <!-- Header Glow -->
+            <div class="p-6 text-center border-b border-stone-200/50 dark:border-stone-800/50 relative overflow-hidden">
+                <div class="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-32 bg-stone-500/10 blur-3xl rounded-full"></div>
+                <div class="relative z-10">
+                  <div class="mx-auto h-12 w-12 bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 rounded-[1rem] flex items-center justify-center mb-3 text-xl font-serif italic shadow-md">D</div>
+                  <h2 class="text-xl font-black text-stone-900 dark:text-stone-100 uppercase tracking-widest">DENFAR</h2>
+                  <p class="text-[10px] text-stone-500 font-mono mt-1 tracking-wider">RUC: 20123456789</p>
+                  <p class="text-[10px] text-stone-500 font-mono tracking-wider">Jr. La Moda 123, Huancayo</p>
+                  <div class="mt-4 inline-flex items-center gap-2 px-3 py-1.5 bg-stone-100/50 dark:bg-stone-800/50 rounded-lg">
+                    <span class="text-xs text-stone-900 dark:text-stone-100 font-bold font-mono">#{{ ticketNumber.toString().padStart(6, '0') }}</span>
+                    <span class="w-1 h-1 rounded-full bg-stone-300"></span>
+                    <span class="text-[10px] text-stone-500 font-medium">{{ date | date:'dd/MM HH:mm' }}</span>
+                  </div>
+                </div>
             </div>
 
             <!-- Cliente -->
             @if (clientName !== 'Cliente') {
-              <div class="px-8 pt-4 pb-2 border-b border-stone-100">
-                <p class="text-xs text-stone-400 uppercase tracking-wide">Cliente</p>
-                <p class="text-sm font-bold text-stone-900 font-mono">{{ clientName }}</p>
+              <div class="px-6 py-4 border-b border-stone-200/50 dark:border-stone-800/50 bg-stone-50/30 dark:bg-stone-950/30">
+                <p class="text-[10px] text-stone-400 uppercase tracking-widest mb-1">Cliente</p>
+                <p class="text-sm font-bold text-stone-900 dark:text-stone-100 flex items-center gap-2">
+                  <span class="material-icons-outlined text-[16px] text-stone-400">person</span>
+                  {{ clientName }}
+                </p>
                 @if (clientPhone) {
-                  <p class="text-xs text-stone-500 font-mono">{{ clientPhone }}</p>
+                  <p class="text-xs text-stone-500 mt-0.5 ml-6">{{ clientPhone }}</p>
                 }
               </div>
             }
 
             <!-- Items -->
-            <div class="p-8 py-6 font-mono text-sm space-y-3">
-                
+            <div class="p-6 font-mono text-sm space-y-4 max-h-[35vh] overflow-y-auto no-scrollbar">
                 @for (item of items; track item.product.id) {
-                    <div class="space-y-1">
+                    <div class="flex flex-col gap-1 bg-white/40 dark:bg-stone-800/40 border border-stone-100 dark:border-stone-700/50 p-3 rounded-2xl">
                         <div class="flex justify-between items-start">
-                            <div class="flex gap-2 flex-1">
-                                <span class="font-bold text-stone-900">{{ item.quantity }}x</span>
+                            <div class="flex gap-2 flex-1 items-start">
+                                <span class="bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 rounded-md px-1.5 py-0.5 text-[10px] font-bold shrink-0 mt-0.5">{{ item.quantity }}x</span>
                                 <div class="flex-1">
-                                    <span class="text-stone-700 uppercase text-xs leading-tight block">{{ item.product.name }}</span>
+                                    <span class="text-stone-900 dark:text-stone-100 font-medium text-xs leading-tight block uppercase">{{ item.product.name }}</span>
                                     @if (item.product.category) {
-                                        <span class="text-[10px] text-stone-400">{{ item.product.category }}</span>
+                                        <span class="text-[9px] text-stone-400 tracking-wider">{{ item.product.category }}</span>
                                     }
                                 </div>
                             </div>
-                            <span class="text-stone-900 font-bold whitespace-nowrap ml-2">
+                            <span class="text-stone-900 dark:text-stone-100 font-bold ml-2">
                                 {{ (item.product.price * item.quantity) | number:'1.2-2' }}
                             </span>
                         </div>
-                        <div class="flex justify-between text-[10px] text-stone-400 ml-6">
-                            <span>S/ {{ item.product.price | number:'1.2-2' }} c/u</span>
-                        </div>
                     </div>
                 }
+            </div>
 
-                <!-- Totales -->
-                <div class="border-t-2 border-dashed border-stone-200 my-4 pt-4 space-y-1">
-                    <div class="flex justify-between text-xs text-stone-600">
+            <!-- Totales -->
+            <div class="px-6 pb-2">
+                <div class="border-t border-dashed border-stone-300 dark:border-stone-700 pt-4 space-y-1.5">
+                    <div class="flex justify-between text-xs text-stone-500 dark:text-stone-400 font-medium font-sans">
                         <span>Subtotal</span>
-                        <span>S/ {{ subtotal | number:'1.2-2' }}</span>
+                        <span class="font-mono">S/ {{ subtotal | number:'1.2-2' }}</span>
                     </div>
-                    <div class="flex justify-between text-xs text-stone-600">
+                    <div class="flex justify-between text-xs text-stone-500 dark:text-stone-400 font-medium font-sans">
                         <span>IGV (18%)</span>
-                        <span>S/ {{ tax | number:'1.2-2' }}</span>
+                        <span class="font-mono">S/ {{ tax | number:'1.2-2' }}</span>
                     </div>
-                    <div class="flex justify-between text-base font-bold text-stone-900 pt-2 border-t border-stone-200">
-                        <span>TOTAL</span>
+                    <div class="flex justify-between items-center text-xl font-bold text-stone-900 dark:text-stone-100 pt-3 mt-1 border-t border-stone-200/50 dark:border-stone-800/50">
+                        <span class="font-sans">TOTAL</span>
                         <span>S/ {{ total | number:'1.2-2' }}</span>
                     </div>
 
                     <!-- Método de pago y cambio -->
                     @if (paymentMethod && amountPaid > 0) {
-                      <div class="mt-3 pt-3 border-t border-stone-200 space-y-1 text-xs">
-                        <div class="flex justify-between text-stone-600">
-                          <span>Método de pago</span>
-                          <span class="font-bold">{{ paymentMethod }}</span>
-                        </div>
-                        <div class="flex justify-between text-stone-600">
-                          <span>Recibido</span>
-                          <span>S/ {{ amountPaid | number:'1.2-2' }}</span>
+                      <div class="bg-stone-50 dark:bg-stone-800/50 rounded-xl p-3 mt-4 mb-2 space-y-1.5 font-sans">
+                        <div class="flex justify-between text-[11px] text-stone-500 dark:text-stone-400">
+                          <span>Pago vía {{ paymentMethod }}</span>
+                          <span class="font-mono font-medium text-stone-900 dark:text-stone-100">S/ {{ amountPaid | number:'1.2-2' }}</span>
                         </div>
                         @if (change > 0) {
-                          <div class="flex justify-between text-stone-900 font-bold">
-                            <span>Cambio</span>
-                            <span>S/ {{ change | number:'1.2-2' }}</span>
+                          <div class="flex justify-between text-xs font-bold text-stone-900 dark:text-stone-100 pt-1.5 border-t border-stone-200/50 dark:border-stone-700/50">
+                            <span>Vuelto</span>
+                            <span class="font-mono">S/ {{ change | number:'1.2-2' }}</span>
                           </div>
                         }
                       </div>
                     }
-
-                    <p class="text-[10px] text-stone-400 mt-3 text-center uppercase tracking-wide">
-                        Gracias por tu preferencia
-                    </p>
                 </div>
             </div>
 
-            <!-- Código QR (opcional) -->
-            @if (qrCode) {
-              <div class="px-8 pb-4 flex flex-col items-center border-t border-stone-100 pt-4">
-                <p class="text-[10px] text-stone-400 uppercase mb-2">Verifica tu ticket</p>
-                <img [src]="qrCode" class="w-20 h-20 border border-stone-200 rounded-lg" alt="Código QR">
-              </div>
-            }
-
-            <!-- Botones de acción -->
-            <div class="bg-stone-50 p-6 flex flex-col gap-3 no-print">
+            <!-- Acciones Glassmorphism -->
+            <div class="p-6 pt-2 flex flex-col gap-2.5 no-print">
+                <!-- Compartir/Imprimir Doble -->
+                <div class="flex gap-2">
+                  <button 
+                      (click)="printTicket()"
+                      class="flex-1 py-3.5 rounded-xl bg-stone-900 dark:bg-stone-100 hover:bg-black dark:hover:bg-white text-white dark:text-stone-900 font-bold flex items-center justify-center gap-2 shadow-sm transition-all active:scale-95 text-xs"
+                  >
+                      <span class="material-icons-outlined text-lg">print</span>
+                      IMPRIMIR
+                  </button>
+                  <button 
+                      (click)="sendToWhatsApp()"
+                      [disabled]="!clientPhone"
+                      class="flex-1 py-3.5 rounded-xl bg-[#25D366]/10 hover:bg-[#25D366]/20 border border-[#25D366]/30 text-[#1da851] dark:text-[#25D366] font-bold flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed text-xs"
+                  >
+                      <span class="material-icons-outlined text-lg">chat</span>
+                      WHATSAPP
+                  </button>
+                </div>
                 
-                <!-- Imprimir -->
-                <button 
-                    (click)="printTicket()"
-                    class="w-full py-3 rounded-xl bg-stone-900 hover:bg-black text-white font-bold flex items-center justify-center gap-2 shadow-sm transition-all active:scale-95"
-                    aria-label="Imprimir ticket"
-                >
-                    <span class="material-icons-outlined">print</span>
-                    Imprimir Ticket
-                </button>
-
-                <!-- WhatsApp -->
-                <button 
-                    (click)="sendToWhatsApp()"
-                    [disabled]="!clientPhone"
-                    class="w-full py-3 rounded-xl bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold flex items-center justify-center gap-2 shadow-sm transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
-                    [attr.aria-label]="clientPhone ? 'Enviar ticket por WhatsApp' : 'Ingrese número de teléfono del cliente'"
-                >
-                    <span class="material-icons-outlined">chat</span>
-                    {{ clientPhone ? 'Enviar al Cliente' : 'Sin número de teléfono' }}
-                </button>
-
-                <!-- Cerrar -->
+                
                 <button 
                     (click)="close()"
-                    class="w-full py-3 rounded-xl border-2 border-stone-200 text-stone-600 font-bold hover:bg-stone-100 transition-colors active:scale-95"
-                    aria-label="Cerrar ticket y comenzar nueva venta"
+                    class="w-full py-3 rounded-xl border-2 border-stone-900 dark:border-stone-100 bg-transparent text-stone-900 dark:text-stone-100 font-bold hover:bg-stone-900 hover:text-white dark:hover:bg-stone-100 dark:hover:text-stone-900 transition-all active:scale-95 text-xs tracking-widest uppercase"
                 >
-                    Cerrar / Nueva Venta
+                    Confirmar Venta
                 </button>
             </div>
 
-            <!-- Efecto papel cortado -->
-            <div class="absolute bottom-0 left-0 right-0 h-4 bg-stone-900/5 jagged-edge"></div>
-
+            <!-- Efecto papel cortado elegante reintroducido -->
+            <div class="absolute bottom-0 left-0 right-0 h-3 bg-stone-900/5 jagged-edge no-print"></div>
         </div>
       </div>
     }
   `,
   styles: [`
-    /* Fuente Monoespaciada para efecto Ticket */
+    /* Efecto Papel Cortado (Zig Zag) reconstruido elegante */
+    .ticket-shape {
+      border-radius: 12px 12px 0 0;
+    }
+    
+    .jagged-edge {
+      background: linear-gradient(-45deg, transparent 12px, #ffffff 0) left, 
+                  linear-gradient(45deg, transparent 12px, #ffffff 0) left;
+      background-size: 12px 12px;
+      background-repeat: repeat-x;
+      height: 12px;
+      bottom: -12px;
+      position: absolute;
+      width: 100%;
+      transform: rotate(180deg);
+      filter: drop-shadow(0px -2px 1px rgba(0,0,0,0.05));
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .jagged-edge {
+        background: linear-gradient(-45deg, transparent 12px, #1c1917 0) left, 
+                    linear-gradient(45deg, transparent 12px, #1c1917 0) left;
+        background-size: 12px 12px;
+      }
+    }
     .font-mono { 
       font-family: 'Space Mono', 'Courier New', monospace; 
     }
@@ -290,7 +309,8 @@ export class UiTicketComponent implements OnInit, OnChanges {
   @Input() paymentMethod = '';
   @Input() amountPaid = 0;
   
-  @Output() closeTicket = new EventEmitter<void>();
+  @Output() closeTicket = new EventEmitter<void>(); // Se usa para confirmar
+  @Output() cancelTicket = new EventEmitter<void>(); // Se usa para abortar la venta (la X)
   @Output() ticketPrinted = new EventEmitter<void>();
   @Output() ticketSent = new EventEmitter<void>();
 
@@ -326,13 +346,18 @@ export class UiTicketComponent implements OnInit, OnChanges {
   @HostListener('document:keydown.escape')
   onEscapeKey() {
     if (this.isOpen) {
-      this.close();
+      this.cancel();
     }
   }
 
-  close() {
+  close() { // CONFIRMAR VENTA
     this.isOpen = false;
     this.closeTicket.emit();
+  }
+
+  cancel() { // ABORTAR VENTA (BOTÓN X)
+    this.isOpen = false;
+    this.cancelTicket.emit();
   }
 
   printTicket() {

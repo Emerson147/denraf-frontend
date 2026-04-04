@@ -346,3 +346,4 @@ export interface DashboardResponse {
 
   conversion: number;
 }
+export * from './venta';

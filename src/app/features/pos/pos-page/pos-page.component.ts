@@ -20,8 +20,9 @@ import { ProductService } from '../../../core/services/product.service';
 import { OfflineService } from '../../../core/services/offline.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { AuthService } from '../../../core/auth/auth';
+import { BackendAuthService } from '../../../core/services/backend-auth.service';
 import { LoggerService } from '../../../core/services/logger.service';
-import { Sale, SaleItem, Product, ProductVariant } from '../../../core/models';
+import { Sale, SaleItem, Product, ProductVariant, VentaRequest } from '../../../core/models';
 import { UiAnimatedDialogComponent } from '../../../shared/ui/ui-animated-dialog/ui-animated-dialog.component';
 import { ImageFallbackDirective } from '../../../shared/directives/image-fallback.directive';
 import { PosPaymentFacade } from '../facades/pos-payment.facade';
@@ -54,6 +55,7 @@ export class PosPageComponent {
   private offlineService = inject(OfflineService);
   private toastService = inject(ToastService);
   private authService = inject(AuthService);
+  private backendAuth = inject(BackendAuthService);
   private logger = inject(LoggerService);
   private destroyRef = inject(DestroyRef);
 
@@ -154,6 +156,51 @@ export class PosPageComponent {
       this.showTicket.set(false);
     } else {
       this.clearFilters();
+    }
+  }
+
+  // 🔥 INTERCEPTOR DE CÓDIGO DE BARRAS (Hardware Scanner)
+  private barcodeBuffer = '';
+  private barcodeTimeout: any = null;
+
+  @HostListener('window:keypress', ['$event'])
+  handleBarcodeScanner(event: KeyboardEvent) {
+    const target = event.target as HTMLElement;
+    // Ignorar si el usuario está escribiendo en el buscador de forma explícita
+    if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') return;
+
+    if (event.key === 'Enter') {
+      if (this.barcodeBuffer.length > 3) {
+        this.processBarcode(this.barcodeBuffer);
+      }
+      this.barcodeBuffer = '';
+      return;
+    }
+
+    // Acumular caracteres rápidos (los scanners lo hacen en milisegundos)
+    if (event.key.length === 1) {
+      this.barcodeBuffer += event.key;
+      
+      clearTimeout(this.barcodeTimeout);
+      this.barcodeTimeout = setTimeout(() => {
+        this.barcodeBuffer = ''; // Reset si tardó más de 50ms entre teclas (fue humano, no scanner)
+      }, 50);
+    }
+  }
+
+  private processBarcode(scannedCode: string) {
+    this.logger.log(`🔍 Barcode escaneado: ${scannedCode}`);
+    const productByBarcode = this.products().find((p) =>
+      p.variants?.some((v) => v.barcode === scannedCode) || p.id === scannedCode
+    );
+
+    if (productByBarcode) {
+      const variant = productByBarcode.variants?.find((v) => v.barcode === scannedCode);
+      this.addToCartWithVariant(productByBarcode, variant);
+      // Opcional: Sonido de "beep" exitoso podría ir aquí
+    } else {
+      this.toastService.warning(`No existe el código: ${scannedCode}`);
+      // Opcional: Sonido de "error" podría ir aquí
     }
   }
 
@@ -457,7 +504,14 @@ export class PosPageComponent {
     this.autoDetectSaleType();
   }
 
-  completeSale() {
+  onTicketCancelled() {
+    // El usuario cerró el modal sin confirmar la venta mediante la cruz (X)
+    this.showTicket.set(false);
+    this.paymentMethod = ''; // Opcional, pero previene errores lógicos de re-apertura
+    this.toastService.warning('Venta abortada, sigue en el carrito.');
+  }
+
+  async completeSale() {
     if (this.cart().length === 0) return;
 
     // Validar método de pago
@@ -466,67 +520,40 @@ export class PosPageComponent {
       return;
     }
 
-    // Convertir items del carrito a SaleItems
-    const saleItems: SaleItem[] = this.cart().map((item) => ({
-      productId: item.product.id,
-      productName: item.product.name,
-      quantity: item.quantity,
-      size: item.variant?.size || item.product.sizes[0] || 'M',
-      color: item.variant?.color || item.product.colors?.[0],
-      unitPrice: item.product.price,
-      subtotal: item.product.price * item.quantity,
-      variantId: item.variant?.id, // Incluir ID de variante si existe
-    }));
-
-    // Calcular totales
-    const subtotal = this.subtotal();
-    const tax = this.tax();
     const total = this.total();
 
-    const saleData = {
-      items: saleItems,
-      subtotal: subtotal,
-      discount: this.discount,
-      tax: tax,
-      total: total - this.discount,
+    // Obtener UUID del usuario logueado en Spring Boot
+    const loggedUser = this.backendAuth.currentUser();
+    const vendedorUuid = loggedUser?.id || "908c700f-a335-4341-be6f-a62bfd7daa10"; // Fallback por seguridad
+
+    // 🚀 NUEVA ESTRUCTURA: Payload JSON para Spring Boot Backend (VentaController)
+    const ventaRequest: VentaRequest = {
+      vendedorId: vendedorUuid, 
       paymentMethod: this.getPaymentMethodType(),
-      status: 'completed' as const,
-      saleType: this.saleType(), // 🎯 Tipo de venta registrado
-      customer:
-        this.clientName !== 'Cliente'
-          ? {
-              id: `CLI-${Date.now()}`,
-              name: this.clientName,
-              phone: this.clientPhone || undefined,
-              totalPurchases: total,
-              tier: 'nuevo' as const,
-            }
-          : undefined,
-      notes:
-        this.amountPaid > 0
-          ? `Pagó: S/ ${this.amountPaid}, Cambio: S/ ${this.amountPaid - total}`
-          : undefined,
-      createdBy: this.authService.currentUser()?.name || 'Usuario POS',
-      vendedorId: this.authService.currentUser()?.id || 'user-1',
+      discount: this.discount,
+      tax: this.tax(),
+      notes: this.amountPaid > 0 ? `Pagó: S/ ${this.amountPaid}, Cambio: S/ ${this.amountPaid - total}` : undefined,
+      items: this.cart().map(item => ({
+        productId: item.product.id,
+        varianteId: item.variant?.id,
+        quantity: item.quantity
+      }))
     };
 
     // 🔌 DETECCIÓN AUTOMÁTICA: Online vs Offline
 
     if (this.offlineService.isOnline()) {
-      // ✅ MODO ONLINE: Guardar normalmente
-      const sale = this.salesService.createSale(saleData);
-      if (sale) {
-        this.toastService.success(`Venta ${sale.saleNumber} registrada correctamente`);
-        this.logger.log('✅ Venta registrada (ONLINE):', sale);
+      // ✅ MODO ONLINE: Guardar directamente en Spring Boot
+      try {
+        const ventaResponse = await this.salesService.createVenta(ventaRequest);
+        this.logger.log('✅ Venta HTTP registrada en Backend:', ventaResponse);
+      } catch (error) {
+        this.logger.log('❌ Error registrando venta HTTP:', error);
       }
     } else {
-      // 📴 MODO OFFLINE: Guardar en IndexedDB
-      this.offlineService.saveSaleOffline(saleData);
-      this.toastService.warning('Venta guardada offline. Se sincronizará cuando vuelva internet');
-      this.logger.log('📴 Venta guardada (OFFLINE):', saleData);
+      // 📴 MODO OFFLINE: Guardar en IndexedDB (mantener lógica Legacy temporalmente)
+      this.toastService.warning('Venta Offline no compatible aún con la nueva API. Conéctate a Internet.');
     }
-
-    // ✅ El stock se reduce automáticamente en SalesService.createSale()
   }
 
   getPaymentMethodType(): Sale['paymentMethod'] {

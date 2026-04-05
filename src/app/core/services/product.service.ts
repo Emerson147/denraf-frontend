@@ -41,7 +41,7 @@ export class ProductService {
    */
   private loadProducts(): void {
     this.isLoading.set(true);
-    this.api.get<any>('productos').subscribe({
+    this.api.get<any>('productos?size=1000').subscribe({
       next: (response) => {
         // Extraer .content si el backend devuelve un objeto Page de Spring Boot
         let products = response && response.content ? response.content : response;
@@ -93,7 +93,7 @@ export class ProductService {
     console.log('🔄 Sincronización manual forzada...');
     this.isSyncing.set(true);
     return new Promise((resolve) => {
-      this.api.get<any>('productos').subscribe({
+      this.api.get<any>('productos?size=1000').subscribe({
         next: (response) => {
           // Extraer .content si el backend devuelve un objeto Page de Spring Boot
           let products = response && response.content ? response.content : response;

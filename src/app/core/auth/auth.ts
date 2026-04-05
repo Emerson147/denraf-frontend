@@ -59,7 +59,7 @@ export class AuthService {
 
     try {
       this.isSyncing.set(true);
-      console.log('☁️ Cargando usuarios desde Supabase...');
+      // console.log('☁️ Cargando usuarios desde Supabase...');
 
       const { data, error } = await supabase.from('usuarios').select('*');
 
@@ -79,7 +79,7 @@ export class AuthService {
           createdAt: u.created_at ? new Date(u.created_at) : new Date(),
         }));
         
-        console.log(`✅ Supabase: ${users.length} usuarios cargados`);
+        // console.log(`✅ Supabase: ${users.length} usuarios cargados`);
         this.usersList.set(users);
         await this.localDb.saveUsers(users);
       }

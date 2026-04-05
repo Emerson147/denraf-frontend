@@ -312,7 +312,7 @@ export class SyncService {
         .limit(5000);
 
       if (!prodError && productosRaw && productosRaw.length > 0) {
-        console.log(`✅ Carga completa exitosa: ${productosRaw.length} productos`);
+        // console.log(`✅ Carga completa exitosa: ${productosRaw.length} productos`);
         return productosRaw;
       }
 
@@ -414,7 +414,7 @@ export class SyncService {
         .filter((p: any) => p.status === 'active' && p.stock >= 0)
         .map((p: any) => this.adaptFromSupabase('product', p));
 
-      console.log(`✅ Productos descargados: ${productosRaw?.length || 0} total, ${productos.length} después de filtros`);
+      // console.log(`✅ Productos descargados: ${productosRaw?.length || 0} total, ${productos.length} después de filtros`);
 
       if (productos.length > 0) {
         await this.localDb.saveProducts(productos);
@@ -446,7 +446,7 @@ export class SyncService {
         await this.localDb.saveSales(ventas);
       }
 
-      console.log(`⬇️ Datos descargados: ${productos.length} productos, ${ventas.length} ventas`);
+      // console.log(`⬇️ Datos descargados: ${productos.length} productos, ${ventas.length} ventas`);
       return { products: productos, sales: ventas };
     } catch (error) {
       console.error('Error descargando datos:', error);

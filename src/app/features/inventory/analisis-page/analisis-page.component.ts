@@ -4,6 +4,8 @@ import { NgApexchartsModule, ApexOptions } from 'ng-apexcharts';
 import { InventoryService } from '../../../core/services/inventory.service';
 import { ProductService } from '../../../core/services/product.service';
 import { ApexChartConfigService } from '../../../core/services/apex-chart-config.service';
+import { BackendLiquidacionService } from '../../../core/services/backend-liquidacion.service';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-analisis-page',
@@ -21,8 +23,9 @@ export class AnalisisPageComponent {
   private inventoryService = inject(InventoryService);
   private productService = inject(ProductService);
   private apexConfigService = inject(ApexChartConfigService);
+  private backendLiquidacionService = inject(BackendLiquidacionService);
 
-  // Servicios y datos inteligentes
+  // Servicios y datos inteligentes (Legacy retiene alertas básicas)
   metrics = this.inventoryService.metrics;
   stockAlerts = this.inventoryService.stockAlerts;
   criticalProducts = this.inventoryService.criticalProducts;
@@ -31,13 +34,81 @@ export class AnalisisPageComponent {
   reorderSuggestions = this.inventoryService.reorderSuggestions;
   productAnalytics = this.inventoryService.productAnalytics;
   
-  // 🆕 Métricas de modelo de feria
-  capitalHealth = this.inventoryService.capitalHealth;
-  basicProducts = this.inventoryService.basicProducts;
-  frozenProducts = this.inventoryService.frozenProducts;
-  liquidationSuggestions = this.inventoryService.liquidationSuggestions;
-  productsToReorder = this.inventoryService.productsToReorder;
-  productClassifications = this.inventoryService.productClassifications;
+  // 🚀 CONEXIÓN A BACKEND SPRING BOOT: Modelo de Feria y Liquidación
+  liquidacionData = toSignal(this.backendLiquidacionService.getLiquidaciones());
+
+  resumenFinanciero = computed(() => {
+    return this.liquidacionData()?.resumen || {
+      totalCapital: 0, capitalActivo: 0, capitalLento: 0, capitalCongelado: 0,
+      metaLiberacion: 0, ratioLiquidez: 0,
+      productosCongelados: 0, productosLentos: 0, productosActivos: 0
+    };
+  });
+
+  productosAnalizadosBackend = computed(() => this.liquidacionData()?.productos || []);
+
+  capitalHealth = computed(() => {
+    const res = this.resumenFinanciero();
+    return {
+      totalInvested: res.totalCapital,
+      activeCapital: res.capitalActivo,
+      slowCapital: res.capitalLento,
+      frozenCapital: res.capitalCongelado,
+      liquidityRatio: res.ratioLiquidez,
+      targetLiberation: res.metaLiberacion
+    };
+  });
+
+  liquidationSuggestions = computed(() => {
+    // Tabla ROJA de liquidación (Productos en estado CONGELADO)
+    const congelados = this.productosAnalizadosBackend().filter(p => p.estado === 'CONGELADO');
+    return congelados.map(item => ({
+      product: { id: item.productoId, name: item.nombre, stock: item.stock },
+      costPrice: item.costo,
+      currentPrice: item.precioActual,
+      fairsWithoutSale: item.feriasSinVender,
+      daysWithoutSale: item.diasSinVender,
+      frozenCapital: item.capitalCongelado,
+      liquidationPlan: {
+        week1: { price: item.precioConDescuento20, profit: item.precioConDescuento20 - item.costo },
+        week2: { price: item.precioConDescuento30, profit: item.precioConDescuento30 - item.costo },
+        week3: { price: item.precioConDescuento40, profit: item.precioConDescuento40 - item.costo }
+      }
+    }));
+  });
+
+  frozenProducts = computed(() => {
+    // Tarjeta "Estancados" (Status = CONGELADO)
+    const congelados = this.productosAnalizadosBackend().filter(p => p.estado === 'CONGELADO');
+    return congelados.map(item => ({
+      product: { id: item.productoId, name: item.nombre, stock: item.stock },
+      fairsSinceLastSale: item.feriasSinVender
+    }));
+  });
+
+  basicProducts = computed(() => {
+    // Tarjeta "Básicos" (Alta rotación) - Rotación de >= 2 por feria
+    const basicos = this.productosAnalizadosBackend().filter(p => p.rotacionPorFeria >= 2);
+    return basicos.map(item => ({
+      product: { id: item.productoId, name: item.nombre, stock: item.stock },
+      rotationPerFair: item.rotacionPorFeria,
+      shouldReorder: item.stock < 10
+    }));
+  });
+
+  productClassifications = computed(() => {
+    // Tarjeta "Variedad" (Media/Baja rotación) - Todo el que no sea congelado ni alta rotación
+    const variedad = this.productosAnalizadosBackend().filter(p => p.estado !== 'CONGELADO' && p.rotacionPorFeria < 2);
+    return variedad.map(item => ({
+      product: { id: item.productoId, name: item.nombre, stock: item.stock },
+      classification: 'variedad',
+      rotationPerFair: item.rotacionPorFeria,
+      fairsSinceLastSale: item.feriasSinVender
+    }));
+  });
+  
+  // ( Legacy de compras en inventory.service.ts )
+  productsToReorder = this.inventoryService.reorderSuggestions;
   
   // Computed para alertas de alta prioridad
   highPriorityAlertsCount = computed(() => 

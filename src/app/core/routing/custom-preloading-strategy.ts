@@ -32,7 +32,7 @@ export class CustomPreloadingStrategy implements PreloadingStrategy {
     // 🚀 Precargar después del delay especificado
     return timer(delay).pipe(
       mergeMap(() => {
-        console.log(`🔄 Precargando ruta: ${route.path} (delay: ${delay}ms)`);
+        // console.log(`🔄 Precargando ruta: ${route.path} (delay: ${delay}ms)`);
         return load();
       })
     );

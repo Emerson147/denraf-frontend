@@ -1,21 +1,24 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { ApexOptions } from 'ng-apexcharts';
+import { ThemeService } from '../theme/theme.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ApexChartConfigService {
+  private themeService = inject(ThemeService);
   
   /**
    * Configuración base para todos los gráficos
-   * Tema oscuro minimalista con colores stone
+   * Tema responsivo dark/light con colores stone
    */
   getBaseConfig(): Partial<ApexOptions> {
+    const isDark = this.themeService.darkMode();
     return {
       chart: {
         type: 'line',
         fontFamily: 'ui-sans-serif, system-ui, sans-serif',
-        foreColor: '#e7e5e4', // stone-200
+        foreColor: isDark ? '#e7e5e4' : '#57534e', // stone-200 dark / stone-600 light
         background: 'transparent',
         toolbar: {
           show: false
@@ -34,11 +37,11 @@ export class ApexChartConfigService {
         }
       },
       theme: {
-        mode: 'dark',
+        mode: isDark ? 'dark' : 'light',
         palette: 'palette1'
       },
       grid: {
-        borderColor: '#292524', // stone-800
+        borderColor: isDark ? '#292524' : '#e7e5e4', // stone-800 dark / stone-200 light
         strokeDashArray: 4,
         padding: {
           top: 0,
@@ -48,7 +51,7 @@ export class ApexChartConfigService {
         }
       },
       tooltip: {
-        theme: 'dark',
+        theme: isDark ? 'dark' : 'light',
         style: {
           fontSize: '12px',
           fontFamily: 'ui-sans-serif, system-ui, sans-serif'
@@ -76,7 +79,7 @@ export class ApexChartConfigService {
         fontFamily: 'ui-sans-serif, system-ui, sans-serif',
         fontSize: '14px',
         labels: {
-          colors: '#e7e5e4' // stone-200
+          colors: isDark ? '#e7e5e4' : '#1c1917' // stone-200 dark / stone-900 light
         },
         markers: {
           offsetX: 0,
@@ -227,6 +230,7 @@ export class ApexChartConfigService {
     labels: string[];
     height?: number;
   }): ApexOptions {
+    const isDark = this.themeService.darkMode();
     const colors = this.getColors();
     
     return {
@@ -256,14 +260,14 @@ export class ApexChartConfigService {
               name: {
                 show: true,
                 fontSize: '16px',
-                color: '#e7e5e4', // stone-200
+                color: isDark ? '#e7e5e4' : '#57534e', // stone-200 dark / stone-600 light
                 offsetY: -10
               },
               value: {
                 show: true,
                 fontSize: '24px',
                 fontWeight: 600,
-                color: '#fafaf9', // stone-50
+                color: isDark ? '#fafaf9' : '#1c1917', // stone-50 dark / stone-900 light
                 offsetY: 10,
                 formatter: (val: string) => {
                   return `S/ ${parseFloat(val).toFixed(0)}`;
@@ -273,7 +277,7 @@ export class ApexChartConfigService {
                 show: true,
                 label: 'Total',
                 fontSize: '14px',
-                color: '#a8a29e', // stone-400
+                color: isDark ? '#a8a29e' : '#78716c', // stone-400 dark / stone-500 light
                 formatter: (w: any) => {
                   const total = w.globals.seriesTotals.reduce((a: number, b: number) => a + b, 0);
                   return `S/ ${total.toFixed(0)}`;

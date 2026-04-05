@@ -145,7 +145,7 @@ export class SalesService {
       const { sales: supabaseSales } = await this.syncService.pullFromCloud();
 
       if (supabaseSales && supabaseSales.length > 0) {
-        console.log(`✅ Supabase: ${supabaseSales.length} ventas cargadas`);
+        // console.log(`✅ Supabase: ${supabaseSales.length} ventas cargadas`);
 
         // 🔧 FIX: Fusionar ventas locales con Supabase
         // Conservar ventas locales que no están en Supabase (aún no sincronizadas)
@@ -182,7 +182,7 @@ export class SalesService {
           );
         }
 
-        console.log(`✅ Total ventas después de merge: ${mergedSales.length}`);
+        // console.log(`✅ Total ventas después de merge: ${mergedSales.length}`);
       }
     } catch (error) {
       console.error('❌ Error cargando ventas desde Supabase:', error);

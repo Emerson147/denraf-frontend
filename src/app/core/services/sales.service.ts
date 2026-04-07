@@ -359,7 +359,7 @@ export class SalesService {
     );
   }
 
-  // ✅ NUEVO METODO PARA ENVIAR AL BACKEND SPRING BOOT
+  // NUEVO METODO PARA ENVIAR AL BACKEND SPRING BOOT
   async createVenta(request: VentaRequest): Promise<VentaResponse> {
     try {
       this.isLoading.set(true);
@@ -368,6 +368,26 @@ export class SalesService {
       
       this.toastService.success(`✅ Venta HTTP registrada en Spring Boot con ID: ${res.saleNumber}`);
       
+      // ⚡ REDUCIR STOCK OPTIMISTAMENTE (Se refleja en tiempo real en la UI)
+      const failedItems: string[] = [];
+      request.items.forEach((item) => {
+        const success = this.productService.reduceStock(
+          item.productId,
+          item.quantity,
+          item.varianteId
+        );
+        if (!success) {
+          failedItems.push(item.productId);
+        }
+      });
+      
+      if (failedItems.length > 0) {
+        console.warn(`⚠️ No se pudo actualizar el stock optimista de algunos ítems localmente: ${failedItems.join(', ')}`);
+      }
+
+      // Resincronizar de fondo para asegurar precisión exacta con el backend
+      this.productService.forceSync().catch(err => console.error('Error auto-sync tras venta:', err));
+
       return res;
     } catch (error) {
       console.error('Error enviando venta al backend:', error);

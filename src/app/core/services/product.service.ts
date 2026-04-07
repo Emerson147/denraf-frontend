@@ -47,9 +47,15 @@ export class ProductService {
         let products = response && response.content ? response.content : response;
         
         // Ahora el backend responde con category y variants directamente
-        products = (products || []).map((p: any) => ({
-          ...p
-        }));
+        products = (products || []).map((p: any) => {
+          const calculatedStock = p.variants && p.variants.length > 0 
+            ? p.variants.reduce((sum: number, v: any) => sum + (v.stock || 0), 0)
+            : (p.stock || 0);
+          return {
+            ...p,
+            stock: calculatedStock
+          };
+        });
 
         this.productsSignal.set(products);
         this.isLoading.set(false);
@@ -99,9 +105,15 @@ export class ProductService {
           let products = response && response.content ? response.content : response;
           
           // Ahora el backend responde con category y variants directamente
-          products = (products || []).map((p: any) => ({
-            ...p
-          }));
+          products = (products || []).map((p: any) => {
+            const calculatedStock = p.variants && p.variants.length > 0
+              ? p.variants.reduce((sum: number, v: any) => sum + (v.stock || 0), 0)
+              : (p.stock || 0);
+            return {
+              ...p,
+              stock: calculatedStock
+            };
+          });
 
           this.productsSignal.set(products);
           this.isSyncing.set(false);
@@ -297,6 +309,9 @@ export class ProductService {
             throw new Error(`Producto ${id} no encontrado`);
           }
 
+          // Guardar estado original para posible rollback
+          const originalProduct = { ...products[index] };
+
           const updatedProducts = [...products];
           updatedProducts[index] = {
             ...updatedProducts[index],
@@ -310,7 +325,25 @@ export class ProductService {
 
           // 🔄 Actualizar en Background
           this.api.put(`productos/${id}`, updatedProducts[index]).subscribe({
-            error: (err) => console.error(`❌ Error actualizando producto ${id} en API:`, err)
+            error: (err) => {
+              console.error(`❌ Error actualizando producto ${id} en API:`, err);
+              
+              // Revertir cambio optimista (Rollback)
+              const currentProducts = this.productsSignal();
+              const rollbackProducts = [...currentProducts];
+              const rollIndex = rollbackProducts.findIndex(p => p.id === id);
+              if (rollIndex !== -1) {
+                rollbackProducts[rollIndex] = originalProduct;
+                this.productsSignal.set(rollbackProducts);
+              }
+
+              // Mostrar la alerta al usuario
+              this.errorHandler.handleError(
+                new Error('No se pudo guardar el producto en el servidor. Los cambios han sido revertidos.'),
+                'Sincronización con el servidor',
+                'high'
+              );
+            }
           });
           
           return true;

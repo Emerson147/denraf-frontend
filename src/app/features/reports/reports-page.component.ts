@@ -330,7 +330,7 @@ export class ReportsPageComponent {
   topProducts = computed(() => {
     const topFromService = this.salesService.topProducts().slice(0, 4);
     
-    return topFromService.map(p => ({
+    return topFromService.map((p: any) => ({
       name: p.name,
       sold: p.quantity,
       revenue: p.revenue,
@@ -341,7 +341,7 @@ export class ReportsPageComponent {
   // 📊 Datos SIMPLES para exportación rápida (compatible con sistema actual)
   exportData = computed(() => {
     // Para exportación simple, devolvemos solo el top de productos
-    return this.topProducts().map(p => ({
+    return this.topProducts().map((p: any) => ({
       'Producto': p.name,
       'Unidades Vendidas': p.sold,
       'Ingresos (S/)': p.revenue.toFixed(2),
@@ -471,7 +471,7 @@ export class ReportsPageComponent {
     }];
     
     // ============= SECCIÓN 7: TOP 10 PRODUCTOS =============
-    data['Top Productos'] = this.topProducts().slice(0, 10).map((p, i) => ({
+    data['Top Productos'] = this.topProducts().slice(0, 10).map((p: any, i: number) => ({
       '#': i + 1,
       'Producto': p.name,
       'Unidades': p.sold,

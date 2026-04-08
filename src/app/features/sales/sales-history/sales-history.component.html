@@ -1,570 +1,329 @@
-<div
-  class="min-h-screen bg-stone-50 dark:bg-stone-950 p-4 sm:p-6 lg:p-8 transition-colors duration-150"
->
-  <div class="max-w-[1600px] mx-auto space-y-4 sm:space-y-6">
-    <!-- Header Estandarizado con ui-page-header -->
+<div class="min-h-screen bg-[#f8fafc] dark:bg-[#09090b] p-4 sm:p-8 transition-colors duration-300 font-sans tracking-tight">
+  <div class="max-w-[1600px] mx-auto space-y-6">
+    
+    <!-- Header Premium -->
     <app-ui-page-header
       title="Historial de Ventas"
-      subtitle="DenRaf · Registro completo de transacciones"
-      materialIcon="analytics"
+      subtitle="Todas las transacciones de Tu Tienda. Busca, filtra y audita facturas."
+      materialIcon="receipt_long"
     >
-      <app-ui-export-menu [data]="exportData()" type="sales" (pdfExport)="exportToZenPDF()" />
+      <div class="flex gap-2">
+        <app-ui-export-menu
+          [data]="exportData()"
+          type="sales"
+          (pdfExport)="exportToZenPDF()"
+        ></app-ui-export-menu>
+      </div>
     </app-ui-page-header>
 
-    <!-- Filtros + Resumen (compacto) -->
-    <div
-      class="bg-white dark:bg-stone-900 rounded-2xl border border-stone-100 dark:border-stone-800 shadow-sm p-4 sm:p-6 space-y-4 transition-colors duration-150"
-    >
+    <!-- Resumen Cards BENTO / STRIPE -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="bg-white dark:bg-stone-900 p-6 rounded-2xl border border-stone-200/50 dark:border-stone-800/80 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.05)] flex items-center justify-between">
+        <div>
+          <p class="text-xs font-semibold text-stone-500 uppercase tracking-widest mb-1">Volumen</p>
+          <h3 class="text-3xl font-bold tracking-tight text-stone-900 dark:text-white">{{ summary().count }}</h3>
+        </div>
+        <div class="h-12 w-12 rounded-full bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400 flex items-center justify-center">
+          <span class="material-icons-outlined">payments</span>
+        </div>
+      </div>
+      
+      <div class="bg-white dark:bg-stone-900 p-6 rounded-2xl border border-stone-200/50 dark:border-stone-800/80 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.05)] flex items-center justify-between">
+        <div>
+          <p class="text-xs font-semibold text-stone-500 uppercase tracking-widest mb-1">Ingresos</p>
+          <h3 class="text-3xl font-bold tracking-tight text-emerald-600 dark:text-emerald-400">S/ {{ summary().total | number : '1.2-2' }}</h3>
+        </div>
+        <div class="h-12 w-12 rounded-full bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-400 flex items-center justify-center">
+          <span class="material-icons-outlined">trending_up</span>
+        </div>
+      </div>
+
+      <div class="bg-white dark:bg-stone-900 p-6 rounded-2xl border border-stone-200/50 dark:border-stone-800/80 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.05)] flex items-center justify-between">
+        <div>
+          <p class="text-xs font-semibold text-stone-500 uppercase tracking-widest mb-1">Ticket Promedio</p>
+          <h3 class="text-3xl font-bold tracking-tight text-stone-900 dark:text-zinc-100">S/ {{ summary().average | number : '1.2-2' }}</h3>
+        </div>
+        <div class="h-12 w-12 rounded-full bg-indigo-50 text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-400 flex items-center justify-center">
+          <span class="material-icons-outlined">shopping_bag</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Controles (SearchBar + iOS Segmented Controls) -->
+    <div class="flex flex-col sm:flex-row gap-4 justify-between items-center bg-white/70 backdrop-blur-md border border-stone-200/60 dark:bg-stone-900/70 p-4 rounded-2xl dark:border-stone-800 shadow-sm z-20 sticky top-4">
+      
       <!-- Búsqueda -->
-      <div class="relative max-w-md">
-        <span
-          class="absolute left-3 top-1/2 -translate-y-1/2 material-icons-outlined text-stone-400 dark:text-stone-500 text-xl"
-          >search</span
-        >
+      <div class="relative w-full sm:w-96">
+        <span class="absolute left-3 top-1/2 -translate-y-1/2 material-icons-outlined text-stone-400">search</span>
         <input
           #searchInput
           type="text"
-          placeholder="Buscar por cliente, producto o número..."
+          placeholder="Buscar factura o cliente (F2)..."
           [value]="searchQuery()"
           (input)="searchQuery.set($any($event.target).value)"
-          class="w-full pl-10 pr-16 py-2.5 bg-stone-50 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-stone-400 dark:focus:ring-stone-600 focus:border-transparent transition-all duration-150 text-sm text-stone-900 dark:text-stone-100 placeholder:text-stone-500 dark:placeholder:text-stone-400"
+          class="w-full pl-10 pr-4 py-2.5 bg-stone-100 dark:bg-stone-800/50 border-none rounded-xl focus:ring-2 focus:ring-blue-500/50 transition-all text-sm font-medium dark:text-white placeholder:text-stone-400"
         />
-        <kbd
-          class="hidden md:inline-block absolute right-3 top-1/2 -translate-y-1/2 px-1.5 py-0.5 text-[10px] bg-stone-200 dark:bg-stone-600 text-stone-600 dark:text-stone-300 rounded border border-stone-300 dark:border-stone-500 font-mono font-semibold"
-          >F2</kbd
-        >
       </div>
 
-      <!-- Filtros por periodo -->
-      <div class="flex flex-wrap gap-2">
-        <button
-          *ngFor="
-            let period of [
-              { value: 'today', label: 'Hoy' },
-              { value: 'week', label: 'Esta semana' },
-              { value: 'month', label: 'Este mes' },
-              { value: 'all', label: 'Todas' }
-            ]
-          "
-          (click)="selectedPeriod.set($any(period.value))"
-          [class.bg-stone-900]="selectedPeriod() === period.value"
-          [class.dark:bg-stone-100]="selectedPeriod() === period.value"
-          [class.text-white]="selectedPeriod() === period.value"
-          [class.dark:text-stone-900]="selectedPeriod() === period.value"
-          [class.bg-stone-100]="selectedPeriod() !== period.value"
-          [class.dark:bg-stone-800]="selectedPeriod() !== period.value"
-          [class.text-stone-600]="selectedPeriod() !== period.value"
-          [class.dark:text-stone-300]="selectedPeriod() !== period.value"
-          class="px-4 py-2 rounded-xl text-sm font-medium transition-all duration-150 ease-out hover:scale-[1.02] active:scale-95"
-        >
-          {{ period.label }}
-        </button>
-
-        <!-- Filtro por vendedor -->
-        <div class="ml-auto relative">
-          <div class="relative">
-            <span
-              class="material-icons-outlined absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 dark:text-stone-500 text-lg pointer-events-none"
-            >
-              person
-            </span>
-            <select
-              [value]="selectedVendor() || ''"
-              (change)="selectedVendor.set($any($event.target).value || null)"
-              class="pl-10 pr-4 py-2 rounded-xl text-sm font-medium bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 border-2 border-stone-200 dark:border-stone-700 focus:outline-none focus:border-stone-900 dark:focus:border-stone-100 transition-all appearance-none cursor-pointer hover:border-stone-400 dark:hover:border-stone-600"
-              style="min-width: 180px"
-            >
-              <option value="">Todos los vendedores</option>
-              <option *ngFor="let user of availableUsers()" [value]="user.id">
-                {{ user.name }}
-              </option>
-            </select>
-            <span
-              class="material-icons-outlined absolute right-2 top-1/2 -translate-y-1/2 text-stone-400 dark:text-stone-500 text-lg pointer-events-none"
-            >
-              expand_more
-            </span>
-          </div>
-        </div>
+      <!-- Segmented Control estilo iOS / Stripe -->
+      <div class="p-1 bg-stone-100 dark:bg-stone-800/70 rounded-xl flex">
+        <button 
+          (click)="selectedPeriod.set('today')" 
+          [class.bg-white]="selectedPeriod() === 'today'" [class.text-stone-900]="selectedPeriod() === 'today'" [class.shadow-sm]="selectedPeriod() === 'today'"
+          [class.text-stone-500]="selectedPeriod() !== 'today'" [class.dark:text-stone-400]="selectedPeriod() !== 'today'" [class.dark:bg-stone-600]="selectedPeriod() === 'today'" [class.dark:text-white]="selectedPeriod() === 'today'"
+          class="px-4 py-1.5 text-sm font-semibold rounded-lg transition-all duration-200"
+        >Hoy</button>
+        <button 
+          (click)="selectedPeriod.set('week')" 
+          [class.bg-white]="selectedPeriod() === 'week'" [class.text-stone-900]="selectedPeriod() === 'week'" [class.shadow-sm]="selectedPeriod() === 'week'"
+          [class.text-stone-500]="selectedPeriod() !== 'week'" [class.dark:text-stone-400]="selectedPeriod() !== 'week'" [class.dark:bg-stone-600]="selectedPeriod() === 'week'" [class.dark:text-white]="selectedPeriod() === 'week'"
+          class="px-4 py-1.5 text-sm font-semibold rounded-lg transition-all duration-200"
+        >Semana</button>
+        <button 
+          (click)="selectedPeriod.set('month')" 
+          [class.bg-white]="selectedPeriod() === 'month'" [class.text-stone-900]="selectedPeriod() === 'month'" [class.shadow-sm]="selectedPeriod() === 'month'"
+          [class.text-stone-500]="selectedPeriod() !== 'month'" [class.dark:text-stone-400]="selectedPeriod() !== 'month'" [class.dark:bg-stone-600]="selectedPeriod() === 'month'" [class.dark:text-white]="selectedPeriod() === 'month'"
+          class="px-4 py-1.5 text-sm font-semibold rounded-lg transition-all duration-200"
+        >Mes</button>
+        <button 
+          (click)="selectedPeriod.set('all')" 
+          [class.bg-white]="selectedPeriod() === 'all'" [class.text-stone-900]="selectedPeriod() === 'all'" [class.shadow-sm]="selectedPeriod() === 'all'"
+          [class.text-stone-500]="selectedPeriod() !== 'all'" [class.dark:text-stone-400]="selectedPeriod() !== 'all'" [class.dark:bg-stone-600]="selectedPeriod() === 'all'" [class.dark:text-white]="selectedPeriod() === 'all'"
+          class="px-4 py-1.5 text-sm font-semibold rounded-lg transition-all duration-200"
+        >Todas</button>
       </div>
 
-      <!-- Resumen compacto (inline) -->
-      <div
-        class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 border-t border-stone-100 dark:border-stone-800"
-      >
-        <div
-          class="group text-center sm:text-left p-4 rounded-xl hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-all duration-150 ease-out cursor-pointer hover:scale-[1.02]"
-        >
-          <p
-            class="text-xs text-stone-500 dark:text-stone-400 uppercase tracking-wide font-medium mb-1"
-          >
-            Total Ventas
-          </p>
-          <p
-            class="text-2xl font-bold text-stone-900 dark:text-stone-100 group-hover:scale-105 transition-transform duration-150 ease-out transform-gpu"
-          >
-            {{ summary().count }}
-          </p>
-        </div>
-        <div
-          class="group text-center sm:text-left p-4 rounded-xl hover:bg-emerald-50 dark:hover:bg-emerald-950/20 transition-all duration-150 ease-out cursor-pointer hover:scale-[1.02]"
-        >
-          <p
-            class="text-xs text-stone-500 dark:text-stone-400 uppercase tracking-wide font-medium mb-1"
-          >
-            Ingresos
-          </p>
-          <p
-            class="text-2xl font-bold text-amber-600 dark:text-amber-500 group-hover:scale-105 transition-transform duration-150 ease-out transform-gpu"
-          >
-            S/ {{ summary().total | number : '1.2-2' }}
-          </p>
-        </div>
-        <div
-          class="group text-center sm:text-left p-4 rounded-xl hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-all duration-150 ease-out cursor-pointer hover:scale-[1.02]"
-        >
-          <p
-            class="text-xs text-stone-500 dark:text-stone-400 uppercase tracking-wide font-medium mb-1"
-          >
-            Ticket Promedio
-          </p>
-          <p
-            class="text-2xl font-bold text-stone-900 dark:text-stone-100 group-hover:scale-105 transition-transform duration-150 ease-out transform-gpu"
-          >
-            S/ {{ summary().average | number : '1.2-2' }}
-          </p>
-        </div>
-      </div>
     </div>
 
-    <!-- Lista de ventas -->
-    <div
-      class="bg-white dark:bg-stone-900 rounded-2xl border border-stone-100 dark:border-stone-800 shadow-sm overflow-hidden transition-colors duration-150"
-    >
-      @if (filteredSales().length === 0) {
-      <app-ui-empty-state
-        icon="receipt_long"
-        title="No hay ventas registradas"
-        description="Las ventas aparecerán aquí una vez que realices transacciones"
-      />
+    <!-- TABLA DE DATOS (Estilo Stripe) -->
+    <div class="bg-white dark:bg-stone-900 border border-stone-200/60 dark:border-stone-800 shadow-sm rounded-2xl overflow-hidden">
+      
+      @if (filteredSales().length === 0 && !salesService.isLoading()) {
+        <app-ui-empty-state icon="receipt_long" title="Sin resultados" description="No encontramos ninguna venta en este periodo." />
+      } @else if (salesService.isLoading()) {
+        <div class="p-12 flex justify-center items-center"><div class="animate-spin h-8 w-8 border-4 border-stone-200 border-t-blue-600 rounded-full"></div></div>
       } @else {
-      <!-- Tabla responsive -->
-      <div class="overflow-x-auto">
-        <table class="w-full">
-          <thead
-            class="bg-stone-50 dark:bg-stone-950/50 border-b border-stone-100 dark:border-stone-800"
-          >
-            <tr>
-              <th
-                class="px-4 sm:px-6 py-4 text-left text-xs font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider"
-              >
-                Venta
-              </th>
-              <th
-                class="px-4 sm:px-6 py-4 text-left text-xs font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider"
-              >
-                Fecha
-              </th>
-              <th
-                class="px-4 sm:px-6 py-4 text-left text-xs font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider hidden sm:table-cell"
-              >
-                Cliente
-              </th>
-              <th
-                class="px-4 sm:px-6 py-4 text-left text-xs font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider"
-              >
-                Productos
-              </th>
-              <th
-                class="px-4 sm:px-6 py-4 text-left text-xs font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider hidden md:table-cell"
-              >
-                Pago
-              </th>
-              <th
-                class="px-4 sm:px-6 py-4 text-right text-xs font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider"
-              >
-                Total
-              </th>
-              <th
-                class="px-4 sm:px-6 py-4 text-center text-xs font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider hidden lg:table-cell"
-              >
-                Estado
-              </th>
-              <th
-                class="px-4 sm:px-6 py-4 text-center text-xs font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider"
-              >
-                Acción
-              </th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-stone-100 dark:divide-stone-800">
-            @for (sale of filteredSales(); track sale.id) {
-            <tr
-              class="hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-all duration-150 ease-out"
-            >
-              <!-- Número de venta -->
-              <td class="px-4 sm:px-6 py-4">
-                <div class="flex items-center gap-2">
-                  <span class="material-icons-outlined text-stone-400 dark:text-stone-500 text-lg"
-                    >receipt</span
-                  >
-                  <span class="text-sm font-medium text-stone-900 dark:text-stone-100">{{
-                    sale.saleNumber
-                  }}</span>
-                  <!-- Badge vendedor -->
-                  <div
-                    class="h-6 w-6 rounded-full flex items-center justify-center text-[10px] font-bold"
-                    [class]="getVendorColor(sale.vendedorId)"
-                    [title]="getVendorName(sale.vendedorId)"
-                  >
-                    {{ getVendorInitial(sale.vendedorId) }}
-                  </div>
-                </div>
-              </td>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse text-sm">
+            <thead>
+              <tr class="border-b border-stone-100 dark:border-stone-800 bg-stone-50/50 dark:bg-stone-900">
+                <th class="px-6 py-4 font-semibold text-stone-500 dark:text-stone-400">Factura</th>
+                <th class="px-6 py-4 font-semibold text-stone-500 dark:text-stone-400">Fecha</th>
+                <th class="px-6 py-4 font-semibold text-stone-500 dark:text-stone-400">Cliente</th>
+                <th class="px-6 py-4 font-semibold text-stone-500 dark:text-stone-400 hidden sm:table-cell">Productos</th>
+                <th class="px-6 py-4 font-semibold text-stone-500 dark:text-stone-400 text-right">Total</th>
+                <th class="px-6 py-4 font-semibold text-stone-500 dark:text-stone-400 text-center">Estado</th>
+                <th class="px-6 py-4 font-semibold text-stone-500 dark:text-stone-400 text-right"></th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-stone-100 dark:divide-stone-800">
+              @for (sale of filteredSales(); track sale.id) {
+                <tr class="hover:bg-stone-50/70 dark:hover:bg-stone-800/40 transition-colors group">
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center gap-2">
+                       <span class="font-mono text-stone-900 dark:text-stone-200 font-medium">{{ sale.saleNumber }}</span>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4 text-stone-500 dark:text-stone-400">
+                    {{ sale.date | date : 'dd/MM, h:mm a' }}
+                  </td>
+                  <td class="px-6 py-4">
+                    <span class="font-medium text-stone-700 dark:text-stone-300">{{ sale.customer?.name || 'Venta Casual' }}</span>
+                  </td>
+                  <td class="px-6 py-4 hidden sm:table-cell">
+                    <span class="text-stone-500 dark:text-stone-400 line-clamp-1 max-w-[200px]">
+                      {{ sale.items.length }} Items
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 text-right">
+                    <span class="font-bold text-stone-900 dark:text-white">S/ {{ sale.total | number : '1.2-2' }}</span>
+                  </td>
+                  <td class="px-6 py-4 text-center">
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-bold tracking-wider uppercase border"
+                          [class]="getStatusBadge(sale.status).class">
+                      {{ getStatusBadge(sale.status).label }}
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 text-right whitespace-nowrap">
+                    <!-- Acciones (Solo visibles en Hover) -->
+                    <div class="px-2 py-3 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity justify-end">
+                      <button (click)="viewDetails(sale); $event.stopPropagation()" class="p-1.5 rounded-lg text-stone-500 hover:text-stone-700 hover:bg-stone-200/50 dark:hover:bg-stone-700/50 dark:text-stone-400 dark:hover:text-stone-200 transition-all cursor-pointer" title="Ver Detalles">
+                        <span class="material-icons-outlined text-[18px]">visibility</span>
+                      </button>
+                      <button (click)="printTicket(sale); $event.stopPropagation()" class="p-1.5 rounded-lg text-blue-500 hover:text-blue-700 hover:bg-blue-100/50 dark:hover:bg-blue-900/30 dark:text-blue-400 dark:hover:text-blue-300 transition-all cursor-pointer" title="Imprimir Ticket">
+                        <span class="material-icons-outlined text-[18px]">receipt</span>
+                      </button>
+                      @if (sale.status === 'completed') {
+                        <button (click)="openCancelModal(sale); $event.stopPropagation()" class="p-1.5 rounded-lg text-red-500 hover:text-red-700 hover:bg-red-100/50 dark:hover:bg-red-900/30 dark:text-red-400 dark:hover:text-red-300 transition-all cursor-pointer" title="Anular Venta">
+                          <span class="material-icons-outlined text-[18px]">cancel</span>
+                        </button>
+                      }
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
 
-              <!-- Fecha -->
-              <td class="px-4 sm:px-6 py-4 text-sm text-stone-600 dark:text-stone-400">
-                {{ sale.date | date : 'dd/MM/yy, h:mm a' }}
-              </td>
+        <!-- Pagination Bar (Spring Boot) -->
+        <div class="px-6 py-4 border-t border-stone-100 dark:border-stone-800 flex flex-col sm:flex-row gap-4 items-center justify-between bg-stone-50/50 dark:bg-stone-900/50">
+          <div class="flex items-center gap-4">
+            <span class="text-sm font-medium text-stone-500">
+              Total: <span class="font-bold text-stone-800 dark:text-stone-200">{{ salesService.totalElements() }} ventas</span>
+            </span>
+            <div class="h-4 w-px bg-stone-300 dark:bg-stone-700 hidden sm:block"></div>
+            <div class="flex items-center gap-2">
+              <label class="text-sm text-stone-500">Mostrar:</label>
+              <select (change)="onPageSizeChange($event)" class="text-sm p-1.5 bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-lg outline-none focus:ring-2 focus:ring-blue-500/30 text-stone-700 dark:text-stone-300 font-medium">
+                <option value="10" [selected]="salesService.pageSize() === 10">10</option>
+                <option value="20" [selected]="salesService.pageSize() === 20">20</option>
+                <option value="50" [selected]="salesService.pageSize() === 50">50</option>
+                <option value="100" [selected]="salesService.pageSize() === 100">100</option>
+              </select>
+            </div>
+          </div>
 
-              <!-- Cliente -->
-              <td
-                class="px-4 sm:px-6 py-4 text-sm text-stone-600 dark:text-stone-400 hidden sm:table-cell"
-              >
-                {{ sale.customer?.name || 'Cliente casual' }}
-              </td>
-
-              <!-- Productos -->
-              <td class="px-4 sm:px-6 py-4">
-                <div class="flex flex-col gap-1">
-                  @for (item of (sale.items || []).slice(0, 2); track item.productId) {
-                  <span class="text-xs text-stone-600 dark:text-stone-400"
-                    >{{ item.quantity }}x {{ item.productName }}</span
-                  >
-                  } @if ((sale.items.length || 0) > 2) {
-                  <span class="text-xs text-stone-400 dark:text-stone-500"
-                    >+{{ (sale.items.length || 0) - 2 }} más</span
-                  >
-                  }
-                </div>
-              </td>
-
-              <!-- Método de pago -->
-              <td
-                class="px-4 sm:px-6 py-4 text-sm text-stone-600 dark:text-stone-400 hidden md:table-cell"
-              >
-                {{ getPaymentMethodLabel(sale.paymentMethod) }}
-              </td>
-
-              <!-- Total -->
-              <td class="px-4 sm:px-6 py-4 text-right">
-                <span class="text-sm font-bold text-stone-900 dark:text-stone-100"
-                  >S/ {{ sale.total | number : '1.2-2' }}</span
-                >
-              </td>
-
-              <!-- Estado -->
-              <td class="px-4 sm:px-6 py-4 text-center hidden lg:table-cell">
-                <span
-                  class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium"
-                  [class]="getStatusBadge(sale.status).class"
-                >
-                  {{ getStatusBadge(sale.status).label }}
-                </span>
-              </td>
-
-              <!-- Acciones -->
-              <td class="px-4 sm:px-6 py-4 text-center">
-                <div class="flex items-center justify-center gap-1">
-                  <!-- Ver detalles -->
-                  <button
-                    (click)="viewSaleDetails(sale)"
-                    class="group inline-flex items-center justify-center h-8 w-8 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 transition-all duration-150 ease-out hover:scale-110 active:scale-95"
-                    title="Ver detalles"
-                  >
-                    <span class="material-icons-outlined text-lg">visibility</span>
-                  </button>
-
-                  <!-- Reimprimir ticket -->
-                  <button
-                    (click)="reprintTicket(sale)"
-                    class="group inline-flex items-center justify-center h-8 w-8 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/30 text-stone-600 dark:text-stone-400 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-150 ease-out hover:scale-110 active:scale-95"
-                    title="Reimprimir ticket"
-                  >
-                    <span class="material-icons-outlined text-lg">print</span>
-                  </button>
-
-                  <!-- Anular venta (solo si no está cancelada) -->
-                  @if (sale.status !== 'cancelled') {
-                  <button
-                    (click)="openCancelModal(sale)"
-                    class="group inline-flex items-center justify-center h-8 w-8 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/30 text-stone-600 dark:text-stone-400 hover:text-red-600 dark:hover:text-red-400 transition-all duration-150 ease-out hover:scale-110 active:scale-95"
-                    title="Anular venta"
-                  >
-                    <span class="material-icons-outlined text-lg">cancel</span>
-                  </button>
-                  }
-                </div>
-              </td>
-            </tr>
-            }
-          </tbody>
-        </table>
-      </div>
+          <div class="flex items-center gap-2">
+            <button [disabled]="salesService.currentPage() === 0" (click)="prevPage()" class="p-1.5 rounded-lg border border-stone-200 bg-white shadow-sm hover:bg-stone-50 disabled:opacity-50 text-stone-600 dark:bg-stone-800 dark:border-stone-700 dark:text-stone-300">
+              <span class="material-icons-outlined text-sm">chevron_left</span>
+            </button>
+            <span class="text-sm font-semibold mx-2 text-stone-700 dark:text-stone-300">
+              Página {{ salesService.currentPage() + 1 }} de {{ salesService.totalPages() }}
+            </span>
+            <button [disabled]="salesService.currentPage() >= salesService.totalPages() - 1" (click)="nextPage()" class="p-1.5 rounded-lg border border-stone-200 bg-white shadow-sm hover:bg-stone-50 disabled:opacity-50 text-stone-600 dark:bg-stone-800 dark:border-stone-700 dark:text-stone-300">
+              <span class="material-icons-outlined text-sm">chevron_right</span>
+            </button>
+          </div>
+        </div>
       }
     </div>
 
-    <!-- Modal de detalles (si hay venta seleccionada) -->
+    <!-- Modal Detalles iOS Style Premium -->
     @if (selectedSale()) {
-    <div
-      class="fixed inset-0 bg-stone-900/40 dark:bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200"
-      (click)="closeDetails()"
-    >
-      <div
-        class="bg-white dark:bg-stone-900 rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-200"
-        (click)="$event.stopPropagation()"
-      >
-        <!-- Header del modal -->
-        <div
-          class="sticky top-0 bg-white dark:bg-stone-900 border-b border-stone-100 dark:border-stone-800 p-6 flex items-center justify-between"
-        >
-          <div>
-            <h3 class="text-xl font-bold text-stone-900 dark:text-stone-100">
-              {{ selectedSale()!.saleNumber }}
-            </h3>
-            <p class="text-sm text-stone-500 dark:text-stone-400">
-              {{ selectedSale()!.date | date : 'medium' }}
-            </p>
-          </div>
-          <button
-            (click)="closeDetails()"
-            class="h-10 w-10 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 flex items-center justify-center text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 transition-all duration-150"
-          >
-            <span class="material-icons-outlined">close</span>
-          </button>
-        </div>
-
-        <!-- Contenido del modal -->
-        <div class="p-6 space-y-6">
-          <!-- Cliente -->
-          @if (selectedSale()!.customer) {
-          <div>
-            <p
-              class="text-xs text-stone-500 dark:text-stone-400 uppercase tracking-wide font-medium mb-2"
-            >
-              Cliente
-            </p>
-            <p class="text-sm font-medium text-stone-900 dark:text-stone-100">
-              {{ selectedSale()!.customer!.name }}
-            </p>
-            @if (selectedSale()!.customer!.phone) {
-            <p class="text-sm text-stone-600 dark:text-stone-400">
-              {{ selectedSale()!.customer!.phone }}
-            </p>
-            }
-          </div>
-          }
-
-          <!-- Productos -->
-          <div>
-            <p
-              class="text-xs text-stone-500 dark:text-stone-400 uppercase tracking-wide font-medium mb-3"
-            >
-              Productos
-            </p>
-            <div class="space-y-2">
-              @for (item of (selectedSale()!.items || []); track item.productId) {
-              <div
-                class="flex items-center justify-between py-2 border-b border-stone-100 dark:border-stone-800"
-              >
-                <div class="flex-1">
-                  <p class="text-sm font-medium text-stone-900 dark:text-stone-100">
-                    {{ item.productName }}
-                  </p>
-                  <p class="text-xs text-stone-500 dark:text-stone-400">
-                    Talla: {{ item.size }} • Cantidad: {{ item.quantity }}
-                  </p>
-                </div>
-                <p class="text-sm font-bold text-stone-900 dark:text-stone-100">
-                  S/ {{ item.subtotal | number : '1.2-2' }}
-                </p>
+      <div class="fixed inset-0 z-50 flex justify-center items-end sm:items-center bg-stone-900/40 dark:bg-black/60 backdrop-blur-[4px] animate-in fade-in" (click)="closeDetails()">
+        <div class="bg-white dark:bg-[#1c1c1e] w-full sm:w-[480px] sm:rounded-3xl rounded-t-3xl shadow-2xl overflow-hidden animate-in slide-in-from-bottom-[50%] sm:zoom-in-95" (click)="$event.stopPropagation()">
+          
+          <!-- Header -->
+          <div class="relative bg-stone-50/80 dark:bg-[#2c2c2e] p-6 border-b border-stone-100 dark:border-stone-800/80">
+            <button (click)="closeDetails()" class="absolute top-6 right-6 h-8 w-8 rounded-full bg-stone-200/50 dark:bg-stone-700/50 hover:bg-stone-200 hover:scale-105 flex items-center justify-center transition-all text-stone-600 dark:text-stone-300">
+              <span class="material-icons-outlined text-sm">close</span>
+            </button>
+            <div class="flex flex-col items-center justify-center text-center mt-2">
+              <div class="h-16 w-16 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center mb-3 shadow-sm border border-blue-200/50 dark:border-blue-800/50">
+                <span class="material-icons-outlined text-3xl">receipt_long</span>
               </div>
+              <h4 class="text-2xl font-bold tracking-tight text-stone-900 dark:text-white">{{ selectedSale()!.saleNumber }}</h4>
+              <p class="text-sm text-stone-500 mt-1 dark:text-stone-400">{{ selectedSale()!.date | date:'dd MMM yyyy, h:mm a' }}</p>
+              
+              <div class="mt-4 inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold tracking-wide uppercase border bg-white dark:bg-stone-800 shadow-sm" [class]="getStatusBadge(selectedSale()!.status).class">
+                <span class="w-1.5 h-1.5 rounded-full" [class.bg-emerald-500]="selectedSale()!.status === 'completed'" [class.bg-amber-500]="selectedSale()!.status === 'pending'" [class.bg-red-500]="selectedSale()!.status === 'cancelled'"></span>
+                {{ getStatusBadge(selectedSale()!.status).label }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Body -->
+          <div class="p-6">
+            <div class="flex gap-4 mb-6">
+              <div class="flex-1 bg-stone-50 dark:bg-stone-800/40 p-4 rounded-2xl border border-stone-100 dark:border-stone-800">
+                <p class="text-xs text-stone-500 mb-1 flex items-center gap-1"><span class="material-icons-outlined text-[14px]">person</span> Cliente</p>
+                <p class="font-semibold text-stone-900 dark:text-stone-200">{{ selectedSale()!.customer?.name || 'Cliente Casual' }}</p>
+              </div>
+              <div class="flex-1 bg-stone-50 dark:bg-stone-800/40 p-4 rounded-2xl border border-stone-100 dark:border-stone-800">
+                <p class="text-xs text-stone-500 mb-1 flex items-center gap-1"><span class="material-icons-outlined text-[14px]">credit_card</span> Pago</p>
+                <p class="font-semibold text-stone-900 dark:text-stone-200">{{ getPaymentMethodLabel(selectedSale()!.paymentMethod) }}</p>
+              </div>
+            </div>
+
+            <!-- Items -->
+            <div>
+              <h5 class="text-xs font-bold text-stone-400 uppercase tracking-widest mb-3 ml-2">Artículos ({{ selectedSale()!.items.length }})</h5>
+              <div class="bg-stone-50/50 dark:bg-stone-800/20 rounded-2xl p-4 border border-stone-100 dark:border-stone-800/50">
+                <div class="space-y-3.5">
+                  @for (item of selectedSale()!.items; track item.productId) {
+                    <div class="flex justify-between items-start text-sm">
+                      <div class="flex gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-stone-200/50 dark:bg-stone-700/50 flex items-center justify-center text-stone-500 dark:text-stone-400 mt-0.5 shrink-0">
+                          <span class="font-bold text-xs">{{ item.quantity }}x</span>
+                        </div>
+                        <div>
+                          <span class="font-medium text-stone-800 dark:text-stone-200 line-clamp-2 max-w-[200px] leading-snug">{{ item.productName }}</span>
+                          <span class="text-xs text-stone-500 mt-0.5 block">S/ {{ item.unitPrice | number:'1.2-2' }} c/u</span>
+                        </div>
+                      </div>
+                      <span class="font-semibold text-stone-700 dark:text-stone-300 shrink-0">S/ {{ item.subtotal | number:'1.2-2' }}</span>
+                    </div>
+                  }
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Footer Totals -->
+          <div class="bg-stone-50 dark:bg-[#2c2c2e] p-6 border-t border-dashed border-stone-200/80 dark:border-stone-700">
+            <!-- Desglose sutil -->
+            <div class="space-y-2 mb-4 text-sm px-2">
+              <div class="flex justify-between text-stone-500">
+                <span>Subtotal</span>
+                <span>S/ {{ selectedSale()!.subtotal | number:'1.2-2' }}</span>
+              </div>
+              @if (selectedSale()!.discount > 0) {
+                <div class="flex justify-between text-emerald-500 font-medium">
+                  <span>Descuento</span>
+                  <span>- S/ {{ selectedSale()!.discount | number:'1.2-2' }}</span>
+                </div>
               }
             </div>
-          </div>
-
-          <!-- Totales -->
-          <div class="bg-stone-50 dark:bg-stone-950/50 rounded-xl p-4 space-y-2">
-            <div class="flex justify-between text-sm">
-              <span class="text-stone-600 dark:text-stone-400">Subtotal</span>
-              <span class="font-medium text-stone-900 dark:text-stone-100"
-                >S/ {{ selectedSale()!.subtotal | number : '1.2-2' }}</span
-              >
-            </div>
-            @if (selectedSale()!.discount > 0) {
-            <div class="flex justify-between text-sm">
-              <span class="text-stone-600 dark:text-stone-400">Descuento</span>
-              <span class="font-medium text-rose-600 dark:text-rose-400"
-                >-S/ {{ selectedSale()!.discount | number : '1.2-2' }}</span
-              >
-            </div>
-            }
-            <div
-              class="flex justify-between text-base font-bold pt-2 border-t border-stone-200 dark:border-stone-800"
-            >
-              <span class="text-stone-900 dark:text-stone-100">Total</span>
-              <span class="text-amber-600 dark:text-amber-500"
-                >S/ {{ selectedSale()!.total | number : '1.2-2' }}</span
-              >
+            
+            <!-- Gran Total -->
+            <div class="flex justify-between items-center text-xl font-bold bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 shadow-sm rounded-xl p-4">
+              <span class="text-stone-900 dark:text-white">Pagado Total</span>
+              <span class="text-blue-600 dark:text-blue-500">S/ {{ selectedSale()!.total | number:'1.2-2' }}</span>
             </div>
           </div>
 
-          <!-- Método de pago -->
-          <div class="flex items-center justify-between">
-            <p
-              class="text-xs text-stone-500 dark:text-stone-400 uppercase tracking-wide font-medium"
-            >
-              Método de pago
-            </p>
-            <span
-              class="px-3 py-1 bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 rounded-full text-sm font-medium"
-            >
-              {{ getPaymentMethodLabel(selectedSale()!.paymentMethod) }}
-            </span>
-          </div>
-
-          <!-- Notas -->
-          @if (selectedSale()!.notes) {
-          <div>
-            <p
-              class="text-xs text-stone-500 dark:text-stone-400 uppercase tracking-wide font-medium mb-2"
-            >
-              Notas
-            </p>
-            <p class="text-sm text-stone-600 dark:text-stone-400">{{ selectedSale()!.notes }}</p>
-          </div>
-          }
         </div>
       </div>
-    </div>
     }
 
-    <!-- 🎫 Modal de Anulación de Venta -->
+    <!-- Modal Anular iOS Style -->
     @if (cancelModalOpen()) {
-    <div
-      class="fixed inset-0 bg-stone-900/40 dark:bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200"
-      (click)="closeCancelModal()"
-    >
-      <div
-        class="bg-white dark:bg-stone-900 rounded-2xl shadow-2xl max-w-md w-full animate-in zoom-in-95 duration-200"
-        (click)="$event.stopPropagation()"
-      >
-        <!-- Header -->
-        <div class="p-6 border-b border-stone-100 dark:border-stone-800">
-          <div class="flex items-center gap-3">
-            <div
-              class="w-12 h-12 rounded-xl bg-red-100 dark:bg-red-900/40 flex items-center justify-center"
-            >
-              <span class="material-icons-outlined text-2xl text-red-600 dark:text-red-400"
-                >cancel</span
-              >
-            </div>
-            <div>
-              <h3 class="text-lg font-bold text-stone-900 dark:text-stone-100">Anular Venta</h3>
-              <p class="text-sm text-stone-500 dark:text-stone-400">
-                {{ saleToCancel()?.saleNumber }}
-              </p>
-            </div>
+      <div class="fixed inset-0 z-50 flex justify-center items-center bg-stone-900/40 dark:bg-black/60 backdrop-blur-sm animate-in fade-in" (click)="closeCancelModal()">
+        <div class="bg-white dark:bg-[#1c1c1e] w-[400px] rounded-3xl p-6 shadow-2xl animate-in zoom-in-95 text-center" (click)="$event.stopPropagation()">
+          <div class="h-14 w-14 rounded-full bg-red-100 dark:bg-red-900/30 mx-auto flex items-center justify-center mb-4 text-red-600 dark:text-red-400">
+            <span class="material-icons-outlined text-2xl">undo</span>
           </div>
-        </div>
-
-        <!-- Contenido -->
-        <div class="p-6 space-y-4">
-          <div
-            class="p-4 bg-amber-50 dark:bg-amber-900/20 rounded-xl border border-amber-200 dark:border-amber-800"
-          >
-            <p
-              class="text-sm text-amber-800 dark:text-amber-300 font-medium flex items-center gap-2"
-            >
-              <span class="material-icons-outlined text-lg">warning</span>
-              Esta acción no se puede deshacer
-            </p>
-          </div>
-
-          <!-- Motivo de anulación -->
-          <div>
-            <label class="block text-xs font-medium text-stone-700 dark:text-stone-300 mb-2"
-              >Motivo de anulación</label
-            >
-            <select
-              [value]="cancelReason()"
-              (change)="cancelReason.set($any($event.target).value)"
-              class="w-full px-3 py-2.5 bg-stone-50 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-stone-400 dark:focus:ring-stone-600 text-sm text-stone-900 dark:text-stone-100 transition-all duration-150"
-            >
-              <option value="">Seleccionar motivo...</option>
-              <option value="Error en productos">Error en productos</option>
-              <option value="Cliente canceló compra">Cliente canceló compra</option>
-              <option value="Producto defectuoso">Producto defectuoso</option>
-              <option value="Error de precio">Error de precio</option>
-              <option value="Devolución">Devolución</option>
-              <option value="Otro">Otro</option>
-            </select>
-          </div>
-
-          <!-- Restaurar stock -->
-          <label
-            class="flex items-center gap-3 p-3 bg-stone-50 dark:bg-stone-800 rounded-xl cursor-pointer hover:bg-stone-100 dark:hover:bg-stone-700 transition-colors duration-150"
-          >
-            <input
-              type="checkbox"
-              [checked]="restoreStock()"
-              (change)="restoreStock.set($any($event.target).checked)"
-              class="w-5 h-5 rounded border-stone-300 dark:border-stone-600 text-emerald-600 focus:ring-emerald-500"
-            />
-            <div>
-              <p class="text-sm font-medium text-stone-900 dark:text-stone-100">Restaurar stock</p>
-              <p class="text-xs text-stone-500 dark:text-stone-400">
-                Devolver productos al inventario
-              </p>
-            </div>
+          <h3 class="text-xl font-bold mb-2 tracking-tight text-stone-900 dark:text-white">Anular esta Venta</h3>
+          <p class="text-sm text-stone-500 mb-6 px-4">Se invalidará la factura y los fondos no contarán en los balances contables.</p>
+          
+          <input [(ngModel)]="cancelReason" placeholder="Motivo (Ej: Devolución, Error)" class="w-full mb-4 px-4 py-3 bg-stone-100 dark:bg-stone-800 border-none rounded-xl text-sm focus:ring-2 focus:ring-red-500/30 placeholder:text-stone-400" />
+          
+          <label class="flex items-center gap-3 p-3 bg-stone-50 dark:bg-stone-800/50 rounded-xl mb-6 cursor-pointer text-left hover:bg-stone-100 transition-colors">
+            <input type="checkbox" [(ngModel)]="restoreStock" class="w-5 h-5 rounded border-stone-300 text-stone-900 focus:ring-stone-900" />
+            <div><p class="text-sm font-semibold">Devolver inventario</p><p class="text-xs text-stone-500">Volver a sumar stock de los artículos vendidos</p></div>
           </label>
-        </div>
-
-        <!-- Acciones -->
-        <div class="p-6 border-t border-stone-100 dark:border-stone-800 flex gap-3">
-          <button
-            (click)="closeCancelModal()"
-            class="flex-1 py-2.5 px-4 text-sm font-medium text-stone-700 dark:text-stone-300 bg-stone-100 dark:bg-stone-800 hover:bg-stone-200 dark:hover:bg-stone-700 rounded-xl transition-all duration-150"
-          >
-            Cancelar
-          </button>
-          <button
-            (click)="confirmCancelSale()"
-            [disabled]="!cancelReason()"
-            class="flex-1 py-2.5 px-4 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-xl transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-          >
-            <span class="material-icons-outlined text-lg">delete_forever</span>
-            Anular Venta
-          </button>
+          <div class="flex gap-3">
+            <button (click)="closeCancelModal()" class="flex-1 py-3 bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 font-semibold rounded-xl hover:bg-stone-200 transition-colors">Atrás</button>
+            <button (click)="confirmCancelSale()" class="flex-1 py-3 bg-red-600 text-white font-semibold rounded-xl hover:bg-red-700 shadow-md shadow-red-600/20 transition-all active:scale-95">Anular Ahora</button>
+          </div>
         </div>
       </div>
-    </div>
     }
 
-    <!-- 🖨️ Modal de Reimprimir Ticket -->
+    <!-- Modal Recibo Reimpresion -->
     @if (showTicketModal() && ticketSale()) {
-    <app-ui-ticket
-      [isOpen]="showTicketModal()"
-      [items]="getTicketItems(ticketSale()!)"
-      [total]="ticketSale()!.total"
-      [ticketNumber]="getTicketNumber(ticketSale()!.saleNumber)"
-      [clientName]="ticketSale()!.customer?.name || 'Cliente'"
-      [clientPhone]="ticketSale()!.customer?.phone || ''"
-      [paymentMethod]="getPaymentMethodLabel(ticketSale()!.paymentMethod)"
-      [amountPaid]="ticketSale()!.total"
-      (closeTicket)="closeTicketModal()"
-      (ticketPrinted)="closeTicketModal()"
-    ></app-ui-ticket>
+      <app-ui-ticket
+        [isOpen]="showTicketModal()"
+        [items]="getTicketItems(ticketSale()!)"
+        [total]="ticketSale()!.total"
+        [ticketNumber]="getTicketNumber(ticketSale()!.saleNumber)"
+        [clientName]="ticketSale()!.customer?.name || 'Venta Rápida'"
+        [paymentMethod]="getPaymentMethodLabel(ticketSale()!.paymentMethod)"
+        [amountPaid]="ticketSale()!.total"
+        (closeTicket)="closeTicketModal()"
+      ></app-ui-ticket>
     }
+
   </div>
 </div>

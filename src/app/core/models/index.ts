@@ -346,4 +346,28 @@ export interface DashboardResponse {
 
   conversion: number;
 }
+// ============================================
+// CLIENTES
+// ============================================
+
+export interface Client {
+  id: string;
+  name: string;
+  phone: string;
+  email?: string;
+  address?: string;
+  // Preferencias de ropa
+  sizeTop?: 'XS' | 'S' | 'M' | 'L' | 'XL' | 'XXL';
+  sizeBottom?: string; // '28','30','32','34','36'
+  stylePreference?: string; // 'Casual', 'Elegante', 'Urbano'
+  notes?: string;
+  // Stats calculados
+  totalSpent: number;
+  totalPurchases: number;
+  lastPurchaseDate?: string; // ISO string
+  tier: 'nuevo' | 'silver' | 'gold';
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export * from './venta';

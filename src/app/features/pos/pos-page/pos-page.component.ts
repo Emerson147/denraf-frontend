@@ -22,7 +22,8 @@ import { ToastService } from '../../../core/services/toast.service';
 import { AuthService } from '../../../core/auth/auth';
 import { BackendAuthService } from '../../../core/services/backend-auth.service';
 import { LoggerService } from '../../../core/services/logger.service';
-import { Sale, SaleItem, Product, ProductVariant, VentaRequest } from '../../../core/models';
+import { ClientService } from '../../../core/services/client.service';
+import { Sale, SaleItem, Product, ProductVariant, VentaRequest, Client } from '../../../core/models';
 import { UiAnimatedDialogComponent } from '../../../shared/ui/ui-animated-dialog/ui-animated-dialog.component';
 import { ImageFallbackDirective } from '../../../shared/directives/image-fallback.directive';
 import { PosPaymentFacade } from '../facades/pos-payment.facade';
@@ -57,6 +58,7 @@ export class PosPageComponent {
   private authService = inject(AuthService);
   private backendAuth = inject(BackendAuthService);
   private logger = inject(LoggerService);
+  private clientService = inject(ClientService);
   private destroyRef = inject(DestroyRef);
 
   // ViewChild para enfoque automático
@@ -73,6 +75,14 @@ export class PosPageComponent {
   toastIcon = signal('check_circle');
   showMobileCart = signal(false); // 📱 Control del bottom sheet móvil
   showClearConfirm = signal(false); // 🗑️ Confirmación para vaciar
+
+  // --- INTEGRACIÓN CLIENTES ---
+  selectedClient = signal<Client | null>(null);
+  clientSearchQuery = signal('');
+  showNewClientModal = signal(false);
+  newClientName = signal('');
+  newClientPhone = signal('');
+  newClientError = signal('');
 
   // 🎯 Tipo de venta (auto-detectado por día)
   saleType = signal<'feria-acobamba' | 'feria-paucara' | 'tienda'>('tienda');
@@ -213,6 +223,16 @@ export class PosPageComponent {
   amountPaid = 0;
   discount = 0; // Descuento aplicado
   currentSale: Sale | null = null; // Venta actual para el ticket
+
+  // Computed predictivo para Clientes
+  suggestedClients = computed(() => {
+    const q = this.clientSearchQuery().toLowerCase().trim();
+    if (!q) return [];
+    return this.clientService.clients().filter(c => 
+      c.name.toLowerCase().includes(q) || 
+      c.phone.includes(q)
+    ).slice(0, 5);
+  });
 
   // Selector de variantes
   variantSelectorOpen = signal(false);
@@ -506,10 +526,21 @@ export class PosPageComponent {
     this.amountPaid = 0;
     this.discount = 0;
     this.showClientForm.set(false);
+    this.selectedClient.set(null);
+    this.clientSearchQuery.set('');
     this.currentTicketNumber++;
 
     // 🎯 Auto-detectar tipo de venta para la próxima
     this.autoDetectSaleType();
+    
+    // ⚡ TIEMPO REAL: Sobrescribir LTV del cliente instantáneamente en la interfaz 
+    // sin depender de la latencia de red, para que en la página de Clientes ya se vea la suma al segundo.
+    if (this.selectedClient()?.id) {
+      this.clientService.updateClientLtvLocally(this.selectedClient()!.id, this.total());
+    }
+
+    // 🔄 Hacer que el módulo de clientes recargue en background también por seguridad
+    this.clientService.forceSync();
   }
 
   onTicketCancelled() {
@@ -537,6 +568,7 @@ export class PosPageComponent {
     // 🚀 NUEVA ESTRUCTURA: Payload JSON para Spring Boot Backend (VentaController)
     const ventaRequest: VentaRequest = {
       vendedorId: vendedorUuid, 
+      customerId: this.selectedClient()?.id, // Vínculo BD
       paymentMethod: this.getPaymentMethodType(),
       discount: this.discount,
       tax: this.tax(),
@@ -580,12 +612,56 @@ export class PosPageComponent {
   }
 
   onTicketSent() {
-    if (!this.clientPhone) {
+    if (!this.clientPhone && !this.selectedClient()?.phone) {
       this.toastService.warning('Ingresa el teléfono del cliente');
       return;
     }
     this.logger.log('Ticket enviado por WhatsApp');
     this.toastService.success('Ticket enviado por WhatsApp');
+  }
+
+  // --- LÓGICA DE CLIENTES ---
+  selectClient(client: Client) {
+    this.selectedClient.set(client);
+    this.clientSearchQuery.set('');
+    this.clientName = client.name;
+    this.clientPhone = client.phone;
+  }
+
+  removeSelectedClient() {
+    this.selectedClient.set(null);
+    this.clientName = '';
+    this.clientPhone = '';
+  }
+
+  openNewClientModal() {
+    this.newClientName.set(this.clientSearchQuery());
+    this.newClientPhone.set('');
+    this.newClientError.set('');
+    this.showNewClientModal.set(true);
+  }
+
+  async saveNewClient() {
+    const name = this.newClientName().trim();
+    const phone = this.newClientPhone().trim();
+    if (!name || !phone) {
+      this.newClientError.set('Nombre y teléfono son obligatorios');
+      return;
+    }
+    
+    try {
+      // Bloquear o mostrar loader (opcional) si tuviéramos isLoading aquí
+      const realClient = await this.clientService.createClientAsync({ name, phone });
+      
+      this.selectedClient.set(realClient);
+      this.clientName = realClient.name;
+      this.clientPhone = realClient.phone;
+      this.clientSearchQuery.set('');
+      this.showNewClientModal.set(false);
+    } catch (err) {
+      // Toast ya lo maneja ClientService en caso de error
+      this.newClientError.set('Ocurrió un error guardando el cliente.');
+    }
   }
 
   // Toast notifications

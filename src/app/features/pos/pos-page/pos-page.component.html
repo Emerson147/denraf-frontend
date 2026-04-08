@@ -317,32 +317,59 @@
         <div class="p-5 bg-transparent border-t border-stone-200/50 dark:border-stone-700/50 space-y-4">
           
           <!-- Datos del cliente (inline compacto Glass) -->
-          @if (showClientForm()) {
-            <div class="p-4 bg-white/50 dark:bg-stone-900/50 backdrop-blur-md rounded-2xl border border-stone-200/60 dark:border-stone-700/60 shadow-sm space-y-3">
-              <div class="flex items-center justify-between">
-                <h3 class="text-[10px] font-bold text-stone-500 tracking-wider uppercase">Cliente Asignado</h3>
-                <button
-                  (click)="showClientForm.set(false)"
-                  class="text-stone-400 hover:text-red-500 transition-colors duration-300"
-                >
+          @if (selectedClient()) {
+            <div class="p-4 bg-white/50 dark:bg-stone-900/50 backdrop-blur-md rounded-2xl border border-stone-200/60 dark:border-stone-700/60 shadow-sm flex items-center justify-between animate-in slide-in-from-top-2 duration-300">
+              <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-full bg-stone-200 dark:bg-stone-700 flex items-center justify-center shrink-0">
+                  <span class="material-icons-outlined text-stone-500 text-lg">person</span>
+                </div>
+                <div class="min-w-0 flex-1">
+                  <h3 class="text-sm font-bold text-stone-800 dark:text-stone-100 truncate flex items-center gap-2">
+                    {{ selectedClient()!.name }}
+                    @if (selectedClient()!.tier === 'gold') {
+                      <span class="material-icons-outlined text-amber-500 text-[14px]">stars</span>
+                    }
+                  </h3>
+                  <p class="text-[10px] text-stone-500 truncate">{{ selectedClient()!.phone || 'Sin teléfono' }}</p>
+                </div>
+              </div>
+              <button (click)="removeSelectedClient()" class="text-stone-400 hover:text-red-500 transition-colors p-1 shrink-0">
+                <span class="material-icons-outlined text-base">close</span>
+              </button>
+            </div>
+          } @else if (showClientForm()) {
+            <div class="p-3 bg-white/50 dark:bg-stone-900/50 backdrop-blur-md rounded-2xl border border-stone-200/60 dark:border-stone-700/60 shadow-sm space-y-2 relative">
+              <div class="flex items-center justify-between pl-1">
+                <h3 class="text-[10px] font-bold text-stone-500 tracking-wider uppercase">Vincular Cliente</h3>
+                <button (click)="showClientForm.set(false)" class="text-stone-400 hover:text-stone-600 transition-colors">
                   <span class="material-icons-outlined text-sm">close</span>
                 </button>
               </div>
               
-              <div class="grid grid-cols-2 gap-3">
+              <div class="relative">
+                <span class="absolute left-3 top-1/2 -translate-y-1/2 material-icons-outlined text-stone-400 text-sm">search</span>
                 <input
                   type="text"
-                  placeholder="Nombre Apellido"
-                  [(ngModel)]="clientName"
-                  class="px-3 py-2 text-sm border border-stone-200/60 dark:border-stone-700/60 bg-white/70 dark:bg-stone-800/70 text-stone-900 dark:text-stone-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-stone-400 dark:focus:ring-stone-500 placeholder:text-stone-400 dark:placeholder:text-stone-500 transition-all duration-300"
-                />
-                <input
-                  type="tel"
-                  placeholder="Teléfono/Cel"
-                  [(ngModel)]="clientPhone"
-                  class="px-3 py-2 text-sm border border-stone-200/60 dark:border-stone-700/60 bg-white/70 dark:bg-stone-800/70 text-stone-900 dark:text-stone-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-stone-400 dark:focus:ring-stone-500 placeholder:text-stone-400 dark:placeholder:text-stone-500 transition-all duration-300"
+                  placeholder="Buscar por nombre o celular..."
+                  [(ngModel)]="clientSearchQuery"
+                  class="w-full pl-9 pr-3 py-2 text-sm border border-stone-200/60 dark:border-stone-700/60 bg-white/70 dark:bg-stone-800/70 text-stone-900 dark:text-stone-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-stone-400 transition-all duration-300 placeholder:text-stone-400"
                 />
               </div>
+
+              <!-- Sugerencias Dropdown -->
+              @if (clientSearchQuery().trim().length > 0) {
+                <div class="absolute left-0 right-0 top-[calc(100%+8px)] bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-xl shadow-xl overflow-hidden z-[60] animate-in fade-in zoom-in-95 duration-200 max-h-60 overflow-y-auto">
+                  @for (client of suggestedClients(); track client.id) {
+                    <button (click)="selectClient(client)" class="w-full text-left px-4 py-2 hover:bg-stone-50 dark:hover:bg-stone-700 transition-colors border-b border-stone-100 dark:border-stone-700/50 flex flex-col">
+                      <span class="text-sm font-bold text-stone-800 dark:text-stone-100">{{ client.name }}</span>
+                      <span class="text-[10px] text-stone-500">{{ client.phone || 'S/N' }} • {{ client.tier | uppercase }}</span>
+                    </button>
+                  }
+                  <button (click)="openNewClientModal()" class="w-full text-center px-4 py-3 bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 hover:bg-black dark:hover:bg-white text-xs font-bold transition-all">
+                    + Cargar nuevo: "{{ clientSearchQuery() }}"
+                  </button>
+                </div>
+              }
             </div>
           }
 
@@ -388,7 +415,7 @@
               </div>
             }
 
-            @if (!showClientForm() && cart().length > 0) {
+            @if (!showClientForm() && !selectedClient() && cart().length > 0) {
               <button
                 (click)="showClientForm.set(true)"
                 class="w-full py-2.5 text-xs rounded-xl border border-dashed border-stone-300 dark:border-stone-700 text-stone-500 dark:text-stone-400 font-bold hover:bg-white/50 dark:hover:bg-stone-800/50 transition-all flex items-center justify-center gap-2"
@@ -752,6 +779,70 @@
             class="py-3.5 rounded-xl font-bold text-sm bg-red-500 text-white hover:bg-red-600 shadow-md shadow-red-500/20 transition-all active:scale-95"
           >
             Sí, Vaciar
+          </button>
+        </div>
+      </div>
+    </app-ui-animated-dialog>
+
+    <!-- Modal Registro Rápido Cliente Nuevo -->
+    <app-ui-animated-dialog 
+      [isOpen]="showNewClientModal()" 
+      (isOpenChange)="showNewClientModal.set($event)"
+      [maxWidth]="'sm'"
+    >
+      <div class="space-y-5">
+        <div class="flex items-center gap-3 border-b border-stone-100 dark:border-stone-700 pb-4">
+          <div class="w-10 h-10 rounded-xl bg-stone-100 dark:bg-stone-800 flex items-center justify-center">
+            <span class="material-icons-outlined text-stone-600 dark:text-stone-300">person_add</span>
+          </div>
+          <div>
+            <h2 class="text-lg font-bold text-stone-800 dark:text-stone-100">Cliente Nuevo</h2>
+            <p class="text-[10px] text-stone-500 uppercase tracking-widest font-mono">Registro en Caja</p>
+          </div>
+        </div>
+
+        @if (newClientError()) {
+          <div class="px-3 py-2 bg-red-50 border border-red-200 rounded-lg text-xs text-red-600">
+            {{ newClientError() }}
+          </div>
+        }
+
+        <div class="space-y-4">
+          <div class="space-y-1.5">
+            <label class="text-xs font-bold text-stone-700 dark:text-stone-300">Nombre Completo <span class="text-red-500">*</span></label>
+            <input 
+              type="text" 
+              [(ngModel)]="newClientName"
+              placeholder="Ej. Juan Pérez"
+              class="w-full px-4 py-2.5 bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-xl focus:ring-2 focus:ring-stone-400 outline-none text-sm"
+              autofocus
+            />
+          </div>
+          <div class="space-y-1.5">
+            <label class="text-xs font-bold text-stone-700 dark:text-stone-300">Celular o Teléfono <span class="text-red-500">*</span></label>
+            <input 
+              type="tel" 
+              [(ngModel)]="newClientPhone"
+              placeholder="Ej. 988..."
+              class="w-full px-4 py-2.5 bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-xl focus:ring-2 focus:ring-stone-400 outline-none text-sm"
+            />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3 pt-3">
+          <button 
+            type="button"
+            (click)="showNewClientModal.set(false)"
+            class="px-4 py-3 bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-300 font-bold text-sm rounded-xl hover:bg-stone-50 transition-all font-mono"
+          >
+            CANCELAR
+          </button>
+          <button 
+            type="button"
+            (click)="saveNewClient()"
+            class="px-4 py-3 bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 font-bold text-sm rounded-xl hover:bg-black transition-all shadow-lg shadow-stone-900/20 active:scale-95 font-mono"
+          >
+            GUARDAR
           </button>
         </div>
       </div>

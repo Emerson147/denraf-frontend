@@ -1,334 +1,152 @@
-import { Injectable, signal, computed, inject } from '@angular/core';
+import { Injectable, signal, inject, computed } from '@angular/core';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { InventoryMovement } from '../models';
-import { ProductService } from './product.service';
-import { AuthService } from '../auth/auth';
-import { SyncService } from './sync.service';
-import { LocalDbService } from './local-db.service';
 import { ErrorHandlerService } from './error-handler.service';
+import { ToastService } from './toast.service';
+import { environment } from '../../../environments/environment';
+import { firstValueFrom } from 'rxjs';
+import { ProductService } from './product.service';
 
 /**
- * 🚀 InventoryMovementService - Gestión de movimientos de inventario
+ * 🚀 InventoryMovementService - Gestión Paginada desde Spring Boot
  *
  * Estrategia:
- * 1. Registra entradas, salidas, ajustes y devoluciones
- * 2. Actualiza stock automáticamente
- * 3. Sincroniza con Supabase
- * 4. Cache en IndexedDB
+ * 1. Single Source of Truth (PostgreSQL via REST).
+ * 2. Paginación Server-Side integrada en señales.
+ * 3. Actualización optimista parcial pero dependiente del status 201.
  */
 @Injectable({
   providedIn: 'root',
 })
 export class InventoryMovementService {
-  private productService = inject(ProductService);
-  private authService = inject(AuthService);
-  private syncService = inject(SyncService);
-  private localDb = inject(LocalDbService);
+  private http = inject(HttpClient);
   private errorHandler = inject(ErrorHandlerService);
+  private toastService = inject(ToastService);
+  private productService = inject(ProductService);
 
-  // State
+  private readonly API_URL = `${environment.apiUrl}/movimientos`;
+
+  // --- ESTADO REACTIVO PAGINADO ---
   private movementsSignal = signal<InventoryMovement[]>([]);
+  public totalElements = signal<number>(0);
+  public totalPages = signal<number>(0);
+  public currentPage = signal<number>(0);
+  public pageSize = signal<number>(20);
+  public isLoading = signal<boolean>(false);
 
-  // 🔄 Estado de carga
-  isLoading = signal(true);
-  private initialized = false;
-  private readonly SYNC_INTERVAL_MS = 5 * 60 * 1000; // 5 minutos
-  lastSyncTime = signal<Date | null>(null);
+  // Filtros Persistentes
+  public currentTypeFilter = signal<string | null>(null);
 
   // API pública
   readonly movements = this.movementsSignal.asReadonly();
 
-  // Computed
+  // Computados
   entradas = computed(() => this.movementsSignal().filter((m) => m.type === 'entrada'));
-
-  salidas = computed(() => this.movementsSignal().filter((m) => m.type === 'salida'));
-
   ajustes = computed(() => this.movementsSignal().filter((m) => m.type === 'ajuste'));
 
-  devoluciones = computed(() => this.movementsSignal().filter((m) => m.type === 'devolucion'));
-
-  // 📏 Cache de fecha actual para evitar recalcular new Date() en cada computed
-  private currentDateCache = computed(() => {
-    // Trigger implícito para actualizar cuando cambien movimientos
-    this.movementsSignal();
-    return new Date().toDateString();
-  });
-
-  // Movimientos de hoy (optimizado con cache)
-  todayMovements = computed(() => {
-    const today = this.currentDateCache();
-    return this.movementsSignal().filter((m) => new Date(m.date).toDateString() === today);
-  });
-
-  // 💰 Inversión total en compras (entradas)
-  totalInvestment = computed(() => {
-    return this.entradas().reduce((sum, entrada) => {
-      return sum + (entrada.totalCost || 0);
-    }, 0);
-  });
-
-  // 💸 Inversión del día
-  todayInvestment = computed(() => {
-    return this.todayMovements()
-      .filter((m) => m.type === 'entrada')
-      .reduce((sum, entrada) => sum + (entrada.totalCost || 0), 0);
-  });
-
-  // 💸 Inversión de la semana (optimizado con timestamps)
-  weeklyInvestment = computed(() => {
-    const weekAgoTime = Date.now() - 7 * 24 * 60 * 60 * 1000;
-
-    return this.entradas()
-      .filter((m) => new Date(m.date).getTime() >= weekAgoTime)
-      .reduce((sum, entrada) => sum + (entrada.totalCost || 0), 0);
-  });
-
-  // 💸 Inversión del mes (optimizado con timestamps)
-  monthlyInvestment = computed(() => {
-    const monthAgoTime = Date.now() - 30 * 24 * 60 * 60 * 1000;
-
-    return this.entradas()
-      .filter((m) => new Date(m.date).getTime() >= monthAgoTime)
-      .reduce((sum, entrada) => sum + (entrada.totalCost || 0), 0);
-  });
-
-  constructor() {
-    if (!this.initialized) {
-      this.initialized = true;
-      this.initStaleWhileRevalidate();
-    }
-  }
-
   /**
-   * 🚀 Estrategia Stale-While-Revalidate
+   * 🔄 Fetch Paginated Movements from Spring Boot (Server-Side Pagination)
    */
-  private async initStaleWhileRevalidate(): Promise<void> {
-    console.log('⚡ [Movements] Iniciando Stale-While-Revalidate...');
+  async fetchPaginatedMovements(page: number = 0, size: number = this.pageSize(), type?: string): Promise<void> {
+    this.isLoading.set(true);
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString())
+      .set('sortBy', 'createdAt')
+      .set('sortDir', 'desc');
 
-    // PASO 1: Cargar cache INMEDIATAMENTE
-    await this.loadFromCache();
-
-    // PASO 2: Actualizar desde Supabase si es necesario
-    const shouldSync = this.shouldSyncWithSupabase();
-    if (shouldSync) {
-      console.log('🔄 [Movements] Actualizando desde Supabase en background...');
-      this.loadFromSupabaseBackground();
+    if (type) {
+      params = params.set('type', type);
+      this.currentTypeFilter.set(type);
     } else {
-      console.log('✅ [Movements] Cache reciente');
-      this.isLoading.set(false);
-    }
-  }
-
-  private async loadFromCache(): Promise<boolean> {
-    try {
-      const cached = await this.localDb.getMovements();
-
-      if (cached && cached.length > 0) {
-        console.log(`⚡ [Movements] Cache: ${cached.length} movimientos`);
-        this.movementsSignal.set(cached);
-        this.isLoading.set(false);
-        return true;
-      }
-      return false;
-    } catch (error) {
-      console.warn('⚠️ [Movements] Error leyendo cache:', error);
-      return false;
-    }
-  }
-
-  private shouldSyncWithSupabase(): boolean {
-    const lastSync = this.lastSyncTime();
-    if (!lastSync) return true;
-
-    const timeSinceLastSync = Date.now() - lastSync.getTime();
-    return timeSinceLastSync > this.SYNC_INTERVAL_MS;
-  }
-
-  private loadFromSupabaseBackground(): void {
-    this.syncFromSupabase();
-  }
-
-  private async syncFromSupabase(): Promise<void> {
-    if (!navigator.onLine) {
-      console.log('📴 [Movements] Sin conexión');
-      this.isLoading.set(false);
-      return;
+      this.currentTypeFilter.set(null);
     }
 
     try {
-      // TODO: Implementar pull de Supabase
-      console.log('☁️ [Movements] Sincronizando...');
-      this.lastSyncTime.set(new Date());
+      const response = await firstValueFrom(this.http.get<any>(this.API_URL, { params }));
+      this.movementsSignal.set(response.content || []);
+      this.totalElements.set(response.totalElements || 0);
+      this.totalPages.set(response.totalPages || 0);
+      this.currentPage.set(response.number || 0);
+      this.pageSize.set(response.size || 20);
     } catch (error) {
-      console.error('❌ [Movements] Error sincronizando:', error);
+      this.errorHandler.handleError(error as any, 'Error cargando historial de movimientos');
     } finally {
       this.isLoading.set(false);
     }
   }
 
   /**
-   * 📥 Registrar entrada de inventario
+   * 🔄 Cambiar la cantidad de ítems a visualizar por página
    */
-  registerEntrada(
+  async changePageSize(newSize: number): Promise<void> {
+    this.pageSize.set(newSize);
+    await this.fetchPaginatedMovements(0, newSize, this.currentTypeFilter() || undefined);
+  }
+
+  /**
+   * 📥 Registrar entrada de inventario vía API
+   */
+  async registerEntrada(
     entrada: Omit<InventoryMovement, 'id' | 'movementNumber' | 'date' | 'type'>
-  ): InventoryMovement | null {
-    return this.errorHandler.handleSyncOperation(
-      () => {
-        const newMovement: InventoryMovement = {
-          ...entrada,
-          id: crypto.randomUUID(),
-          movementNumber: this.generateMovementNumber('ENTRADA'),
-          date: new Date(),
-          type: 'entrada',
-        };
-
-        // Aumentar stock
-        const success = this.productService.addStock(
-          entrada.productId,
-          entrada.quantity,
-          entrada.variantId
-        );
-
-        if (!success) {
-          throw new Error('No se pudo actualizar el stock');
-        }
-
-        // Agregar movimiento
-        this.movementsSignal.update((current) => [newMovement, ...current]);
-
-        // Sincronizar con Supabase
-        this.syncService.queueForSync('inventory_movement', 'create', newMovement);
-
-        // Guardar en IndexedDB
-        this.localDb.saveMovement(newMovement);
-
-        console.log('✅ Entrada registrada:', newMovement);
-        return newMovement;
-      },
-      'Registro de entrada',
-      'No se pudo registrar la entrada de inventario'
-    );
+  ): Promise<InventoryMovement | null> {
+    return this.createMovement('entrada', entrada);
   }
 
   /**
-   * 📤 Registrar salida de inventario (manual)
+   * 🔧 Registrar ajuste de inventario vía API
    */
-  registerSalida(
-    salida: Omit<InventoryMovement, 'id' | 'movementNumber' | 'date' | 'type'>
-  ): InventoryMovement | null {
-    return this.errorHandler.handleSyncOperation(
-      () => {
-        const newMovement: InventoryMovement = {
-          ...salida,
-          id: crypto.randomUUID(),
-          movementNumber: this.generateMovementNumber('SALIDA'),
-          date: new Date(),
-          type: 'salida',
-        };
-
-        // Reducir stock
-        const success = this.productService.reduceStock(
-          salida.productId,
-          salida.quantity,
-          salida.variantId
-        );
-
-        if (!success) {
-          throw new Error('Stock insuficiente o producto no encontrado');
-        }
-
-        // Agregar movimiento
-        this.movementsSignal.update((current) => [newMovement, ...current]);
-
-        // Sincronizar
-        this.syncService.queueForSync('inventory_movement', 'create', newMovement);
-
-        // Guardar en IndexedDB
-        this.localDb.saveMovement(newMovement);
-
-        console.log('✅ Salida registrada:', newMovement);
-        return newMovement;
-      },
-      'Registro de salida',
-      'No se pudo registrar la salida de inventario'
-    );
-  }
-
-  /**
-   * 🔧 Registrar ajuste de inventario
-   */
-  registerAjuste(
+  async registerAjuste(
     ajuste: Omit<InventoryMovement, 'id' | 'movementNumber' | 'date' | 'type'>
-  ): InventoryMovement | null {
-    return this.errorHandler.handleSyncOperation(
-      () => {
-        const newMovement: InventoryMovement = {
-          ...ajuste,
-          id: crypto.randomUUID(),
-          movementNumber: this.generateMovementNumber('AJUSTE'),
-          date: new Date(),
-          type: 'ajuste',
-        };
-
-        // Actualizar stock (positivo o negativo)
-        const success =
-          ajuste.quantity > 0
-            ? this.productService.addStock(ajuste.productId, ajuste.quantity, ajuste.variantId)
-            : this.productService.reduceStock(
-                ajuste.productId,
-                Math.abs(ajuste.quantity),
-                ajuste.variantId
-              );
-
-        if (!success) {
-          throw new Error('No se pudo ajustar el stock');
-        }
-
-        this.movementsSignal.update((current) => [newMovement, ...current]);
-        this.syncService.queueForSync('inventory_movement', 'create', newMovement);
-
-        // Guardar en IndexedDB
-        this.localDb.saveMovement(newMovement);
-
-        console.log('✅ Ajuste registrado:', newMovement);
-        return newMovement;
-      },
-      'Ajuste de inventario',
-      'No se pudo realizar el ajuste'
-    );
+  ): Promise<InventoryMovement | null> {
+    return this.createMovement('ajuste', ajuste);
   }
 
   /**
-   * Generar número de movimiento único
+   * Universal POST Creator
    */
-  private generateMovementNumber(prefix: string): string {
-    const count =
-      this.movementsSignal().filter((m) => m.movementNumber.startsWith(prefix)).length + 1;
+  private async createMovement(
+    type: string,
+    data: Omit<InventoryMovement, 'id' | 'movementNumber' | 'date' | 'type'>
+  ): Promise<InventoryMovement | null> {
+    try {
+      this.isLoading.set(true);
+      
+      const payload = {
+        ...data,
+        type: type,
+        unitCost: data.cost // Adaptar de `cost` a `unitCost` para compatibilidad backend
+      };
 
-    return `${prefix}-${String(count).padStart(4, '0')}`;
+      const result = await firstValueFrom(
+        this.http.post<InventoryMovement>(this.API_URL, payload)
+      );
+
+      // Actualizar la grilla trayendo la página 0 (para ver el nuevo)
+      await this.fetchPaginatedMovements(0, this.pageSize(), this.currentTypeFilter() || undefined);
+      
+      // Sincronizar el catálogo local de productos con la DB
+      if (type === 'entrada') {
+          this.productService.addStock(data.productId, data.quantity, data.variantId);
+      } else if (type === 'ajuste' && data.quantity > 0) {
+          this.productService.addStock(data.productId, data.quantity, data.variantId);
+      } else if (type === 'ajuste' && data.quantity < 0) {
+          this.productService.reduceStock(data.productId, Math.abs(data.quantity), data.variantId);
+      }
+
+      return result;
+    } catch (error) {
+      this.errorHandler.handleError(error as any, `Error al registrar ${type}`);
+      return null;
+    } finally {
+      this.isLoading.set(false);
+    }
   }
 
   /**
-   * Obtener movimientos por producto
-   */
-  getMovementsByProduct(productId: string): InventoryMovement[] {
-    return this.movementsSignal().filter((m) => m.productId === productId);
-  }
-
-  /**
-   * Obtener movimientos por rango de fechas
-   */
-  getMovementsByDateRange(startDate: Date, endDate: Date): InventoryMovement[] {
-    return this.movementsSignal().filter((m) => {
-      const moveDate = new Date(m.date);
-      return moveDate >= startDate && moveDate <= endDate;
-    });
-  }
-
-  /**
-   * 🔄 Sincronización manual
+   * 🔄 Sincronización manual/recarga
    */
   async forceSync(): Promise<void> {
-    console.log('🔄 [Movements] Sincronización manual forzada...');
-    await this.syncFromSupabase();
+    await this.fetchPaginatedMovements(this.currentPage(), this.pageSize(), this.currentTypeFilter() || undefined);
   }
 }

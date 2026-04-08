@@ -2,8 +2,6 @@ import { Injectable, inject, effect } from '@angular/core';
 import { SalesService } from './sales.service';
 import { ProductService } from './product.service';
 import { NotificationService } from './notification.service';
-import { AnalyticsService } from './analytics.service';
-
 /**
  * 🚨 AlertService - Sistema de alertas inteligentes
  * 
@@ -21,8 +19,6 @@ export class AlertService {
   private salesService = inject(SalesService);
   private productService = inject(ProductService);
   private notificationService = inject(NotificationService);
-  private analyticsService = inject(AnalyticsService);
-
   // Configuración de alertas
   private readonly WEEKLY_SALES_GOAL = 5000; // Meta semanal en soles
   private readonly NO_MOVEMENT_DAYS = 30; // Días sin movimiento para alertar

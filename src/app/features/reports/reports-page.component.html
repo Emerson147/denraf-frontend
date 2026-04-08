@@ -1,648 +1,552 @@
-<div class="min-h-screen bg-stone-50 dark:bg-stone-950 p-6 md:p-8 transition-colors duration-100">
+<div class="min-h-screen bg-stone-50 dark:bg-stone-950 p-4 sm:p-6 lg:p-8 transition-colors duration-300 ease-out">
   <div class="max-w-[1600px] mx-auto space-y-6">
-    
-    <!-- Header -->
-    <div class="flex flex-col md:flex-row md:items-start justify-between gap-6 mb-6">
-      <div class="flex flex-col gap-2">
-        <div class="flex items-center gap-3">
-          <div class="text-4xl">📈</div>
-          <div>
-            <h1 class="text-3xl font-serif font-bold text-stone-800 dark:text-stone-100">Reportes</h1>
-            <p class="text-stone-500 dark:text-stone-400 text-sm font-light">Análisis de rendimiento financiero</p>
-          </div>
-        </div>
-      </div>
-      
-      <div class="flex gap-3">
-        <!-- Botón Exportar Completo -->
-        <app-ui-export-menu
-          [data]="exportDataComplete()"
-          type="reports"
-        />
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- HEADER                                      -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <app-ui-page-header title="Reportes" subtitle="DenRaf • Análisis Financiero" materialIcon="query_stats" />
+      <div class="flex items-center gap-3 w-full sm:w-auto">
+        <app-period-selector class="flex-1 sm:flex-initial" (periodChange)="onPeriodChange($event)" />
+        <button (click)="descargarExcel()" class="bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 rounded-xl px-5 py-2.5 font-medium shadow-sm hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center gap-2">
+          <span class="material-icons-outlined text-sm">download</span> Excel
+        </button>
+        <app-ui-export-menu [data]="exportData()" type="reports" />
       </div>
     </div>
 
-    <!-- KPIs Principales -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-      
-      <div class="group bg-white dark:bg-stone-900 rounded-2xl border border-stone-100 dark:border-stone-800 shadow-sm hover:shadow-lg p-6 transition-all duration-300 ease-out cursor-pointer hover:scale-[1.01] hover:-translate-y-0.5">
-        <div class="flex items-center gap-3 mb-4">
-          <div class="h-10 w-10 rounded-xl bg-emerald-500 dark:bg-emerald-600 flex items-center justify-center text-white group-hover:scale-110 group-hover:rotate-6 transition-transform duration-200 ease-out">
-            <span class="material-icons-outlined text-lg">paid</span>
-          </div>
-          <p class="text-xs uppercase tracking-wide text-stone-400 dark:text-stone-500 font-medium">Ingresos Totales</p>
-        </div>
-        <p class="text-3xl font-bold text-stone-900 dark:text-stone-100 group-hover:scale-105 transition-transform duration-200 ease-out transform-gpu">S/ {{ totalRevenue() | number:'1.0-0' }}</p>
-        <div class="flex items-center gap-2 mt-2">
-          <span class="px-2 py-1 rounded-full text-xs font-bold border"
-                [ngClass]="{
-                  'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 border-emerald-100 dark:border-emerald-800': weekComparison().isPositive,
-                  'bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 border-red-100 dark:border-red-800': !weekComparison().isPositive
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- SKELETON LOADING                            -->
+    <!-- ═══════════════════════════════════════════ -->
+    @if (loading()) {
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <app-ui-skeleton variant="card" class="lg:col-span-8 h-96" />
+      <div class="lg:col-span-4 space-y-6">
+        <app-ui-skeleton variant="card" class="h-44" />
+        <app-ui-skeleton variant="card" class="h-44" />
+      </div>
+    </div>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <app-ui-skeleton variant="card" class="h-24" />
+      <app-ui-skeleton variant="card" class="h-24" />
+      <app-ui-skeleton variant="card" class="h-24" />
+      <app-ui-skeleton variant="card" class="h-24" />
+    </div>
+    } @else {
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- MÓDULO 1: HERO BENTO — REVENUE OVERVIEW               -->
+    <!-- Responsabilidad: Visión general financiera del período -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+      <!-- ┌─────────────────────────────────────────┐ -->
+      <!-- │  BIG BOX: Gráfico de Ingresos (Col 1-8)  │ -->
+      <!-- └─────────────────────────────────────────┘ -->
+      <div class="lg:col-span-8 bg-white dark:bg-stone-900 rounded-3xl border border-stone-200/60 dark:border-stone-800 shadow-sm p-6 lg:p-8 relative overflow-hidden group">
+        <!-- Mesh gradient decorativo -->
+        <div class="absolute top-0 right-0 w-96 h-96 bg-linear-to-bl from-emerald-100/50 dark:from-emerald-900/20 rounded-full blur-3xl opacity-50 pointer-events-none transition-opacity group-hover:opacity-100"></div>
+        <div class="relative z-10 flex flex-col h-full">
+          <div class="flex items-center justify-between mb-8">
+            <div>
+              <h2 class="text-2xl font-bold text-stone-900 dark:text-stone-100 tracking-tight">Evolución de Ingresos</h2>
+              <p class="text-sm text-stone-500 dark:text-stone-400 mt-1">Comparativa de ingresos y ganancia neta</p>
+            </div>
+            <!-- Crecimiento Tag -->
+            <div class="px-4 py-2 rounded-full border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 flex items-center gap-2">
+              <span class="text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider">Crecimiento</span>
+              <div class="flex items-center gap-1" [ngClass]="{
+                  'text-emerald-600 dark:text-emerald-400': weekComparison().isPositive,
+                  'text-rose-600 dark:text-rose-400': !weekComparison().isPositive
                 }">
-            {{ weekComparison().arrow }} {{ weekComparison().percentage | number:'1.1-1' }}%
-          </span>
-          <span class="text-xs text-stone-500 dark:text-stone-400">vs semana pasada</span>
-        </div>
-      </div>
-
-      <div class="group bg-white dark:bg-stone-900 rounded-2xl border border-stone-100 dark:border-stone-800 shadow-sm hover:shadow-lg p-6 transition-all duration-300 ease-out cursor-pointer hover:scale-[1.01] hover:-translate-y-0.5">
-        <div class="flex items-center gap-3 mb-4">
-          <div class="h-10 w-10 rounded-xl bg-emerald-500 dark:bg-emerald-600 flex items-center justify-center text-white group-hover:scale-110 group-hover:rotate-6 transition-transform duration-200 ease-out">
-            <span class="material-icons-outlined text-lg">savings</span>
-          </div>
-          <p class="text-xs uppercase tracking-wide text-stone-400 dark:text-stone-500 font-medium">Ganancia Neta</p>
-        </div>
-        <p class="text-3xl font-bold text-emerald-600 dark:text-emerald-400 group-hover:scale-105 transition-transform duration-200 ease-out transform-gpu">S/ {{ totalProfit() | number:'1.0-0' }}</p>
-        <div class="flex items-center gap-2 mt-2">
-          <span class="bg-stone-50 dark:bg-stone-800 text-stone-600 dark:text-stone-300 px-2 py-1 rounded-full text-xs font-bold">
-            {{ profitMargin() | number:'1.0-0' }}% margen
-          </span>
-        </div>
-      </div>
-
-      <div class="group bg-white dark:bg-stone-900 rounded-2xl border border-stone-100 dark:border-stone-800 shadow-sm hover:shadow-lg p-6 transition-all duration-300 ease-out cursor-pointer hover:scale-[1.01] hover:-translate-y-0.5">
-        <div class="flex items-center gap-3 mb-4">
-          <div class="h-10 w-10 rounded-xl bg-stone-900 dark:bg-stone-100 flex items-center justify-center text-white dark:text-stone-900 group-hover:scale-110 group-hover:rotate-6 transition-transform duration-200 ease-out">
-            <span class="material-icons-outlined text-lg">inventory_2</span>
-          </div>
-          <p class="text-xs uppercase tracking-wide text-stone-400 dark:text-stone-500 font-medium">Productos Vendidos</p>
-        </div>
-        <p class="text-3xl font-bold text-stone-900 dark:text-stone-100 group-hover:scale-105 transition-transform duration-200 ease-out transform-gpu">{{ totalProductsSold() }}</p>
-        <p class="text-xs text-stone-500 dark:text-stone-400 mt-2">Unidades esta semana</p>
-      </div>
-
-      <div class="group bg-white dark:bg-stone-900 rounded-2xl border border-stone-100 dark:border-stone-800 shadow-sm hover:shadow-lg p-6 transition-all duration-300 ease-out cursor-pointer hover:scale-[1.01] hover:-translate-y-0.5">
-        <div class="flex items-center gap-3 mb-4">
-          <div class="h-10 w-10 rounded-xl bg-amber-500 dark:bg-amber-600 flex items-center justify-center text-white group-hover:scale-110 group-hover:rotate-6 transition-transform duration-200 ease-out">
-            <span class="material-icons-outlined text-lg">trending_up</span>
-          </div>
-          <p class="text-xs uppercase tracking-wide text-stone-400 dark:text-stone-500 font-medium">Meta Mensual</p>
-        </div>
-        <p class="text-3xl font-bold text-stone-900 dark:text-stone-100 group-hover:scale-105 transition-transform duration-200 ease-out transform-gpu">{{ monthlyGoalPercentage() | number:'1.0-0' }}%</p>
-        <div class="w-full bg-stone-100 dark:bg-stone-800 h-2 rounded-full overflow-hidden mt-3">
-          <div class="h-full bg-emerald-500 dark:bg-emerald-600 rounded-full transition-all duration-1000" [style.width.%]="monthlyGoalPercentage()"></div>
-        </div>
-      </div>
-
-    </div>
-
-    <!-- Gráfico Principal -->
-    <div class="bg-white dark:bg-stone-900 rounded-2xl border border-stone-100 dark:border-stone-800 shadow-sm p-8 relative overflow-hidden transition-colors duration-100">
-      
-      <div class="flex justify-between items-start mb-8 relative z-10">
-        <div>
-          <p class="text-xs uppercase tracking-wider text-stone-400 dark:text-stone-500 font-medium mb-2">Ventas de la Semana</p>
-          <h2 class="text-4xl font-bold text-stone-900 dark:text-stone-100 tracking-tight">S/ {{ totalRevenue() | number:'1.0-0' }}</h2>
-          <div class="flex items-center gap-2 mt-3">
-            <span class="px-3 py-1 rounded-lg text-sm font-bold border"
-                  [ngClass]="{
-                    'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 border-emerald-100 dark:border-emerald-800': weekComparison().isPositive,
-                    'bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 border-red-100 dark:border-red-800': !weekComparison().isPositive
-                  }">
-              {{ weekComparison().arrow }} {{ weekComparison().percentage | number:'1.1-1' }}%
-            </span>
-            <span class="text-sm text-stone-500 dark:text-stone-400">vs semana anterior</span>
-          </div>
-        </div>
-        
-        <div class="bg-stone-50 dark:bg-stone-950/50 p-1 rounded-xl flex gap-1 border border-stone-100 dark:border-stone-800">
-          <button class="px-4 py-2 rounded-lg bg-white dark:bg-stone-900 shadow-sm text-xs font-bold text-stone-900 dark:text-stone-100 border border-stone-200 dark:border-stone-700 hover:scale-[1.02] transition-all duration-200 ease-out active:scale-95">
-            7 Días
-          </button>
-          <button class="px-4 py-2 rounded-lg text-xs font-medium text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 hover:bg-white/50 dark:hover:bg-stone-800/50 transition-all duration-200 ease-out hover:scale-[1.02] active:scale-95">
-            30 Días
-          </button>
-          <button class="px-4 py-2 rounded-lg text-xs font-medium text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 hover:bg-white/50 dark:hover:bg-stone-800/50 transition-all duration-200 ease-out hover:scale-[1.02] active:scale-95">
-            1 Año
-          </button>
-        </div>
-      </div>
-
-      <div class="h-64 w-full relative z-10">
-        <!-- ApexCharts Area Chart -->
-        <apx-chart
-          [series]="weeklyChartOptions().series!"
-          [chart]="weeklyChartOptions().chart!"
-          [xaxis]="weeklyChartOptions().xaxis!"
-          [yaxis]="weeklyChartOptions().yaxis!"
-          [colors]="weeklyChartOptions().colors!"
-          [fill]="weeklyChartOptions().fill!"
-          [stroke]="weeklyChartOptions().stroke!"
-          [grid]="weeklyChartOptions().grid!"
-          [tooltip]="weeklyChartOptions().tooltip!"
-          [dataLabels]="weeklyChartOptions().dataLabels!"
-        ></apx-chart>
-      </div>
-
-      <!-- Efecto decorativo -->
-      <div class="absolute top-0 right-0 w-96 h-96 bg-emerald-500/5 dark:bg-emerald-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
-    </div>
-
-    <!-- 🎪 Comparación Ferias vs Tienda -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-      <!-- Ferias -->
-      <div class="group bg-linear-to-br from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30 border border-amber-200 dark:border-amber-800 rounded-2xl p-6 hover:shadow-lg transition-all duration-300 ease-out cursor-pointer hover:scale-[1.01]">
-        <div class="flex items-center gap-3 mb-4">
-          <div class="h-10 w-10 rounded-xl bg-amber-500 flex items-center justify-center text-white group-hover:scale-110 group-hover:rotate-6 transition-transform duration-200 ease-out">
-            <span class="material-icons-outlined text-lg">celebration</span>
-          </div>
-          <div>
-            <p class="text-xs uppercase tracking-wide text-amber-700 dark:text-amber-400 font-medium">Ferias</p>
-            <p class="text-xs text-amber-600 dark:text-amber-500">Jue + Dom</p>
-          </div>
-        </div>
-        <p class="text-3xl font-bold text-amber-900 dark:text-amber-100 group-hover:scale-105 transition-transform duration-200 ease-out transform-gpu">S/ {{ fairComparison().ferias.revenue | number:'1.0-0' }}</p>
-        <p class="text-sm text-emerald-600 dark:text-emerald-400 font-bold mt-1">+S/ {{ fairComparison().ferias.profit | number:'1.0-0' }} ganancia</p>
-        <p class="text-xs text-amber-600 dark:text-amber-400 mt-2">Mejor: {{ fairComparison().mejorFeria }}</p>
-      </div>
-
-      <!-- Tienda -->
-      <div class="group bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-6 hover:shadow-lg transition-all duration-300 ease-out cursor-pointer hover:scale-[1.01]">
-        <div class="flex items-center gap-3 mb-4">
-          <div class="h-10 w-10 rounded-xl bg-stone-900 dark:bg-stone-100 flex items-center justify-center text-white dark:text-stone-900 group-hover:scale-110 group-hover:rotate-6 transition-transform duration-200 ease-out">
-            <span class="material-icons-outlined text-lg">store</span>
-          </div>
-          <div>
-            <p class="text-xs uppercase tracking-wide text-stone-500 dark:text-stone-400 font-medium">Tienda</p>
-            <p class="text-xs text-stone-400 dark:text-stone-500">Lun-Sáb</p>
-          </div>
-        </div>
-        <p class="text-3xl font-bold text-stone-900 dark:text-stone-100 group-hover:scale-105 transition-transform duration-200 ease-out transform-gpu">S/ {{ fairComparison().tienda.revenue | number:'1.0-0' }}</p>
-        <p class="text-sm text-emerald-600 dark:text-emerald-400 font-bold mt-1">+S/ {{ fairComparison().tienda.profit | number:'1.0-0' }} ganancia</p>
-        <p class="text-xs text-stone-500 dark:text-stone-400 mt-2">{{ fairComparison().tienda.count }} días</p>
-      </div>
-
-      <!-- Proporción -->
-      <div class="group bg-stone-50 dark:bg-stone-800/50 border border-stone-200 dark:border-stone-700 rounded-2xl p-6 hover:shadow-lg transition-all duration-300 ease-out cursor-pointer hover:scale-[1.01]">
-        <div class="flex items-center gap-3 mb-4">
-          <div class="h-10 w-10 rounded-xl bg-stone-600 dark:bg-stone-400 flex items-center justify-center text-white dark:text-stone-900 group-hover:scale-110 group-hover:rotate-6 transition-transform duration-200 ease-out">
-            <span class="material-icons-outlined text-lg">pie_chart</span>
-          </div>
-          <p class="text-xs uppercase tracking-wide text-stone-600 dark:text-stone-300 font-medium">Distribución</p>
-        </div>
-        <div class="space-y-3">
-          <div>
-            <div class="flex items-center justify-between mb-1">
-              <span class="text-xs text-stone-600 dark:text-stone-300">Ferias</span>
-              <span class="text-sm font-bold text-stone-900 dark:text-stone-100">
-                {{ (fairComparison().ferias.revenue / (fairComparison().ferias.revenue + fairComparison().tienda.revenue)) * 100 | number:'1.0-0' }}%
-              </span>
-            </div>
-            <div class="w-full bg-stone-200 dark:bg-stone-700 h-2 rounded-full overflow-hidden">
-              <div class="h-full bg-amber-500 rounded-full transition-all duration-1000"
-                   [style.width.%]="(fairComparison().ferias.revenue / (fairComparison().ferias.revenue + fairComparison().tienda.revenue)) * 100"></div>
-            </div>
-          </div>
-          <div>
-            <div class="flex items-center justify-between mb-1">
-              <span class="text-xs text-stone-600 dark:text-stone-300">Tienda</span>
-              <span class="text-sm font-bold text-stone-900 dark:text-stone-100">
-                {{ (fairComparison().tienda.revenue / (fairComparison().ferias.revenue + fairComparison().tienda.revenue)) * 100 | number:'1.0-0' }}%
-              </span>
-            </div>
-            <div class="w-full bg-stone-200 dark:bg-stone-700 h-2 rounded-full overflow-hidden">
-              <div class="h-full bg-stone-600 rounded-full transition-all duration-1000"
-                   [style.width.%]="(fairComparison().tienda.revenue / (fairComparison().ferias.revenue + fairComparison().tienda.revenue)) * 100"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Productos Top & Categorías -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      
-      <!-- Productos Más Vendidos -->
-      <div class="lg:col-span-2 bg-white dark:bg-stone-900 rounded-2xl border border-stone-100 dark:border-stone-800 shadow-sm p-8 transition-colors duration-100">
-        <div class="flex items-center justify-between mb-6">
-          <h3 class="text-xl font-bold text-stone-800 dark:text-stone-100">Productos Más Vendidos</h3>
-          <span class="text-xs text-stone-400 dark:text-stone-500 font-medium">Esta semana</span>
-        </div>
-        
-        <div class="space-y-5">
-          @for (item of topProducts(); track item.name; let i = $index) {
-            <div class="flex items-center gap-4 group hover:bg-stone-50 dark:hover:bg-stone-800/50 rounded-xl p-3 -mx-3 transition-all duration-200 ease-out cursor-pointer hover:scale-[1.005]">
-              <div class="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm shadow-sm border"
-                   [ngClass]="{
-                     'bg-linear-to-br from-amber-50 to-orange-50 text-amber-700 border-amber-200 dark:from-amber-950/30 dark:to-orange-950/30 dark:text-amber-400 dark:border-amber-800': i === 0,
-                     'bg-stone-100 text-stone-700 border-stone-200 dark:bg-stone-800 dark:text-stone-300 dark:border-stone-700': i > 0
-                   }">
-                #{{ i + 1 }}
+                <span class="material-icons-outlined text-sm">{{ weekComparison().isPositive ? 'trending_up' : 'trending_down' }}</span>
+                <span class="font-bold text-sm">{{ weekComparison().arrow }} {{ weekComparison().percentage | number : '1.1-1' }}%</span>
               </div>
-              
-              <div class="flex-1">
-                <div class="flex justify-between items-start mb-2">
-                  <div>
-                    <p class="font-semibold text-stone-800 dark:text-stone-100">{{ item.name }}</p>
-                    <p class="text-xs text-stone-500 dark:text-stone-400">{{ item.sold }} unidades vendidas</p>
+            </div>
+          </div>
+          <!-- Chart -->
+          <div class="flex-1 min-h-[280px]">
+            <apx-chart
+              [series]="weeklyChartOptions().series!"
+              [chart]="weeklyChartOptions().chart!"
+              [xaxis]="weeklyChartOptions().xaxis!"
+              [yaxis]="weeklyChartOptions().yaxis!"
+              [colors]="weeklyChartOptions().colors!"
+              [fill]="weeklyChartOptions().fill!"
+              [stroke]="weeklyChartOptions().stroke!"
+              [grid]="weeklyChartOptions().grid!"
+              [tooltip]="weeklyChartOptions().tooltip!"
+              [dataLabels]="weeklyChartOptions().dataLabels!"
+            ></apx-chart>
+          </div>
+        </div>
+      </div>
+
+      <!-- ┌──────────────────────────────────────────┐ -->
+      <!-- │  RIGHT COLUMN: Hero KPIs (Col 9-12)       │ -->
+      <!-- └──────────────────────────────────────────┘ -->
+      <div class="lg:col-span-4 flex flex-col gap-6">
+
+        <!-- HERO BOX: Ingresos Totales (DARK) -->
+        <div class="flex-1 bg-stone-900 rounded-3xl p-6 lg:p-8 flex flex-col justify-between relative overflow-hidden group">
+          <div class="absolute -right-10 -bottom-10 opacity-10 group-hover:scale-110 transition-transform duration-700">
+            <span class="material-icons-outlined text-[150px] text-white">query_stats</span>
+          </div>
+          <div class="relative z-10">
+            <div class="flex items-center gap-2 text-stone-400 mb-2">
+              <span class="material-icons-outlined text-sm">attach_money</span>
+              <span class="text-xs uppercase tracking-widest font-semibold">Ingresos Totales</span>
+            </div>
+            <p class="text-4xl lg:text-5xl font-bold text-white tracking-tight">S/ {{ totalRevenue() | number : '1.0-0' }}</p>
+          </div>
+          <div class="relative z-10 mt-6 pt-6 border-t border-white/10 flex items-center justify-between">
+            <p class="text-sm text-stone-400">{{ reportData()?.totalVentas || 0 }} ventas este período</p>
+            <span class="px-3 py-1 rounded-full text-xs font-bold" [ngClass]="{
+              'bg-emerald-500/20 text-emerald-400': weekComparison().isPositive,
+              'bg-rose-500/20 text-rose-400': !weekComparison().isPositive
+            }">{{ weekComparison().arrow }} {{ weekComparison().percentage | number:'1.1-1' }}%</span>
+          </div>
+        </div>
+
+        <!-- Ganancia Neta + Margen -->
+        <div class="flex-1 bg-white dark:bg-stone-900 rounded-3xl border border-stone-200/60 dark:border-stone-800 shadow-sm p-6 lg:p-8 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center gap-2 text-stone-500 dark:text-stone-400 mb-2">
+              <span class="material-icons-outlined text-sm">trending_up</span>
+              <span class="text-xs uppercase tracking-widest font-semibold">Ganancia Neta</span>
+            </div>
+            <p class="text-3xl lg:text-4xl font-bold text-emerald-600 dark:text-emerald-500 tracking-tight">S/ {{ totalProfit() | number : '1.0-0' }}</p>
+          </div>
+          <div class="mt-4 pt-4 border-t border-stone-100 dark:border-stone-800">
+            <div class="flex items-center justify-between text-sm">
+              <span class="text-stone-500">Margen de rentabilidad</span>
+              <span class="font-bold text-stone-800 dark:text-stone-200">{{ profitMargin() | number : '1.0-0' }}%</span>
+            </div>
+            <div class="w-full bg-stone-100 dark:bg-stone-800 h-1.5 rounded-full overflow-hidden mt-2">
+              <div class="h-full bg-emerald-500 rounded-full transition-all duration-1000" [style.width.%]="profitMargin()"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- MÓDULO 2: MICRO-MÉTRICAS PILLS                         -->
+    <!-- Responsabilidad: KPIs rápidos de un vistazo             -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <!-- Productos Vendidos -->
+      <div class="bg-white dark:bg-stone-900 border border-stone-200/60 dark:border-stone-800 rounded-2xl p-4 flex items-center gap-4 hover:border-stone-300 dark:hover:border-stone-700 transition-colors">
+        <div class="w-10 h-10 rounded-full bg-stone-100 dark:bg-stone-800 flex items-center justify-center text-stone-600 dark:text-stone-400">
+          <span class="material-icons-outlined text-lg">inventory_2</span>
+        </div>
+        <div>
+          <p class="text-xs text-stone-500 font-medium">Productos Vendidos</p>
+          <p class="text-lg font-bold text-stone-900 dark:text-stone-100">{{ totalProductsSold() }}</p>
+        </div>
+      </div>
+
+      <!-- Meta Mensual -->
+      <div class="bg-white dark:bg-stone-900 border border-stone-200/60 dark:border-stone-800 rounded-2xl p-4 flex items-center gap-4 hover:border-stone-300 dark:hover:border-stone-700 transition-colors">
+        <div class="w-10 h-10 rounded-full bg-stone-100 dark:bg-stone-800 flex items-center justify-center text-stone-600 dark:text-stone-400">
+          <span class="material-icons-outlined text-lg">flag</span>
+        </div>
+        <div class="flex-1">
+          <p class="text-xs text-stone-500 font-medium">Meta Mensual</p>
+          <p class="text-lg font-bold text-stone-900 dark:text-stone-100">{{ monthlyGoalPercentage() | number:'1.0-0' }}%</p>
+          <div class="w-full bg-stone-100 dark:bg-stone-800 h-1 rounded-full overflow-hidden mt-1">
+            <div class="h-full bg-emerald-500 rounded-full transition-all duration-1000" [style.width.%]="monthlyGoalPercentage()"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ticket Promedio -->
+      <div class="bg-white dark:bg-stone-900 border border-stone-200/60 dark:border-stone-800 rounded-2xl p-4 flex items-center gap-4 hover:border-stone-300 dark:hover:border-stone-700 transition-colors">
+        <div class="w-10 h-10 rounded-full bg-stone-100 dark:bg-stone-800 flex items-center justify-center text-stone-600 dark:text-stone-400">
+          <span class="material-icons-outlined text-lg">receipt</span>
+        </div>
+        <div>
+          <p class="text-xs text-stone-500 font-medium">Ticket Promedio</p>
+          <p class="text-lg font-bold text-stone-900 dark:text-stone-100">S/ {{ (reportData()?.ticketPromedio || 0) | number:'1.2-2' }}</p>
+        </div>
+      </div>
+
+      <!-- Mejor Feria -->
+      <div class="bg-white dark:bg-stone-900 border border-stone-200/60 dark:border-stone-800 rounded-2xl p-4 flex items-center gap-4 hover:border-stone-300 dark:hover:border-stone-700 transition-colors">
+        <div class="w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center text-amber-600 dark:text-amber-400">
+          <span class="material-icons-outlined text-lg">star</span>
+        </div>
+        <div>
+          <p class="text-xs text-amber-600/80 dark:text-amber-500 font-medium">Mejor Feria</p>
+          <p class="text-lg font-bold text-stone-900 dark:text-stone-100">{{ fairComparison().mejorFeria }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- MÓDULO 3: ANÁLISIS DUAL BENTO                              -->
+    <!-- Responsabilidad: Ferias vs Tienda + Análisis de Productos  -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+      <!-- ┌────────────────────────────────────────┐ -->
+      <!-- │  FERIAS vs TIENDA — Hero Dark (Col 1-5) │ -->
+      <!-- └────────────────────────────────────────┘ -->
+      <div class="lg:col-span-5 bg-stone-900 rounded-3xl p-6 lg:p-8 relative overflow-hidden group flex flex-col">
+        <!-- Icon de fondo -->
+        <div class="absolute -right-8 -bottom-8 opacity-10 group-hover:scale-110 transition-transform duration-700">
+          <span class="material-icons-outlined text-[140px] text-white">celebration</span>
+        </div>
+
+        <div class="relative z-10 flex-1 flex flex-col">
+          <div class="flex items-center gap-3 mb-6">
+            <div class="w-10 h-10 rounded-xl bg-amber-500/20 flex items-center justify-center">
+              <span class="material-icons-outlined text-amber-400">celebration</span>
+            </div>
+            <div>
+              <h3 class="text-lg font-bold text-white">Ferias vs Tienda</h3>
+              <p class="text-xs text-stone-400">Distribución de ingresos por canal</p>
+            </div>
+          </div>
+
+          <!-- Ferias -->
+          <div class="bg-white/5 backdrop-blur-sm rounded-2xl p-5 mb-4 border border-white/10">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-2">
+                <span class="material-icons-outlined text-amber-400 text-sm">storefront</span>
+                <span class="text-xs uppercase tracking-wider text-amber-400 font-semibold">Ferias</span>
+              </div>
+              <span class="text-xs text-stone-400">Jue + Dom</span>
+            </div>
+            <p class="text-3xl font-bold text-white tracking-tight mb-1">S/ {{ fairComparison().ferias.revenue | number:'1.0-0' }}</p>
+            <p class="text-sm text-emerald-400 font-medium">+S/ {{ fairComparison().ferias.profit | number:'1.0-0' }} ganancia</p>
+          </div>
+
+          <!-- Tienda -->
+          <div class="bg-white/5 backdrop-blur-sm rounded-2xl p-5 mb-6 border border-white/10">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-2">
+                <span class="material-icons-outlined text-stone-400 text-sm">store</span>
+                <span class="text-xs uppercase tracking-wider text-stone-400 font-semibold">Tienda</span>
+              </div>
+              <span class="text-xs text-stone-500">Lun–Sáb</span>
+            </div>
+            <p class="text-3xl font-bold text-white tracking-tight mb-1">S/ {{ fairComparison().tienda.revenue | number:'1.0-0' }}</p>
+            <p class="text-sm text-emerald-400 font-medium">+S/ {{ fairComparison().tienda.profit | number:'1.0-0' }} ganancia</p>
+          </div>
+
+          <!-- Distribución -->
+          <div class="mt-auto">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs text-stone-400">Ferias {{ fairPercentage() | number:'1.0-0' }}%</span>
+              <span class="text-xs text-stone-400">Tienda {{ storePercentage() | number:'1.0-0' }}%</span>
+            </div>
+            <div class="w-full h-2.5 bg-stone-700 rounded-full overflow-hidden flex">
+              <div class="h-full bg-amber-500 rounded-l-full transition-all duration-1000" [style.width.%]="fairPercentage()"></div>
+              <div class="h-full bg-stone-500 rounded-r-full transition-all duration-1000" [style.width.%]="storePercentage()"></div>
+            </div>
+            <p class="text-xs text-amber-400/80 mt-3">Mejor: {{ fairComparison().mejorFeria }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ┌───────────────────────────────────────────────────────┐ -->
+      <!-- │  ANÁLISIS DE PRODUCTOS — Tabbed Box (Col 6-12)        │ -->
+      <!-- │  Tabs: Top Productos | Categorías | ABC               │ -->
+      <!-- └───────────────────────────────────────────────────────┘ -->
+      <div class="lg:col-span-7 bg-white dark:bg-stone-900 rounded-3xl border border-stone-200/60 dark:border-stone-800 shadow-sm overflow-hidden flex flex-col">
+        <!-- TABS HEADER -->
+        <div class="flex p-2 bg-stone-50 dark:bg-stone-800/50 shrink-0">
+          <button (click)="activeAnalysisTab.set('topProductos')" [ngClass]="activeAnalysisTab() === 'topProductos' ? 'bg-white dark:bg-stone-700 shadow-sm text-stone-900 dark:text-stone-100' : 'text-stone-500 dark:text-stone-400 hover:text-stone-700'" class="flex-1 py-3 text-xs font-semibold uppercase tracking-wider rounded-xl transition-all">Top Productos</button>
+          <button (click)="activeAnalysisTab.set('categorias')" [ngClass]="activeAnalysisTab() === 'categorias' ? 'bg-white dark:bg-stone-700 shadow-sm text-stone-900 dark:text-stone-100' : 'text-stone-500 dark:text-stone-400 hover:text-stone-700'" class="flex-1 py-3 text-xs font-semibold uppercase tracking-wider rounded-xl transition-all">Categorías</button>
+          <button (click)="activeAnalysisTab.set('abc')" [ngClass]="activeAnalysisTab() === 'abc' ? 'bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 shadow-sm' : 'text-stone-500 dark:text-stone-400 hover:text-stone-700'" class="flex-1 py-3 text-xs font-semibold uppercase tracking-wider rounded-xl transition-all">ABC</button>
+        </div>
+
+        <div class="p-6 flex-1 overflow-y-auto bento-scroll">
+
+          <!-- TAB 1: TOP PRODUCTOS -->
+          @if (activeAnalysisTab() === 'topProductos') {
+            <div class="space-y-4 bento-tab-content">
+              <p class="text-sm text-stone-500 mb-4">Productos ordenados por mayores ingresos.</p>
+              @for (item of topProducts().slice(0, 7); track item.name; let i = $index) {
+                <div class="flex items-center gap-4 group hover:bg-stone-50 dark:hover:bg-stone-800/50 rounded-xl p-3 -mx-3 transition-all duration-200 cursor-pointer">
+                  <div class="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs" [ngClass]="{
+                    'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400': i === 0,
+                    'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400': i > 0
+                  }">#{{ i + 1 }}</div>
+                  <div class="flex-1 min-w-0">
+                    <p class="text-sm font-bold text-stone-800 dark:text-stone-200 truncate">{{ item.name }}</p>
+                    <p class="text-xs text-stone-500">{{ item.sold }} u. vendidas</p>
                   </div>
                   <div class="text-right">
-                    <p class="text-lg font-bold text-stone-900 dark:text-stone-100">S/ {{ item.revenue | number:'1.0-0' }}</p>
-                    <span class="text-xs font-bold text-emerald-600 dark:text-emerald-400">{{ item.trend }}</span>
+                    <p class="text-sm font-bold text-teal-600 dark:text-teal-400">S/ {{ item.revenue | number : '1.0-0' }}</p>
+                    <p class="text-xs text-emerald-500 font-medium">{{ item.trend }}</p>
                   </div>
                 </div>
-                
-                <div class="w-full bg-stone-100 dark:bg-stone-800 h-2 rounded-full overflow-hidden">
-                  <div 
-                    class="h-full rounded-full transition-all duration-1000"
-                    [ngClass]="{
-                      'bg-linear-to-r from-amber-500 to-orange-500': i === 0,
-                      'bg-emerald-500 dark:bg-emerald-600': i > 0
-                    }"
-                    [style.width.%]="(item.revenue / 7000) * 100"
-                  ></div>
+              } @empty {
+                <p class="text-center text-sm text-stone-400 mt-10">Sin datos de productos.</p>
+              }
+            </div>
+          }
+
+          <!-- TAB 2: CATEGORÍAS (DONUT CHART) -->
+          @if (activeAnalysisTab() === 'categorias') {
+            <div class="bento-tab-content flex flex-col items-center">
+              <p class="text-sm text-stone-500 mb-4 self-start">Distribución de ventas por categoría.</p>
+              <div class="w-full">
+                <apx-chart
+                  [series]="categoriesChartOptions().series!"
+                  [chart]="categoriesChartOptions().chart!"
+                  [labels]="categoriesChartOptions().labels!"
+                  [colors]="categoriesChartOptions().colors!"
+                  [plotOptions]="categoriesChartOptions().plotOptions!"
+                  [legend]="categoriesChartOptions().legend!"
+                  [dataLabels]="categoriesChartOptions().dataLabels!"
+                ></apx-chart>
+              </div>
+            </div>
+          }
+
+          <!-- TAB 3: ANÁLISIS ABC -->
+          @if (activeAnalysisTab() === 'abc') {
+            <div class="bento-tab-content">
+              <p class="text-sm text-stone-500 mb-4">Regla 80/20 · Productos por importancia</p>
+
+              <!-- ABC Summary Cards -->
+              <div class="grid grid-cols-3 gap-3 mb-6">
+                <div class="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 text-center">
+                  <div class="w-8 h-8 mx-auto bg-emerald-500 rounded-full flex items-center justify-center mb-2">
+                    <span class="text-white font-bold text-sm">A</span>
+                  </div>
+                  <p class="text-lg font-bold text-emerald-900 dark:text-emerald-100">{{ abcSummary().A.count }}</p>
+                  <p class="text-xs text-emerald-600 dark:text-emerald-400">S/ {{ abcSummary().A.revenue | number:'1.0-0' }}</p>
+                </div>
+                <div class="p-3 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 text-center">
+                  <div class="w-8 h-8 mx-auto bg-amber-500 rounded-full flex items-center justify-center mb-2">
+                    <span class="text-white font-bold text-sm">B</span>
+                  </div>
+                  <p class="text-lg font-bold text-amber-900 dark:text-amber-100">{{ abcSummary().B.count }}</p>
+                  <p class="text-xs text-amber-600 dark:text-amber-400">S/ {{ abcSummary().B.revenue | number:'1.0-0' }}</p>
+                </div>
+                <div class="p-3 rounded-xl bg-stone-100 dark:bg-stone-800/50 border border-stone-200 dark:border-stone-700 text-center">
+                  <div class="w-8 h-8 mx-auto bg-stone-400 rounded-full flex items-center justify-center mb-2">
+                    <span class="text-white font-bold text-sm">C</span>
+                  </div>
+                  <p class="text-lg font-bold text-stone-800 dark:text-stone-200">{{ abcSummary().C.count }}</p>
+                  <p class="text-xs text-stone-500">S/ {{ abcSummary().C.revenue | number:'1.0-0' }}</p>
+                </div>
+              </div>
+
+              <!-- Top 10 ABC List -->
+              <div class="space-y-2">
+                @for (product of productABC().slice(0, 8); track product.name; let i = $index) {
+                  <div class="flex items-center justify-between p-2 rounded-lg hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors">
+                    <div class="flex items-center gap-3">
+                      <div class="h-6 w-6 rounded-full flex items-center justify-center text-[10px] font-bold text-white" [ngClass]="{
+                        'bg-emerald-500': product.class === 'A',
+                        'bg-amber-500': product.class === 'B',
+                        'bg-stone-400': product.class === 'C'
+                      }">{{ product.class }}</div>
+                      <div>
+                        <p class="text-sm font-medium text-stone-800 dark:text-stone-200">{{ product.name }}</p>
+                        <p class="text-xs text-stone-500">{{ product.quantity }} u. · {{ product.percentageOfTotal | number:'1.1-1' }}%</p>
+                      </div>
+                    </div>
+                    <p class="text-sm font-bold text-stone-900 dark:text-stone-100">S/ {{ product.revenue | number:'1.0-0' }}</p>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ══════════════════════════════════════════════════════════ -->
+    <!-- MÓDULO 4: INSIGHTS BENTO (Bottom)                         -->
+    <!-- Responsabilidad: Vendedores + Predicciones/Tendencias     -->
+    <!-- ══════════════════════════════════════════════════════════ -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+      <!-- ┌──────────────────────────────────────────────┐ -->
+      <!-- │  VENDEDORES — Gráfico + Podio (Col 1-7)       │ -->
+      <!-- └──────────────────────────────────────────────┘ -->
+      <div class="lg:col-span-7 bg-white dark:bg-stone-900 rounded-3xl border border-stone-200/60 dark:border-stone-800 shadow-sm overflow-hidden flex flex-col h-[560px]">
+        <div class="p-6 border-b border-stone-100 dark:border-stone-800 flex items-center justify-between shrink-0">
+          <div>
+            <h3 class="text-lg font-bold text-stone-900 dark:text-stone-100">Ventas por Vendedor</h3>
+            <p class="text-xs text-stone-500 dark:text-stone-400 mt-0.5">Rendimiento del equipo</p>
+          </div>
+          <span class="px-3 py-1 bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400 text-xs rounded-full font-medium">{{ vendorSalesWithPercentage().length }} vendedores</span>
+        </div>
+
+        <!-- Chart de Barras -->
+        <div class="px-6 pt-4">
+          <apx-chart
+            [series]="vendorChartOptions().series!"
+            [chart]="vendorChartOptions().chart!"
+            [plotOptions]="vendorChartOptions().plotOptions!"
+            [xaxis]="vendorChartOptions().xaxis!"
+            [yaxis]="vendorChartOptions().yaxis!"
+            [colors]="vendorChartOptions().colors!"
+            [grid]="vendorChartOptions().grid!"
+            [tooltip]="vendorChartOptions().tooltip!"
+            [dataLabels]="vendorChartOptions().dataLabels!"
+          ></apx-chart>
+        </div>
+
+        <!-- Podio — vendedores top 3 -->
+        <div class="px-6 pb-6 flex-1 overflow-y-auto bento-scroll">
+          <div class="grid grid-cols-3 gap-3 mt-4">
+            @for (vendor of vendorSalesWithPercentage().slice(0, 3); track vendor.name; let i = $index) {
+              <div class="p-4 rounded-2xl border transition-all duration-300 hover:shadow-md cursor-pointer hover:-translate-y-0.5 text-center" [ngClass]="{
+                'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800': i === 0,
+                'bg-slate-50 dark:bg-slate-900/20 border-slate-200 dark:border-slate-800': i === 1,
+                'bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800': i === 2
+              }">
+                <div class="h-10 w-10 mx-auto rounded-full flex items-center justify-center font-bold text-sm mb-2" [ngClass]="{
+                  'bg-yellow-500 text-white': i === 0,
+                  'bg-slate-400 text-white': i === 1,
+                  'bg-amber-500 text-white': i === 2
+                }">{{ vendor.name.charAt(0).toUpperCase() }}</div>
+                <p class="font-bold text-stone-900 dark:text-stone-100 text-sm truncate">{{ vendor.name }}</p>
+                <p class="text-xs text-stone-500 dark:text-stone-400 mb-2">
+                  @if (i === 0) { 🥇 Top }
+                  @else if (i === 1) { 🥈 2do }
+                  @else { 🥉 3ro }
+                </p>
+                <p class="text-lg font-bold text-stone-900 dark:text-stone-100">S/ {{ vendor.revenue | number:'1.0-0' }}</p>
+                <p class="text-xs text-stone-500">{{ vendor.count }} ventas</p>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- ┌────────────────────────────────────────────────────────┐ -->
+      <!-- │  INSIGHTS TABULADO — Predicción + Tendencia (Col 8-12) │ -->
+      <!-- └────────────────────────────────────────────────────────┘ -->
+      <div class="lg:col-span-5 bg-white dark:bg-stone-900 rounded-3xl border border-stone-200/60 dark:border-stone-800 shadow-sm overflow-hidden flex flex-col h-[560px]">
+        <!-- TABS HEADER -->
+        <div class="flex p-2 bg-stone-50 dark:bg-stone-800/50 shrink-0">
+          <button (click)="activeInsightsTab.set('prediccion')" [ngClass]="activeInsightsTab() === 'prediccion' ? 'bg-white dark:bg-stone-700 shadow-sm text-stone-900 dark:text-stone-100' : 'text-stone-500 dark:text-stone-400 hover:text-stone-700'" class="flex-1 py-3 text-xs font-semibold uppercase tracking-wider rounded-xl transition-all">🔮 Predicción</button>
+          <button (click)="activeInsightsTab.set('tendencia')" [ngClass]="activeInsightsTab() === 'tendencia' ? 'bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 shadow-sm' : 'text-stone-500 dark:text-stone-400 hover:text-stone-700'" class="flex-1 py-3 text-xs font-semibold uppercase tracking-wider rounded-xl transition-all">📈 Tendencia</button>
+        </div>
+
+        <div class="p-6 flex-1 overflow-y-auto bento-scroll">
+
+          <!-- TAB: PREDICCIÓN PRÓXIMA FERIA -->
+          @if (activeInsightsTab() === 'prediccion') {
+            <div class="flex flex-col h-full bento-tab-content">
+              <div class="text-center mb-6 mt-2">
+                <span class="material-icons-outlined text-4xl text-stone-300 dark:text-stone-600 mb-2">auto_graph</span>
+                <h3 class="text-lg font-bold text-stone-900 dark:text-stone-100">Próxima Feria</h3>
+                <p class="text-xs text-stone-500">Cálculo basado en histórico transaccional.</p>
+              </div>
+
+              <!-- Fecha + Nombre -->
+              <div class="bg-linear-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-2xl p-5 mb-4 border border-amber-200 dark:border-amber-800">
+                <div class="flex items-center gap-3 mb-2">
+                  <span class="material-icons-outlined text-2xl text-amber-600">event</span>
+                  <div>
+                    <p class="text-xs font-medium text-amber-700 dark:text-amber-400">{{ nextFairPrediction().day }}</p>
+                    <p class="text-lg font-bold text-amber-900 dark:text-amber-100">{{ nextFairPrediction().name }}</p>
+                  </div>
+                </div>
+                <p class="text-sm text-amber-600 dark:text-amber-400">En {{ nextFairPrediction().daysUntil }} días · {{ nextFairPrediction().date | date:'dd MMM' }}</p>
+              </div>
+
+              <!-- Expectativa de Ingresos -->
+              <div class="bg-stone-50 dark:bg-stone-800/50 rounded-2xl p-5 mb-4 border border-stone-100 dark:border-stone-700">
+                <p class="text-xs font-bold uppercase text-stone-400 mb-1">Expectativa de Ingresos</p>
+                <p class="text-4xl font-bold text-stone-900 dark:text-stone-100 tabular-nums">S/ {{ nextFairPrediction().estimatedRevenue | number : '1.0-0' }}</p>
+                <div class="flex items-center gap-2 mt-3">
+                  <span class="text-xs px-2 py-0.5 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 rounded-full font-medium">↗ Creciendo</span>
+                  <span class="text-xs text-stone-500">Confianza: {{ nextFairPrediction().confidence }}</span>
+                </div>
+              </div>
+
+              <!-- Stock Sugerido -->
+              <div class="grid grid-cols-2 gap-4">
+                <div class="p-4 rounded-2xl border border-stone-100 dark:border-stone-700">
+                  <p class="text-xs text-stone-500 mb-1">Stock Sugerido</p>
+                  <p class="text-xl font-bold text-stone-900 dark:text-stone-100">~{{ nextFairPrediction().suggestedStock }}</p>
+                </div>
+                <div class="p-4 rounded-2xl border border-stone-100 dark:border-stone-700">
+                  <p class="text-xs text-stone-500 mb-1">Confianza</p>
+                  <p class="text-xl font-bold capitalize text-emerald-500">{{ nextFairPrediction().confidence }}</p>
+                </div>
+              </div>
+            </div>
+          }
+
+          <!-- TAB: TENDENCIA DE FERIAS -->
+          @if (activeInsightsTab() === 'tendencia') {
+            <div class="flex flex-col gap-6 bento-tab-content">
+              <p class="text-sm text-stone-500">Promedio móvil · Últimas 4 ferias</p>
+
+              <!-- Feria Acobamba (Jueves) -->
+              <div class="group p-5 bg-linear-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-2xl border border-amber-200 dark:border-amber-800 transition-all duration-300 hover:shadow-lg">
+                <div class="flex items-center gap-3 mb-4">
+                  <span class="material-icons-outlined text-3xl text-amber-600 transition-transform duration-300 group-hover:rotate-6 group-hover:scale-110">store</span>
+                  <div>
+                    <p class="text-xs font-medium text-amber-700 dark:text-amber-400">Jueves</p>
+                    <p class="text-xl font-bold text-amber-900 dark:text-amber-100">Acobamba</p>
+                  </div>
+                </div>
+                <div class="space-y-3">
+                  <div>
+                    <p class="text-xs text-amber-600 dark:text-amber-400 mb-1">Promedio Móvil</p>
+                    <p class="text-3xl font-bold text-amber-900 dark:text-amber-100 transition-transform duration-300 group-hover:scale-105 transform-gpu">
+                      S/ {{ fairTrend().thursday.average | number:'1.0-0' }}
+                    </p>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <span class="px-3 py-1 bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-400 rounded-full text-xs font-medium flex items-center gap-1">
+                      <span class="material-icons-outlined text-sm">trending_flat</span>
+                      {{ fairTrend().thursday.trend }}
+                    </span>
+                  </div>
+                  <p class="text-xs text-amber-600 dark:text-amber-500">
+                    Basado en {{ fairTrend().thursday.count }} ferias recientes
+                  </p>
+                </div>
+              </div>
+
+              <!-- Feria Paucara (Domingo) -->
+              <div class="group p-5 bg-linear-to-br from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 rounded-2xl border border-emerald-200 dark:border-emerald-800 transition-all duration-300 hover:shadow-lg">
+                <div class="flex items-center gap-3 mb-4">
+                  <span class="material-icons-outlined text-3xl text-emerald-600 transition-transform duration-300 group-hover:rotate-6 group-hover:scale-110">storefront</span>
+                  <div>
+                    <p class="text-xs font-medium text-emerald-700 dark:text-emerald-400">Domingo</p>
+                    <p class="text-xl font-bold text-emerald-900 dark:text-emerald-100">Paucara</p>
+                  </div>
+                </div>
+                <div class="space-y-3">
+                  <div>
+                    <p class="text-xs text-emerald-600 dark:text-emerald-400 mb-1">Promedio Móvil</p>
+                    <p class="text-3xl font-bold text-emerald-900 dark:text-emerald-100 transition-transform duration-300 group-hover:scale-105 transform-gpu">
+                      S/ {{ fairTrend().sunday.average | number:'1.0-0' }}
+                    </p>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <span class="px-3 py-1 bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-400 rounded-full text-xs font-medium flex items-center gap-1">
+                      <span class="material-icons-outlined text-sm">trending_flat</span>
+                      {{ fairTrend().sunday.trend }}
+                    </span>
+                  </div>
+                  <p class="text-xs text-emerald-600 dark:text-emerald-500">
+                    Basado en {{ fairTrend().sunday.count }} ferias recientes
+                  </p>
                 </div>
               </div>
             </div>
           }
         </div>
       </div>
-
-      <!-- Panel de Categorías -->
-      <div class="bg-stone-900 rounded-2xl p-8 text-white relative overflow-hidden border border-stone-800">
-        <div class="absolute -bottom-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-3xl"></div>
-        
-        <h3 class="text-xl font-bold mb-6 text-white relative z-10">Distribución por Categoría</h3>
-        
-        <!-- ApexCharts Donut Chart -->
-        <div class="relative z-10">
-          <apx-chart
-            [series]="categoriesChartOptions().series!"
-            [chart]="categoriesChartOptions().chart!"
-            [labels]="categoriesChartOptions().labels!"
-            [colors]="categoriesChartOptions().colors!"
-            [plotOptions]="categoriesChartOptions().plotOptions!"
-            [legend]="categoriesChartOptions().legend!"
-            [dataLabels]="categoriesChartOptions().dataLabels!"
-          ></apx-chart>
-        </div>
-      </div>
-
     </div>
 
-    <!-- Ventas por Vendedor -->
-    <div class="bg-white dark:bg-stone-900 rounded-2xl border border-stone-100 dark:border-stone-800 shadow-sm p-8 transition-colors duration-100">
-      <div class="flex items-center justify-between mb-6">
-        <div>
-          <h3 class="text-2xl font-bold text-stone-800 dark:text-stone-100">Ventas por Vendedor</h3>
-          <p class="text-sm text-stone-500 dark:text-stone-400 mt-1">Comparativa de desempeño del equipo</p>
-        </div>
-        <span class="text-xs text-stone-400 dark:text-stone-500 font-medium">Este mes</span>
-      </div>
-
-      <!-- ApexCharts Bar Chart -->
-      <div class="mb-8">
-        <apx-chart
-          [series]="vendorChartOptions().series!"
-          [chart]="vendorChartOptions().chart!"
-          [plotOptions]="vendorChartOptions().plotOptions!"
-          [xaxis]="vendorChartOptions().xaxis!"
-          [yaxis]="vendorChartOptions().yaxis!"
-          [colors]="vendorChartOptions().colors!"
-          [grid]="vendorChartOptions().grid!"
-          [tooltip]="vendorChartOptions().tooltip!"
-          [dataLabels]="vendorChartOptions().dataLabels!"
-        ></apx-chart>
-      </div>
-
-      <!-- Tabla Comparativa -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        @for (vendor of vendorSalesWithPercentage(); track vendor.id; let i = $index) {
-          <div class="p-6 rounded-xl border transition-all duration-300 ease-out hover:shadow-md cursor-pointer hover:scale-[1.02] hover:-translate-y-0.5"
-               [ngClass]="{
-                 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800': i === 0,
-                 'bg-slate-50 dark:bg-slate-900/20 border-slate-200 dark:border-slate-800': i === 1,
-                 'bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800': i === 2,
-                 'bg-stone-50 dark:bg-stone-800/50 border-stone-200 dark:border-stone-700': i > 2
-               }">
-            <!-- Header con posición y nombre -->
-            <div class="flex items-center gap-3 mb-4">
-              <div class="h-10 w-10 rounded-full flex items-center justify-center font-bold text-sm"
-                   [ngClass]="{
-                     'bg-yellow-500 text-white': i === 0,
-                     'bg-slate-400 text-white': i === 1,
-                     'bg-amber-500 text-white': i === 2,
-                     'bg-stone-400 text-white': i > 2
-                   }">
-                {{ vendor.name.charAt(0).toUpperCase() }}
-              </div>
-              <div class="flex-1">
-                <p class="font-bold text-stone-900 dark:text-stone-100">{{ vendor.name }}</p>
-                <p class="text-xs text-stone-500 dark:text-stone-400">
-                  @if (i === 0) { 🥇 Top Vendedor }
-                  @else if (i === 1) { 🥈 Segundo Lugar }
-                  @else if (i === 2) { 🥉 Tercer Lugar }
-                  @else { Vendedor #{{ i + 1 }} }
-                </p>
-              </div>
-            </div>
-
-            <!-- Métricas -->
-            <div class="space-y-3">
-              <div>
-                <p class="text-xs uppercase tracking-wide text-stone-500 dark:text-stone-400 font-medium mb-1">
-                  Ingresos Totales
-                </p>
-                <p class="text-2xl font-bold text-stone-900 dark:text-stone-100">
-                  S/ {{ vendor.revenue | number:'1.0-0' }}
-                </p>
-              </div>
-
-              <div class="grid grid-cols-2 gap-3">
-                <div>
-                  <p class="text-xs text-stone-500 dark:text-stone-400">Ventas</p>
-                  <p class="text-lg font-bold text-stone-900 dark:text-stone-100">{{ vendor.count }}</p>
-                </div>
-                <div>
-                  <p class="text-xs text-stone-500 dark:text-stone-400">Ticket Prom.</p>
-                  <p class="text-lg font-bold text-stone-900 dark:text-stone-100">S/ {{ vendor.avgTicket | number:'1.0-0' }}</p>
-                </div>
-              </div>
-
-              <!-- Barra de progreso -->
-              <div>
-                <div class="flex items-center justify-between mb-2">
-                  <span class="text-xs text-stone-500 dark:text-stone-400">Participación</span>
-                  <span class="text-xs font-bold text-stone-900 dark:text-stone-100">{{ vendor.percentage | number:'1.1-1' }}%</span>
-                </div>
-                <div class="w-full bg-stone-200 dark:bg-stone-700 h-2 rounded-full overflow-hidden">
-                  <div class="h-full rounded-full transition-all duration-1000"
-                       [ngClass]="{
-                         'bg-yellow-500': i === 0,
-                         'bg-slate-400': i === 1,
-                         'bg-amber-500': i === 2,
-                         'bg-stone-400': i > 2
-                       }"
-                       [style.width.%]="vendor.percentage">
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        }
-      </div>
-    </div>
-
-    <!-- 🔮 SECCIÓN: PREDICCIÓN DE PRÓXIMA FERIA -->
-    <div class="bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800 p-6 shadow-sm">
-      <div class="flex items-center justify-between mb-6">
-        <div>
-          <h3 class="text-2xl font-bold text-stone-800 dark:text-stone-100">Próxima Feria</h3>
-          <p class="text-sm text-stone-500 dark:text-stone-400 mt-1">Predicción basada en historial</p>
-        </div>
-        <span class="material-icons-outlined text-4xl text-amber-500">insights</span>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <!-- Card: Fecha -->
-        <div class="group p-6 bg-linear-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-xl border border-amber-200 dark:border-amber-800 transition-all duration-300 hover:shadow-lg hover:scale-[1.02] hover:-translate-y-0.5">
-          <div class="flex items-center gap-3 mb-4">
-            <span class="material-icons-outlined text-3xl text-amber-600 transition-transform duration-300 group-hover:rotate-6 group-hover:scale-110">event</span>
-            <div>
-              <p class="text-xs font-medium text-amber-700 dark:text-amber-400">{{ nextFairPrediction().day }}</p>
-              <p class="text-lg font-bold text-amber-900 dark:text-amber-100">{{ nextFairPrediction().name }}</p>
-            </div>
-          </div>
-          <div class="space-y-1">
-            <p class="text-2xl font-bold text-amber-900 dark:text-amber-100 transition-transform duration-300 group-hover:scale-105 transform-gpu">
-              {{ nextFairPrediction().daysUntil }} días
-            </p>
-            <p class="text-xs text-amber-600 dark:text-amber-400">{{ nextFairPrediction().date | date:'dd MMM' }}</p>
-          </div>
-        </div>
-
-        <!-- Card: Estimación de Ingresos -->
-        <div class="group p-6 bg-linear-to-br from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 rounded-xl border border-emerald-200 dark:border-emerald-800 transition-all duration-300 hover:shadow-lg hover:scale-[1.02] hover:-translate-y-0.5">
-          <div class="flex items-center gap-3 mb-4">
-            <span class="material-icons-outlined text-3xl text-emerald-600 transition-transform duration-300 group-hover:rotate-6 group-hover:scale-110">trending_up</span>
-            <div>
-              <p class="text-xs font-medium text-emerald-700 dark:text-emerald-400">Estimado</p>
-              <p class="text-sm font-bold text-emerald-900 dark:text-emerald-100">Ingresos</p>
-            </div>
-          </div>
-          <div class="space-y-2">
-            <p class="text-2xl font-bold text-emerald-900 dark:text-emerald-100 transition-transform duration-300 group-hover:scale-105 transform-gpu">
-              S/ {{ nextFairPrediction().estimatedRevenue | number:'1.0-0' }}
-            </p>
-            <div class="flex items-center gap-2">
-              @if (nextFairPrediction().trend === 'creciendo') {
-                <span class="text-xs px-2 py-0.5 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 rounded-full font-medium">↗ Creciendo</span>
-              } @else if (nextFairPrediction().trend === 'bajando') {
-                <span class="text-xs px-2 py-0.5 bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 rounded-full font-medium">↘ Bajando</span>
-              } @else {
-                <span class="text-xs px-2 py-0.5 bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-400 rounded-full font-medium">→ Estable</span>
-              }
-              <span class="text-xs text-emerald-600 dark:text-emerald-400">Confianza: {{ nextFairPrediction().confidence }}</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Card: Stock Sugerido -->
-        <div class="group p-6 bg-linear-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl border border-blue-200 dark:border-blue-800 transition-all duration-300 hover:shadow-lg hover:scale-[1.02] hover:-translate-y-0.5">
-          <div class="flex items-center gap-3 mb-4">
-            <span class="material-icons-outlined text-3xl text-blue-600 transition-transform duration-300 group-hover:rotate-6 group-hover:scale-110">inventory</span>
-            <div>
-              <p class="text-xs font-medium text-blue-700 dark:text-blue-400">Recomendado</p>
-              <p class="text-sm font-bold text-blue-900 dark:text-blue-100">Stock</p>
-            </div>
-          </div>
-          <div class="space-y-1">
-            <p class="text-2xl font-bold text-blue-900 dark:text-blue-100 transition-transform duration-300 group-hover:scale-105 transform-gpu">
-              ~{{ nextFairPrediction().suggestedStock }} productos
-            </p>
-            <p class="text-xs text-blue-600 dark:text-blue-400">Basado en promedio</p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 📊 SECCIÓN: ANÁLISIS ABC (REGLA 80/20) -->
-    <div class="bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800 p-6 shadow-sm">
-      <div class="flex items-center justify-between mb-6">
-        <div>
-          <h3 class="text-2xl font-bold text-stone-800 dark:text-stone-100">Análisis ABC</h3>
-          <p class="text-sm text-stone-500 dark:text-stone-400 mt-1">Regla 80/20 · Productos por importancia</p>
-        </div>
-        <span class="material-icons-outlined text-4xl text-emerald-500">analytics</span>
-      </div>
-
-      <!-- Resumen ABC -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <!-- Clase A -->
-        <div class="group p-6 bg-linear-to-br from-emerald-50 to-green-50 dark:from-emerald-900/20 dark:to-green-900/20 rounded-xl border border-emerald-200 dark:border-emerald-800 transition-all duration-300 hover:shadow-lg hover:scale-[1.02] hover:-translate-y-0.5">
-          <div class="flex items-center justify-between mb-3">
-            <div class="h-10 w-10 bg-emerald-500 rounded-full flex items-center justify-center">
-              <span class="text-white font-bold text-lg">A</span>
-            </div>
-            <span class="material-icons-outlined text-emerald-500 text-2xl transition-transform duration-300 group-hover:rotate-6 group-hover:scale-110">star</span>
-          </div>
-          <p class="text-xs font-medium text-emerald-700 dark:text-emerald-400 mb-2">Productos Estrella</p>
-          <p class="text-2xl font-bold text-emerald-900 dark:text-emerald-100 mb-1 transition-transform duration-300 group-hover:scale-105 transform-gpu">
-            {{ abcSummary().A.count }}
-          </p>
-          <p class="text-sm text-emerald-600 dark:text-emerald-400">S/ {{ abcSummary().A.revenue | number:'1.0-0' }}</p>
-          <p class="text-xs text-emerald-600 dark:text-emerald-500 mt-2">80% de ingresos</p>
-        </div>
-
-        <!-- Clase B -->
-        <div class="group p-6 bg-linear-to-br from-amber-50 to-yellow-50 dark:from-amber-900/20 dark:to-yellow-900/20 rounded-xl border border-amber-200 dark:border-amber-800 transition-all duration-300 hover:shadow-lg hover:scale-[1.02] hover:-translate-y-0.5">
-          <div class="flex items-center justify-between mb-3">
-            <div class="h-10 w-10 bg-amber-500 rounded-full flex items-center justify-center">
-              <span class="text-white font-bold text-lg">B</span>
-            </div>
-            <span class="material-icons-outlined text-amber-500 text-2xl transition-transform duration-300 group-hover:rotate-6 group-hover:scale-110">trending_flat</span>
-          </div>
-          <p class="text-xs font-medium text-amber-700 dark:text-amber-400 mb-2">Productos Regulares</p>
-          <p class="text-2xl font-bold text-amber-900 dark:text-amber-100 mb-1 transition-transform duration-300 group-hover:scale-105 transform-gpu">
-            {{ abcSummary().B.count }}
-          </p>
-          <p class="text-sm text-amber-600 dark:text-amber-400">S/ {{ abcSummary().B.revenue | number:'1.0-0' }}</p>
-          <p class="text-xs text-amber-600 dark:text-amber-500 mt-2">15% de ingresos</p>
-        </div>
-
-        <!-- Clase C -->
-        <div class="group p-6 bg-linear-to-br from-stone-50 to-slate-50 dark:from-stone-800/50 dark:to-slate-800/50 rounded-xl border border-stone-200 dark:border-stone-700 transition-all duration-300 hover:shadow-lg hover:scale-[1.02] hover:-translate-y-0.5">
-          <div class="flex items-center justify-between mb-3">
-            <div class="h-10 w-10 bg-stone-400 rounded-full flex items-center justify-center">
-              <span class="text-white font-bold text-lg">C</span>
-            </div>
-            <span class="material-icons-outlined text-stone-400 text-2xl transition-transform duration-300 group-hover:rotate-6 group-hover:scale-110">trending_down</span>
-          </div>
-          <p class="text-xs font-medium text-stone-600 dark:text-stone-400 mb-2">Productos Lentos</p>
-          <p class="text-2xl font-bold text-stone-800 dark:text-stone-200 mb-1 transition-transform duration-300 group-hover:scale-105 transform-gpu">
-            {{ abcSummary().C.count }}
-          </p>
-          <p class="text-sm text-stone-600 dark:text-stone-400">S/ {{ abcSummary().C.revenue | number:'1.0-0' }}</p>
-          <p class="text-xs text-stone-500 dark:text-stone-500 mt-2">5% de ingresos · Considerar liquidar</p>
-        </div>
-      </div>
-
-      <!-- Top 10 Productos por Clase -->
-      <div class="space-y-2">
-        <p class="text-xs font-bold text-stone-500 uppercase tracking-wide mb-3">Top 10 Productos</p>
-        @for (product of productABC().slice(0, 10); track product.name; let i = $index) {
-          <div class="group flex items-center justify-between p-3 rounded-lg transition-all duration-200 hover:bg-stone-50 dark:hover:bg-stone-800/50"
-               [class.bg-emerald-50]="product.class === 'A' && i < 3"
-               [class.dark:bg-emerald-900/10]="product.class === 'A' && i < 3">
-            <div class="flex items-center gap-3 flex-1">
-              <div class="h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold"
-                   [class.bg-emerald-500]="product.class === 'A'"
-                   [class.bg-amber-500]="product.class === 'B'"
-                   [class.bg-stone-400]="product.class === 'C'"
-                   [class.text-white]="true">
-                {{ product.class }}
-              </div>
-              <div class="flex-1">
-                <p class="font-medium text-stone-800 dark:text-stone-200 text-sm">{{ product.name }}</p>
-                <p class="text-xs text-stone-500 dark:text-stone-400">{{ product.quantity }} unidades · {{ product.percentageOfTotal | number:'1.1-1' }}% del total</p>
-              </div>
-            </div>
-            <p class="text-sm font-bold text-stone-900 dark:text-stone-100 transition-transform duration-300 group-hover:scale-110 transform-gpu">
-              S/ {{ product.revenue | number:'1.0-0' }}
-            </p>
-          </div>
-        }
-      </div>
-    </div>
-
-    <!-- 📈 SECCIÓN: TENDENCIA DE FERIAS -->
-    <div class="bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800 p-6 shadow-sm">
-      <div class="flex items-center justify-between mb-6">
-        <div>
-          <h3 class="text-2xl font-bold text-stone-800 dark:text-stone-100">Tendencia de Ferias</h3>
-          <p class="text-sm text-stone-500 dark:text-stone-400 mt-1">Promedio móvil · Últimas 4 ferias</p>
-        </div>
-        <span class="material-icons-outlined text-4xl text-amber-500">show_chart</span>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <!-- Feria Acobamba (Jueves) -->
-        <div class="group p-6 bg-linear-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-xl border-2 border-amber-200 dark:border-amber-800 transition-all duration-300 hover:shadow-xl hover:scale-[1.02] hover:-translate-y-0.5">
-          <div class="flex items-center gap-3 mb-4">
-            <span class="material-icons-outlined text-4xl text-amber-600 transition-transform duration-300 group-hover:rotate-6 group-hover:scale-110">store</span>
-            <div>
-              <p class="text-xs font-medium text-amber-700 dark:text-amber-400">Jueves</p>
-              <p class="text-xl font-bold text-amber-900 dark:text-amber-100">Acobamba</p>
-            </div>
-          </div>
-          
-          <div class="space-y-4">
-            <div>
-              <p class="text-xs text-amber-600 dark:text-amber-400 mb-1">Promedio Móvil</p>
-              <p class="text-3xl font-bold text-amber-900 dark:text-amber-100 transition-transform duration-300 group-hover:scale-105 transform-gpu">
-                S/ {{ fairTrend().thursday.average | number:'1.0-0' }}
-              </p>
-            </div>
-            
-            <div class="flex items-center gap-2">
-              @if (fairTrend().thursday.trend === 'creciendo') {
-                <span class="px-3 py-1 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 rounded-full text-xs font-medium flex items-center gap-1">
-                  <span class="material-icons-outlined text-sm">trending_up</span>
-                  Creciendo
-                </span>
-              } @else if (fairTrend().thursday.trend === 'bajando') {
-                <span class="px-3 py-1 bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 rounded-full text-xs font-medium flex items-center gap-1">
-                  <span class="material-icons-outlined text-sm">trending_down</span>
-                  Bajando
-                </span>
-              } @else {
-                <span class="px-3 py-1 bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-400 rounded-full text-xs font-medium flex items-center gap-1">
-                  <span class="material-icons-outlined text-sm">trending_flat</span>
-                  Estable
-                </span>
-              }
-            </div>
-            
-            <p class="text-xs text-amber-600 dark:text-amber-500">
-              Basado en {{ fairTrend().thursday.count }} ferias recientes
-            </p>
-          </div>
-        </div>
-
-        <!-- Feria Paucara (Domingo) -->
-        <div class="group p-6 bg-linear-to-br from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 rounded-xl border-2 border-emerald-200 dark:border-emerald-800 transition-all duration-300 hover:shadow-xl hover:scale-[1.02] hover:-translate-y-0.5">
-          <div class="flex items-center gap-3 mb-4">
-            <span class="material-icons-outlined text-4xl text-emerald-600 transition-transform duration-300 group-hover:rotate-6 group-hover:scale-110">storefront</span>
-            <div>
-              <p class="text-xs font-medium text-emerald-700 dark:text-emerald-400">Domingo</p>
-              <p class="text-xl font-bold text-emerald-900 dark:text-emerald-100">Paucara</p>
-            </div>
-          </div>
-          
-          <div class="space-y-4">
-            <div>
-              <p class="text-xs text-emerald-600 dark:text-emerald-400 mb-1">Promedio Móvil</p>
-              <p class="text-3xl font-bold text-emerald-900 dark:text-emerald-100 transition-transform duration-300 group-hover:scale-105 transform-gpu">
-                S/ {{ fairTrend().sunday.average | number:'1.0-0' }}
-              </p>
-            </div>
-            
-            <div class="flex items-center gap-2">
-              @if (fairTrend().sunday.trend === 'creciendo') {
-                <span class="px-3 py-1 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 rounded-full text-xs font-medium flex items-center gap-1">
-                  <span class="material-icons-outlined text-sm">trending_up</span>
-                  Creciendo
-                </span>
-              } @else if (fairTrend().sunday.trend === 'bajando') {
-                <span class="px-3 py-1 bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 rounded-full text-xs font-medium flex items-center gap-1">
-                  <span class="material-icons-outlined text-sm">trending_down</span>
-                  Bajando
-                </span>
-              } @else {
-                <span class="px-3 py-1 bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-400 rounded-full text-xs font-medium flex items-center gap-1">
-                  <span class="material-icons-outlined text-sm">trending_flat</span>
-                  Estable
-                </span>
-              }
-            </div>
-            
-            <p class="text-xs text-emerald-600 dark:text-emerald-500">
-              Basado en {{ fairTrend().sunday.count }} ferias recientes
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-
+    }
   </div>
 </div>

@@ -95,41 +95,41 @@
         <!-- Tabs -->
         <div class="flex gap-2">
           <button
-            (click)="selectedTab.set('all')"
-            [class.bg-stone-900]="selectedTab() === 'all'"
-            [class.dark:bg-stone-100]="selectedTab() === 'all'"
-            [class.text-white]="selectedTab() === 'all'"
-            [class.dark:text-stone-900]="selectedTab() === 'all'"
-            [class.bg-stone-100]="selectedTab() !== 'all'"
-            [class.dark:bg-stone-800]="selectedTab() !== 'all'"
-            [class.text-stone-600]="selectedTab() !== 'all'"
-            [class.dark:text-stone-300]="selectedTab() !== 'all'"
+            (click)="setTab('all')"
+            [class.bg-stone-900]="!movementService.currentTypeFilter()"
+            [class.dark:bg-stone-100]="!movementService.currentTypeFilter()"
+            [class.text-white]="!movementService.currentTypeFilter()"
+            [class.dark:text-stone-900]="!movementService.currentTypeFilter()"
+            [class.bg-stone-100]="movementService.currentTypeFilter()"
+            [class.dark:bg-stone-800]="movementService.currentTypeFilter()"
+            [class.text-stone-600]="movementService.currentTypeFilter()"
+            [class.dark:text-stone-300]="movementService.currentTypeFilter()"
             class="px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ease-out hover:scale-[1.02] active:scale-95"
           >
             Todos
           </button>
           <button
-            (click)="selectedTab.set('entradas')"
-            [class.bg-emerald-700]="selectedTab() === 'entradas'"
-            [class.dark:bg-emerald-600]="selectedTab() === 'entradas'"
-            [class.text-white]="selectedTab() === 'entradas'"
-            [class.bg-stone-100]="selectedTab() !== 'entradas'"
-            [class.dark:bg-stone-800]="selectedTab() !== 'entradas'"
-            [class.text-stone-600]="selectedTab() !== 'entradas'"
-            [class.dark:text-stone-300]="selectedTab() !== 'entradas'"
+            (click)="setTab('entradas')"
+            [class.bg-emerald-700]="movementService.currentTypeFilter() === 'entradas'"
+            [class.dark:bg-emerald-600]="movementService.currentTypeFilter() === 'entradas'"
+            [class.text-white]="movementService.currentTypeFilter() === 'entradas'"
+            [class.bg-stone-100]="movementService.currentTypeFilter() !== 'entradas'"
+            [class.dark:bg-stone-800]="movementService.currentTypeFilter() !== 'entradas'"
+            [class.text-stone-600]="movementService.currentTypeFilter() !== 'entradas'"
+            [class.dark:text-stone-300]="movementService.currentTypeFilter() !== 'entradas'"
             class="px-4 py-2 rounded-xl text-sm font-medium transition-colors duration-100"
           >
             Entradas
           </button>
           <button
-            (click)="selectedTab.set('ajustes')"
-            [class.bg-sky-700]="selectedTab() === 'ajustes'"
-            [class.dark:bg-sky-600]="selectedTab() === 'ajustes'"
-            [class.text-white]="selectedTab() === 'ajustes'"
-            [class.bg-stone-100]="selectedTab() !== 'ajustes'"
-            [class.dark:bg-stone-800]="selectedTab() !== 'ajustes'"
-            [class.text-stone-600]="selectedTab() !== 'ajustes'"
-            [class.dark:text-stone-300]="selectedTab() !== 'ajustes'"
+            (click)="setTab('ajustes')"
+            [class.bg-sky-700]="movementService.currentTypeFilter() === 'ajustes'"
+            [class.dark:bg-sky-600]="movementService.currentTypeFilter() === 'ajustes'"
+            [class.text-white]="movementService.currentTypeFilter() === 'ajustes'"
+            [class.bg-stone-100]="movementService.currentTypeFilter() !== 'ajustes'"
+            [class.dark:bg-stone-800]="movementService.currentTypeFilter() !== 'ajustes'"
+            [class.text-stone-600]="movementService.currentTypeFilter() !== 'ajustes'"
+            [class.dark:text-stone-300]="movementService.currentTypeFilter() !== 'ajustes'"
             class="px-4 py-2 rounded-xl text-sm font-medium transition-colors duration-100"
           >
             Ajustes
@@ -269,6 +269,40 @@
             }
           </tbody>
         </table>
+        <!-- Resto de tabla existente -->
+      </div>
+      
+      <!-- Paginación de Spring Boot Footer -->
+      <div class="px-6 py-4 border-t border-stone-100 dark:border-stone-800 flex flex-col sm:flex-row gap-4 items-center justify-between bg-stone-50/50 dark:bg-stone-900/50">
+        <div class="flex items-center gap-4">
+          <span class="text-sm font-medium text-stone-500">
+            Total: <span class="font-bold text-stone-800 dark:text-stone-200">{{ movementService.totalElements() }} operaciones</span>
+          </span>
+          <div class="h-4 w-px bg-stone-300 dark:bg-stone-700 hidden sm:block"></div>
+          <div class="flex items-center gap-2">
+            <label class="text-sm text-stone-500">Mostrar:</label>
+            <select (change)="onPageSizeChange($event)" class="text-sm p-1.5 bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-lg outline-none focus:ring-2 focus:ring-emerald-500/30 text-stone-700 dark:text-stone-300 font-medium">
+              <option value="10" [selected]="movementService.pageSize() === 10">10</option>
+              <option value="20" [selected]="movementService.pageSize() === 20">20</option>
+              <option value="50" [selected]="movementService.pageSize() === 50">50</option>
+              <option value="100" [selected]="movementService.pageSize() === 100">100</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button [disabled]="movementService.currentPage() === 0" (click)="prevPage()" class="p-1.5 rounded-lg border border-stone-200 bg-white shadow-sm hover:bg-stone-50 disabled:opacity-50 text-stone-600 dark:bg-stone-800 dark:border-stone-700 dark:text-stone-300">
+            <span class="material-icons-outlined text-sm block">chevron_left</span>
+          </button>
+          
+          <div class="text-sm font-medium text-stone-600 dark:text-stone-400 px-2 min-w-[80px] text-center">
+            Pág {{ movementService.currentPage() + 1 }} de {{ movementService.totalPages() || 1 }}
+          </div>
+          
+          <button [disabled]="movementService.currentPage() >= (movementService.totalPages() - 1)" (click)="nextPage()" class="p-1.5 rounded-lg border border-stone-200 bg-white shadow-sm hover:bg-stone-50 disabled:opacity-50 text-stone-600 dark:bg-stone-800 dark:border-stone-700 dark:text-stone-300">
+            <span class="material-icons-outlined text-sm block">chevron_right</span>
+          </button>
+        </div>
       </div>
       }
     </div>

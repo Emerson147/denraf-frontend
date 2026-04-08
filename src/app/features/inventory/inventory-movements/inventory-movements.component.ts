@@ -18,13 +18,12 @@ import { UiPageHeaderComponent } from '../../../shared/ui/ui-page-header/ui-page
   styleUrls: ['./inventory-movements.component.css'],
 })
 export class InventoryMovementsComponent {
-  private movementService = inject(InventoryMovementService);
+  public movementService = inject(InventoryMovementService);
   private productService = inject(ProductService);
   private authService = inject(AuthService);
   private toastService = inject(ToastService);
 
   // State
-  selectedTab = signal<'all' | 'entradas' | 'ajustes'>('all');
   searchQuery = signal('');
   showNewMovementDialog = signal(false);
 
@@ -42,21 +41,9 @@ export class InventoryMovementsComponent {
   products = this.productService.products;
   loading = computed(() => this.movementService.isLoading());
 
-  // Movimientos filtrados
+  // Movimientos filtrados locales (solo búsquedas de texto en la vista actual)
   filteredMovements = computed(() => {
     let movements = this.movementService.movements();
-
-    // Filtrar por tab
-    switch (this.selectedTab()) {
-      case 'entradas':
-        movements = this.movementService.entradas();
-        break;
-      case 'ajustes':
-        movements = this.movementService.ajustes();
-        break;
-    }
-
-    // Filtrar por búsqueda
     const query = this.searchQuery().toLowerCase();
     if (query) {
       movements = movements.filter(
@@ -66,18 +53,46 @@ export class InventoryMovementsComponent {
           m.reason.toLowerCase().includes(query)
       );
     }
-
     return movements;
   });
 
-  // Stats
-  todayEntradas = computed(
-    () => this.movementService.todayMovements().filter((m) => m.type === 'entrada').length
-  );
+  // Stats (Dummy data hasta tener endpoints de stats)
+  todayEntradas = signal<number>(0);
+  todayAjustes = signal<number>(0);
 
-  todayAjustes = computed(
-    () => this.movementService.todayMovements().filter((m) => m.type === 'ajuste').length
-  );
+  ngOnInit() {
+    this.movementService.fetchPaginatedMovements(0, this.movementService.pageSize());
+  }
+
+  // --- PAGINACIÓN ---
+  prevPage() {
+    const current = this.movementService.currentPage();
+    if (current > 0) {
+      this.movementService.fetchPaginatedMovements(current - 1, this.movementService.pageSize(), this.movementService.currentTypeFilter() || undefined);
+    }
+  }
+
+  nextPage() {
+    const current = this.movementService.currentPage();
+    if (current < Math.max(0, this.movementService.totalPages() - 1)) {
+      this.movementService.fetchPaginatedMovements(current + 1, this.movementService.pageSize(), this.movementService.currentTypeFilter() || undefined);
+    }
+  }
+
+  onPageSizeChange(event: Event) {
+    const target = event.target as HTMLSelectElement;
+    const newSize = parseInt(target.value, 10);
+    this.movementService.changePageSize(newSize);
+  }
+
+  // --- FILTROS TAB ---
+  setTab(tab: 'all' | 'entradas' | 'ajustes') {
+    if (tab === 'all') {
+      this.movementService.fetchPaginatedMovements(0, this.movementService.pageSize(), undefined);
+    } else {
+      this.movementService.fetchPaginatedMovements(0, this.movementService.pageSize(), tab);
+    }
+  }
 
   /**
    * Abrir modal para nuevo movimiento
@@ -98,7 +113,7 @@ export class InventoryMovementsComponent {
   /**
    * Registrar nuevo movimiento
    */
-  submitMovement() {
+  async submitMovement() {
     const productId = this.selectedProductId();
     const product = this.products().find((p) => p.id === productId);
 
@@ -136,20 +151,24 @@ export class InventoryMovementsComponent {
 
     let result: InventoryMovement | null = null;
 
-    switch (this.movementType()) {
-      case 'entrada':
-        result = this.movementService.registerEntrada(movement);
-        break;
-      case 'ajuste':
-        // Para ajustes, la cantidad puede ser negativa
-        movement.quantity = this.quantity();
-        result = this.movementService.registerAjuste(movement);
-        break;
-    }
+    try {
+      switch (this.movementType()) {
+        case 'entrada':
+          result = await this.movementService.registerEntrada(movement);
+          break;
+        case 'ajuste':
+          // Para ajustes, la cantidad puede ser negativa o positiva via backend, pero el input ya es el absoluto en el modal.
+          movement.quantity = this.quantity();
+          result = await this.movementService.registerAjuste(movement);
+          break;
+      }
 
-    if (result) {
-      this.toastService.success(`Movimiento registrado: ${result.movementNumber}`);
-      this.closeDialog();
+      if (result) {
+        this.toastService.success(`Movimiento registrado: ${result.movementNumber}`);
+        this.closeDialog();
+      }
+    } catch(e) {
+       console.error("Error al registrar movimiento:", e);
     }
   }
 

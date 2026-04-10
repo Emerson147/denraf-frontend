@@ -1,0 +1,85 @@
+{
+  "version": 1,
+  "skills": {
+    "PR Review": {
+      "source": "angular/angular",
+      "sourceType": "github",
+      "computedHash": "d442fc48460c6907ad3fa6719068e0f344581ab7fe02e1af29796a4111a3012b"
+    },
+    "accessibility": {
+      "source": "addyosmani/web-quality-skills",
+      "sourceType": "github",
+      "computedHash": "6462f04969f59f771150e6410e6a11fa397f2934be0b51e8650f495feed1e28d"
+    },
+    "adev-writing-guide": {
+      "source": "angular/angular",
+      "sourceType": "github",
+      "computedHash": "0da9315d3f7e86f7d80300a36b2a8c85ed64ed318f3512c24324a173d3a6a839"
+    },
+    "angular-developer": {
+      "source": "angular/skills",
+      "sourceType": "github",
+      "computedHash": "b7764c591c965d85f95f1d4f6d3620b6ab92a1b1fedbcdead7d59e946fc3fd2e"
+    },
+    "deploy-to-vercel": {
+      "source": "vercel-labs/agent-skills",
+      "sourceType": "github",
+      "computedHash": "03e0eaaa9bf13ba1e7ffa387f5893de6f324c0868c627001f179395a8feaa7c9"
+    },
+    "frontend-design": {
+      "source": "anthropics/skills",
+      "sourceType": "github",
+      "computedHash": "063a0e6448123cd359ad0044cc46b0e490cc7964d45ef4bb9fd842bd2ffbca67"
+    },
+    "nodejs-backend-patterns": {
+      "source": "wshobson/agents",
+      "sourceType": "github",
+      "computedHash": "c6a99966c2565acc388e574039127abc770bb9a3338be761e421e16f023f702b"
+    },
+    "nodejs-best-practices": {
+      "source": "sickn33/antigravity-awesome-skills",
+      "sourceType": "github",
+      "computedHash": "64f10ff6795265dc4a97a72af86ee309fe57e6c35507775a4da893985984956b"
+    },
+    "reference-compiler-cli": {
+      "source": "angular/angular",
+      "sourceType": "github",
+      "computedHash": "ce937230b5374cf04b00a76251c3545b3dd43797407ef67ebd44b21229a33bd8"
+    },
+    "reference-core": {
+      "source": "angular/angular",
+      "sourceType": "github",
+      "computedHash": "16783417eeebecc4c35f5253872c2155967de10bd3e6b5d26f0bf950ff9347d0"
+    },
+    "reference-signal-forms": {
+      "source": "angular/angular",
+      "sourceType": "github",
+      "computedHash": "c48a51a68ab96d93ce98a7a3b55995208c70436423523ea64ae983a1ffa23020"
+    },
+    "seo": {
+      "source": "addyosmani/web-quality-skills",
+      "sourceType": "github",
+      "computedHash": "f1fed683b76913d26fbf1aa1e008e6932f7771701fc3a79925b042236aa4681a"
+    },
+    "supabase-postgres-best-practices": {
+      "source": "supabase/agent-skills",
+      "sourceType": "github",
+      "computedHash": "f4cd7570115d97af6bcb2946eb891a958c8d04a43b479871c9ccadbc670ad058"
+    },
+    "tailwind-css-patterns": {
+      "source": "giuseppe-trisciuoglio/developer-kit",
+      "sourceType": "github",
+      "computedHash": "6092620c3af955a46ea2b94ca8a40197ac8392e6bbdc8c7515659328b186c770"
+    },
+    "typescript-advanced-types": {
+      "source": "wshobson/agents",
+      "sourceType": "github",
+      "computedHash": "3a3be8c925f96ac4e1280db28a01677e7ca5197f3792de2bbf35ab3bb324b6dd"
+    },
+    "vitest": {
+      "source": "antfu/skills",
+      "sourceType": "github",
+      "computedHash": "669c7275f7e1379b06b2bcfa593603aead4c983b951c7e8edbc09640aa38d0a1"
+    }
+  }
+}

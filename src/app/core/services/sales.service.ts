@@ -9,6 +9,7 @@ import { ProductService } from './product.service';
 import { ErrorHandlerService } from './error-handler.service';
 import { LocalDbService } from './local-db.service';
 import { ClientService } from './client.service';
+import { GamificationService } from './gamification.service';
 
 /**
  * 🚀 SalesService - Spring Boot Paginated Architecture
@@ -23,6 +24,7 @@ export class SalesService {
   private errorHandler = inject(ErrorHandlerService);
   private localDb = inject(LocalDbService);
   private clientService = inject(ClientService);
+  private gamificationService = inject(GamificationService);
   private http = inject(HttpClient);
   private apiUrl = `${environment.apiUrl}/ventas`;
 
@@ -193,6 +195,9 @@ export class SalesService {
 
       // Resincronizar de fondo para asegurar precisión exacta con el backend
       this.productService.forceSync().catch(err => console.error('Error auto-sync tras venta:', err));
+      
+      // 🌟 Reflejar los puntos en metas y goals en tiempo real
+      this.gamificationService.loadData();
 
       return rawResponse;
     } catch (error) {
@@ -228,7 +233,7 @@ export class SalesService {
         tax: newSale.tax,
         createdBy: newSale.createdBy,
         vendedorId: newSale.vendedorId,
-        customerId: newSale.customer?.id
+        customerId: newSale.customer?.id && newSale.customer.id.length === 36 ? newSale.customer.id : undefined
     };
     // No esperamos la respuesta para no bloquear el POS UI
     this.createVenta(req).catch(err => console.error('Error auto-sync createVenta:', err));

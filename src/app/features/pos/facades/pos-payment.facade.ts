@@ -2,7 +2,7 @@ import { Injectable, signal, inject, computed } from '@angular/core';
 import { SalesService } from '../../../core/services/sales.service';
 import { OfflineService } from '../../../core/services/offline.service';
 import { ToastService } from '../../../core/services/toast.service';
-import { AuthService } from '../../../core/auth/auth';
+import { BackendAuthService } from '../../../core/services/backend-auth.service';
 import { LoggerService } from '../../../core/services/logger.service';
 import { Sale, SaleItem, Customer } from '../../../core/models';
 import { CartItem } from './pos-cart.facade';
@@ -36,7 +36,7 @@ export class PosPaymentFacade {
   private salesService = inject(SalesService);
   private offlineService = inject(OfflineService);
   private toastService = inject(ToastService);
-  private authService = inject(AuthService);
+  private authService = inject(BackendAuthService);
   private logger = inject(LoggerService);
   
   // Estado del pago
@@ -202,8 +202,8 @@ export class PosPaymentFacade {
         totalPurchases: total,
         tier: 'nuevo'
       } : undefined,
-      createdBy: this.authService.currentUser()?.name || 'Sistema',
-      vendedorId: this.authService.currentUser()?.id || 'admin'
+      createdBy: this.authService.currentUser()?.nombre || 'Sistema',
+      vendedorId: this.authService.currentUser()?.id || undefined
     };
 
     // Crear venta (online u offline)

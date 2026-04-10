@@ -44,7 +44,7 @@ export interface Sale {
   customer?: Customer;
   notes?: string;
   createdBy: string; // Usuario que hizo la venta
-  vendedorId: string; // ID del vendedor que realizó la venta
+  vendedorId?: string; // ID del vendedor que realizó la venta
 }
 
 export interface SaleItem {

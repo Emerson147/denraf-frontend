@@ -17,6 +17,21 @@ export interface AuthResponse {
   expiresIn: number;
 }
 
+export interface UserDTO {
+  id: string;
+  nombre: string;
+  email: string;
+  rol: string;
+}
+
+// Para update, usamos Map
+export interface UserUpdateRequest {
+  nombre?: string;
+  email?: string;
+  rol?: string;
+  password?: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -56,6 +71,27 @@ export class BackendAuthService {
 
   isAdmin(): boolean {
     return this.currentUser()?.rol === 'ADMIN';
+  }
+
+  // ============================================
+  // GESTIÓN DE USUARIOS (ADMINISTRACIÓN)
+  // ============================================
+
+  getUsers(): Observable<UserDTO[]> {
+    return this.api.get<UserDTO[]>('auth/users');
+  }
+
+  registerUser(data: any): Observable<any> {
+    // Retorna AuthResponse pero no hacemos tap() para no sobreescribir la sesión actual del Admin
+    return this.api.post<any>('auth/register', data);
+  }
+
+  updateUser(id: string, data: UserUpdateRequest): Observable<any> {
+    return this.api.put<any>(`auth/users/${id}`, data);
+  }
+
+  deleteUser(id: string): Observable<any> {
+    return this.api.delete<any>(`auth/users/${id}`);
   }
 
   private loadUserFromStorage(): AuthResponse | null {

@@ -1,7 +1,7 @@
 import { Component, inject, signal, AfterViewInit, DestroyRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { AuthService } from '../core/auth/auth';
+import { BackendAuthService } from '../core/services/backend-auth.service';
 import { ThemeService } from '../core/theme/theme.service';
 import { UiToastComponent } from '../shared/ui/ui-toast/ui-toast.component';
 import { UiNotificationCenterComponent } from '../shared/ui/ui-notification-center/ui-notification-center.component';
@@ -24,12 +24,13 @@ import { ClickOutsideDirective } from '../shared/directives/click-outside/click-
     ConnectionStatusComponent,
     PwaInstallPromptComponent,
     UiErrorLoggerComponent,
-    SyncIndicatorComponent
+    SyncIndicatorComponent,
+    ClickOutsideDirective
   ],
   templateUrl: './main-layout.component.html',
 })
 export class MainLayoutComponent implements AfterViewInit {
-  authService = inject(AuthService);
+  authService = inject(BackendAuthService);
   private router = inject(Router);
   private destroyRef = inject(DestroyRef);
 
@@ -100,7 +101,6 @@ export class MainLayoutComponent implements AfterViewInit {
             this.floatingButtonsVisible.set(false);
           }
         }, 2000);
-        // Aunque este se limpia solo, buena práctica almacenarlo por si acaso
       }
     }, 150);
   }
@@ -129,14 +129,10 @@ export class MainLayoutComponent implements AfterViewInit {
     this.userMenuOpen.set(false);
   }
 
-  switchUser(userId: string) {
-    this.authService.switchUser(userId);
-    this.closeUserMenu();
-  }
-
   logout() {
     this.closeMobileMenu();
     this.closeUserMenu();
-    this.authService.logout(); // Llamamos al metodo que borra y dirige
+    this.authService.logout();
+    this.router.navigate(['/login']);
   }
 }

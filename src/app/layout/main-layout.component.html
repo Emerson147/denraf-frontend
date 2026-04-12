@@ -303,7 +303,7 @@
       </a>
 
       <!-- Solo visible para admin -->
-      @if (authService.currentUser()?.role === 'admin') {
+      @if (authService.currentUser()?.rol === 'ADMIN') {
         <a
           routerLink="/users"
           routerLinkActive="bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 shadow-md"
@@ -348,7 +348,7 @@
           class="flex flex-col overflow-hidden transition-all duration-100"
           [ngClass]="sidebarCollapsed() ? 'opacity-0 w-0 hidden' : 'opacity-100'"
         >
-          <span class="text-sm font-semibold text-stone-800 dark:text-stone-100 whitespace-nowrap">Sensei Dev</span>
+          <span class="text-sm font-semibold text-stone-800 dark:text-stone-100 whitespace-nowrap">{{ authService.currentUser()?.nombre || 'Sensei Dev' }}</span>
           <span class="text-xs text-stone-400 dark:text-stone-500 whitespace-nowrap">Cerrar Sesión</span>
         </div>
         <span 
@@ -586,7 +586,7 @@
           SD
         </div>
         <div class="flex flex-col">
-          <span class="text-sm font-semibold text-stone-800 dark:text-stone-100">Sensei Dev</span>
+          <span class="text-sm font-semibold text-stone-800 dark:text-stone-100">{{ authService.currentUser()?.nombre || 'Sensei Dev' }}</span>
           <span class="text-xs text-stone-400 dark:text-stone-500">Cerrar Sesión</span>
         </div>
         <span class="material-icons-outlined text-stone-400 dark:text-stone-500 ml-auto text-lg">logout</span>
@@ -649,7 +649,7 @@
           >
             <span class="material-icons-outlined text-[19px]">person</span>
             @if (authService.currentUser()) {
-              <span class="text-xs font-medium">{{ authService.currentUser()!.name }}</span>
+              <span class="text-xs font-medium">{{ authService.currentUser()!.nombre }}</span>
             }
           </button>
           
@@ -657,23 +657,15 @@
           @if (userMenuOpen()) {
             <div class="absolute right-0 top-full mt-2 w-[calc(100vw-2rem)] sm:w-48 max-w-xs bg-white dark:bg-stone-800 rounded-xl shadow-2xl border border-stone-200 dark:border-stone-700 overflow-hidden z-50 animate-scale-in">
               <div class="p-2 border-b border-stone-100 dark:border-stone-700">
-                <p class="text-xs text-stone-500 dark:text-stone-400 px-2 py-1">Cambiar vendedor</p>
+                <p class="text-xs text-stone-500 dark:text-stone-400 px-2 py-1">Opciones de cuenta</p>
               </div>
               <div class="p-2">
-                @for (user of authService.getAvailableUsers(); track user.id) {
                   <button 
-                    (click)="switchUser(user.id)"
-                    class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-stone-700 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-700 transition-colors"
-                    [class.bg-stone-100]="authService.currentUser()?.id === user.id"
-                    [class.dark:bg-stone-700]="authService.currentUser()?.id === user.id"
+                    class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-stone-700 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-700 transition-colors bg-stone-100 dark:bg-stone-700"
                   >
                     <span class="material-icons-outlined text-[18px]">person</span>
-                    <span>{{ user.name }}</span>
-                    @if (authService.currentUser()?.id === user.id) {
-                      <span class="ml-auto material-icons-outlined text-[16px] text-green-600">check_circle</span>
-                    }
+                    <span>{{ authService.currentUser()?.nombre }} ({{ authService.currentUser()?.rol }})</span>
                   </button>
-                }
               </div>
               <div class="p-2 border-t border-stone-100 dark:border-stone-700">
                 <button 

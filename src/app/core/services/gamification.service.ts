@@ -184,20 +184,20 @@ export class GamificationService {
   }
 
   // ============================================
-  // MÉTODOS DE CREACIÓN LOCAL (Temporales si el backend aùn no los tiene)
+  // MÉTODOS DE CREACIÓN DE ADMIN
   // ============================================
 
-  createGoal(goalData: Omit<Goal, 'id' | 'current' | 'status'>): Goal {
-    const newGoal: Goal = {
-      ...goalData,
-      id: `goal-local-${Date.now()}`,
-      current: 0,
-      status: 'active'
-    };
-    // El backend actualmente crea las metas semanales y mensuales automáticamente
-    // Si queremos custom en el futuro, requerirá un endpoint POST /goals
-    this.goals.update(goals => [newGoal, ...goals]);
-    return newGoal;
+  assignAdminGoal(goalData: any) {
+    return this.api.post<Goal>('gamification/admin/goals', goalData).pipe( // POST on admin/goals
+       map(res => {
+         this.toastService.success('¡Meta asignada exitosamente!');
+         // Recargamos silenciosamente el leaderboard o metas si es a nosotros mismos
+         if (goalData.userId === this.backendAuthService.currentUser()?.id) {
+            this.loadUserGoals();
+         }
+         return res;
+       })
+    );
   }
 
   deleteGoal(goalId: string) {

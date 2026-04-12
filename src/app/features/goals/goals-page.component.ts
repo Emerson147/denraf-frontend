@@ -1,5 +1,6 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { CommonModule, DecimalPipe } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { GamificationService } from '../../core/services/gamification.service';
 import { ThemeService } from '../../core/theme/theme.service';
 import { BackendAuthService } from '../../core/services/backend-auth.service';
@@ -7,7 +8,7 @@ import { BackendAuthService } from '../../core/services/backend-auth.service';
 @Component({
   selector: 'app-goals-page',
   standalone: true,
-  imports: [CommonModule, DecimalPipe],
+  imports: [CommonModule, DecimalPipe, FormsModule],
   template: `
     <div class="h-full bg-stone-50 dark:bg-stone-950 p-4 sm:p-6 lg:p-8 transition-colors duration-300 ease-out">
       <div class="w-full space-y-6">
@@ -167,15 +168,27 @@ import { BackendAuthService } from '../../core/services/backend-auth.service';
                 <h2 class="text-lg font-bold text-stone-900 dark:text-stone-100">Metas activas</h2>
                 <p class="text-xs text-stone-500 dark:text-stone-400 mt-0.5">Seguimiento en tiempo real</p>
               </div>
-              <span class="px-3 py-1 bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400 text-xs rounded-full font-medium">
-                {{ gamification.activeGoals().length }} metas
-              </span>
+              <div class="flex items-center gap-3">
+                @if (isAdmin) {
+                  <button (click)="openGoalModal()" class="px-3 py-1.5 flex items-center gap-1.5 bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 text-[11px] font-bold rounded-lg hover:scale-105 transition-transform shadow-sm">
+                    <span class="material-icons-outlined text-[14px]">add</span>
+                    Nueva Meta
+                  </button>
+                }
+                <span class="px-3 py-1.5 bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400 text-[11px] rounded-lg font-bold">
+                  {{ gamification.activeGoals().length }} metas
+                </span>
+              </div>
             </div>
 
             <!-- Lista de metas con divide-y -->
             <div class="divide-y divide-stone-100 dark:divide-stone-800 flex-1">
               @for (goal of gamification.activeGoals(); track goal.id) {
-                <div class="p-6 lg:px-8 hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors">
+                <div class="relative p-6 lg:px-8 hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors overflow-hidden group">
+                  @if (goalProgress(goal.current, goal.target) >= 80 && goalProgress(goal.current, goal.target) < 100) {
+                    <!-- Pulse effect for near-completion goals -->
+                    <div class="absolute left-0 top-0 bottom-0 w-1 bg-emerald-500/80 animate-pulse"></div>
+                  }
                   <div class="flex items-start justify-between gap-4">
                     <div class="flex-1 min-w-0">
                       <div class="flex items-center gap-2 mb-1">
@@ -213,8 +226,12 @@ import { BackendAuthService } from '../../core/services/backend-auth.service';
                   </div>
                 </div>
               } @empty {
-                <div class="p-10 text-center text-sm text-stone-400">
-                  No hay metas activas en este momento.
+                <div class="p-12 flex flex-col items-center justify-center text-center">
+                  <div class="w-16 h-16 rounded-full bg-stone-50 dark:bg-stone-800 flex items-center justify-center mb-4">
+                    <span class="material-icons-outlined text-3xl text-stone-300 dark:text-stone-600">flag</span>
+                  </div>
+                  <h3 class="text-sm font-bold text-stone-900 dark:text-stone-100">Sin metas activas</h3>
+                  <p class="text-xs text-stone-500 mt-1 max-w-[200px]">Tu historial de metas anteriores y próximas aparecerá aquí.</p>
                 </div>
               }
             </div>
@@ -301,21 +318,31 @@ import { BackendAuthService } from '../../core/services/backend-auth.service';
             <div class="relative z-10 flex flex-col gap-3 flex-1">
               @for (entry of gamification.allLeaderboard(); track entry.userId; let i = $index) {
                 <div class="flex items-center gap-3 rounded-2xl p-4 border transition-all"
-                  [class.bg-white/5]="i <= 1"
-                  [class.border-white/10]="i <= 1"
-                  [class.bg-transparent]="i > 1"
-                  [class.border-transparent]="i > 1"
-                  [class.opacity-50]="i > 2">
+                  [class.bg-amber-500/10]="entry.rank === 1"
+                  [class.border-amber-500/20]="entry.rank === 1"
+                  [class.bg-stone-300/10]="entry.rank === 2"
+                  [class.border-stone-300/20]="entry.rank === 2"
+                  [class.bg-orange-600/10]="entry.rank === 3"
+                  [class.border-orange-600/20]="entry.rank === 3"
+                  [class.bg-transparent]="entry.rank > 3"
+                  [class.border-transparent]="entry.rank > 3"
+                  [class.opacity-50]="entry.rank > 3">
                   <span class="w-5 text-center text-xs font-semibold"
-                    [class.text-white]="entry.rank <= 3"
+                    [class.text-amber-500]="entry.rank === 1"
+                    [class.text-stone-400]="entry.rank === 2"
+                    [class.text-orange-600]="entry.rank === 3"
                     [class.text-stone-500]="entry.rank > 3">
                     {{ entry.rank }}
                   </span>
                   <div class="w-9 h-9 rounded-full flex items-center justify-center text-[12px] font-bold shrink-0"
-                    [class.bg-white]="entry.rank === 1"
+                    [class.bg-amber-500]="entry.rank === 1"
                     [class.text-stone-900]="entry.rank === 1"
-                    [class.bg-white/10]="entry.rank > 1"
-                    [class.text-white]="entry.rank > 1">
+                    [class.bg-stone-300]="entry.rank === 2"
+                    [class.text-stone-900]="entry.rank === 2"
+                    [class.bg-orange-600]="entry.rank === 3"
+                    [class.text-white]="entry.rank === 3"
+                    [class.bg-white/10]="entry.rank > 3"
+                    [class.text-white]="entry.rank > 3">
                     {{ entry.userName.charAt(0).toUpperCase() }}
                   </div>
                   <div class="flex-1 min-w-0">
@@ -358,6 +385,69 @@ import { BackendAuthService } from '../../core/services/backend-auth.service';
 
         </div>
       </div>
+
+      <!-- MODAL ASIGNAR META -->
+      @if (showGoalModal()) {
+        <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <!-- Backdrop base oscuro -->
+          <div 
+            class="absolute inset-0 bg-stone-900/60 transition-opacity" 
+            (click)="closeGoalModal()"
+          ></div>
+          
+          <!-- Modal Panel Premium Solid -->
+          <div class="relative bg-white dark:bg-stone-900 border border-stone-200/60 dark:border-stone-800 rounded-3xl p-8 w-full max-w-md shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)] dark:shadow-[0_20px_50px_-12px_rgba(0,0,0,0.5)] animate-scale-in">
+            <h2 class="text-xl font-bold text-stone-900 dark:text-stone-100 mb-6 flex items-center gap-2">
+              <span class="material-icons-outlined text-emerald-500">campaign</span>
+              Asignar Meta
+            </h2>
+
+            <div class="space-y-4">
+              <!-- Vendedor -->
+              <div>
+                <label class="block text-[11px] font-bold text-stone-500 dark:text-stone-400 uppercase tracking-widest mb-1.5">Vendedor a evaluar</label>
+                <select [(ngModel)]="newGoal.userId" class="w-full bg-stone-50 dark:bg-stone-800 border border-stone-200/60 dark:border-stone-700/50 rounded-xl px-4 py-3 text-sm font-semibold text-stone-800 dark:text-stone-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/50">
+                  <option value="" disabled selected>Seleccione un asesor...</option>
+                  @for (entry of gamification.allLeaderboard(); track entry.userId) {
+                    <option [value]="entry.userId">{{ entry.userName }}</option>
+                  }
+                </select>
+              </div>
+
+              <!-- Título -->
+              <div>
+                <label class="block text-[11px] font-bold text-stone-500 dark:text-stone-400 uppercase tracking-widest mb-1.5">Descripción de la meta</label>
+                <input [(ngModel)]="newGoal.title" type="text" placeholder="Ej: Bono de Verano, Vender 50 jeans" class="w-full bg-stone-50 dark:bg-stone-800 border border-stone-200/60 dark:border-stone-700/50 rounded-xl px-4 py-3 text-sm font-semibold text-stone-800 dark:text-stone-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 placeholder:font-normal placeholder:opacity-50">
+              </div>
+
+              <div class="grid grid-cols-2 gap-4">
+                 <!-- Métrica -->
+                <div>
+                  <label class="block text-[11px] font-bold text-stone-500 dark:text-stone-400 uppercase tracking-widest mb-1.5">Tipo (Métrica)</label>
+                  <select [(ngModel)]="newGoal.metric" class="w-full bg-stone-50 dark:bg-stone-800 border border-stone-200/60 dark:border-stone-700/50 rounded-xl px-4 py-3 text-sm font-semibold text-stone-800 dark:text-stone-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/50">
+                    <option value="sales_count">Cant. de Ventas</option>
+                    <option value="revenue">Dinero Ingresado</option>
+                  </select>
+                </div>
+                <!-- Objetivo -->
+                <div>
+                  <label class="block text-[11px] font-bold text-stone-500 dark:text-stone-400 uppercase tracking-widest mb-1.5">Objetivo (Num)</label>
+                  <input [(ngModel)]="newGoal.target" type="number" min="1" class="w-full bg-stone-50 dark:bg-stone-800 border border-stone-200/60 dark:border-stone-700/50 rounded-xl px-4 py-3 text-sm font-bold text-stone-800 dark:text-stone-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/50">
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-8 flex items-center justify-end gap-3">
+              <button (click)="closeGoalModal()" class="px-5 py-2.5 rounded-xl text-[13px] font-bold text-stone-500 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors">
+                Cancelar
+              </button>
+              <button (click)="saveGoal()" class="px-6 py-2.5 rounded-xl text-[13px] font-bold text-white bg-stone-900 hover:bg-stone-800 dark:bg-emerald-500 dark:hover:bg-emerald-600 dark:text-stone-900 transition-all shadow-md active:scale-95">
+                Crear Meta
+              </button>
+            </div>
+          </div>
+        </div>
+      }
     </div>
   `,
   styles: [],
@@ -431,5 +521,40 @@ export class GoalsPageComponent {
 
   achievementProgress(current: number, required: number): number {
     return Math.min(Math.round((current / required) * 100), 100);
+  }
+
+  // ============================================
+  // LOGICA DEL MODAL DE CREACIÓN DE METAS (ZEN)
+  // ============================================
+  get isAdmin() {
+    return this.currentUser()?.rol === 'ADMIN';
+  }
+
+  showGoalModal = signal(false);
+  newGoal = { userId: '', title: '', description: '', metric: 'sales_count', target: 0 };
+
+  openGoalModal() {
+    this.showGoalModal.set(true);
+    this.newGoal = { 
+      userId: '', 
+      title: '', 
+      description: 'Meta extraordinaria asignada por dirección', 
+      metric: 'sales_count', 
+      target: 10 
+    };
+  }
+
+  closeGoalModal() {
+    this.showGoalModal.set(false);
+  }
+
+  saveGoal() {
+    if (!this.newGoal.userId || !this.newGoal.target || !this.newGoal.title) return;
+    
+    this.gamification.assignAdminGoal(this.newGoal).subscribe({
+      next: () => {
+        this.closeGoalModal();
+      }
+    });
   }
 }

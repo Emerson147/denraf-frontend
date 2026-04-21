@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { InventoryMovementService } from '../../../core/services/inventory-movement.service';
 import { ProductService } from '../../../core/services/product.service';
-import { AuthService } from '../../../core/auth/auth';
+import { BackendAuthService } from '../../../core/services/backend-auth.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { InventoryMovement, Product } from '../../../core/models';
 import { UiAnimatedDialogComponent } from '../../../shared/ui/ui-animated-dialog/ui-animated-dialog.component';
@@ -20,7 +20,7 @@ import { UiPageHeaderComponent } from '../../../shared/ui/ui-page-header/ui-page
 export class InventoryMovementsComponent {
   public movementService = inject(InventoryMovementService);
   private productService = inject(ProductService);
-  private authService = inject(AuthService);
+  private authService = inject(BackendAuthService);
   private toastService = inject(ToastService);
 
   // State
@@ -137,7 +137,7 @@ export class InventoryMovementsComponent {
       productName: product.name,
       quantity: this.quantity(),
       reason: this.reason(),
-      createdBy: this.authService.currentUser()?.name || 'Usuario',
+      createdBy: this.authService.currentUser()?.nombre || 'Usuario',
       notes: this.notes() || undefined,
     };
 

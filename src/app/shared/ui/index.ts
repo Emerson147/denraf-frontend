@@ -46,5 +46,5 @@ export { UiTicketComponent } from './ui-ticket/ui-ticket.component';
 export { ConnectionStatusComponent } from './connection-status/connection-status.component';
 export { UiSkeletonComponent } from './ui-skeleton/ui-skeleton.component';
 export { PwaInstallPromptComponent } from './pwa-install-prompt/pwa-install-prompt.component';
-export { SyncIndicatorComponent } from './sync-indicator/sync-indicator.component';
+
 export { PeriodSelectorComponent } from './period-selector/period-selector.component';

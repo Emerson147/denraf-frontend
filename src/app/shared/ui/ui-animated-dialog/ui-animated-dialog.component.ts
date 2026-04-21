@@ -9,14 +9,14 @@ import { CommonModule } from '@angular/common';
     @if (showModal()) {
     <div class="fixed inset-0 z-50 flex items-center justify-center px-4">
       <div
-        class="fixed inset-0 bg-stone-900/20 backdrop-blur-sm transition-all duration-400 ease-out"
+        class="fixed inset-0 bg-stone-900/40 dark:bg-black/60 backdrop-blur-md transition-all duration-400 ease-out"
         [class.opacity-0]="!animateIn()"
         [class.opacity-100]="animateIn()"
         (click)="close()"
       ></div>
 
       <div
-        class="relative z-10 w-full max-h-[90vh] flex flex-col transform rounded-4xl bg-[#FDFCFC] shadow-2xl transition-all duration-400 ease-spring"
+        class="relative z-10 w-full max-h-[90vh] flex flex-col transform rounded-4xl bg-white dark:bg-stone-900 shadow-2xl border border-stone-100/50 dark:border-stone-800/50 transition-all duration-400 ease-spring"
         [class.max-w-md]="maxWidth === 'sm'"
         [class.max-w-2xl]="maxWidth === 'md'"
         [class.max-w-4xl]="maxWidth === 'lg'"

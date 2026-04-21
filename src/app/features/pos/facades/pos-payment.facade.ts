@@ -1,6 +1,5 @@
 import { Injectable, signal, inject, computed } from '@angular/core';
 import { SalesService } from '../../../core/services/sales.service';
-import { OfflineService } from '../../../core/services/offline.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { BackendAuthService } from '../../../core/services/backend-auth.service';
 import { LoggerService } from '../../../core/services/logger.service';
@@ -34,7 +33,6 @@ export type PaymentMethod = 'cash' | 'card' | 'transfer' | 'yape' | 'plin';
 @Injectable()
 export class PosPaymentFacade {
   private salesService = inject(SalesService);
-  private offlineService = inject(OfflineService);
   private toastService = inject(ToastService);
   private authService = inject(BackendAuthService);
   private logger = inject(LoggerService);
@@ -55,12 +53,9 @@ export class PosPaymentFacade {
   readonly currentTicketNumber = this.currentTicketNumberSignal.asReadonly();
   readonly saleType = this.saleTypeSignal.asReadonly();
   
-  // Estado de conexión
-  readonly isOnline = this.offlineService.isOnline;
-  readonly pendingSalesCount = computed(() => {
-    const pending = (this.offlineService as any).pendingSales?.() || [];
-    return Array.isArray(pending) ? pending.length : 0;
-  });
+  // Estado de conexión (siempre online, sin soporte offline)
+  readonly isOnline = () => true;
+  readonly pendingSalesCount = computed(() => 0);
 
   /**
    * Establecer método de pago
@@ -206,30 +201,17 @@ export class PosPaymentFacade {
       vendedorId: this.authService.currentUser()?.id || undefined
     };
 
-    // Crear venta (online u offline)
+    // Crear venta (siempre online, sin modo offline)
     let sale: Sale | null = null;
     
-    if (this.offlineService.isOnline()) {
-      // Modo online
-      sale = this.salesService.createSale(saleData);
-      if (sale) {
-        this.logger.log('✅ Venta registrada (ONLINE):', sale);
-        this.toastService.success(`Venta ${sale.saleNumber} registrada`);
-      }
-    } else {
-      // Modo offline
-      this.offlineService.saveSaleOffline(saleData);
-      this.logger.log('📴 Venta guardada (OFFLINE):', saleData);
-      this.toastService.warning('Venta guardada offline. Se sincronizará cuando vuelva internet');
-      
-      // Crear objeto Sale temporal para el ticket
-      sale = {
-        ...saleData,
-        id: `TEMP-${Date.now()}`,
-        saleNumber: `VENTA-${this.currentTicketNumberSignal()}`,
-        date: new Date()
-      };
+    // Modo online
+    sale = this.salesService.createSale(saleData);
+    if (sale) {
+      this.logger.log('✅ Venta registrada:', sale);
+      this.toastService.success(`Venta ${sale.saleNumber} registrada`);
     }
+
+
 
     // Incrementar número de ticket
     this.incrementTicketNumber();

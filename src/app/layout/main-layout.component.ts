@@ -1,4 +1,4 @@
-import { Component, inject, signal, AfterViewInit, DestroyRef } from '@angular/core';
+import { Component, inject, signal, computed, DestroyRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { BackendAuthService } from '../core/services/backend-auth.service';
@@ -8,9 +8,7 @@ import { UiNotificationCenterComponent } from '../shared/ui/ui-notification-cent
 import { ConnectionStatusComponent } from '../shared/ui/connection-status/connection-status.component';
 import { PwaInstallPromptComponent } from '../shared/ui/pwa-install-prompt/pwa-install-prompt.component';
 import { UiErrorLoggerComponent } from '../shared/ui/ui-error-logger/ui-error-logger.component';
-import { SyncIndicatorComponent } from '../shared/ui/sync-indicator/sync-indicator.component';
 import { ClickOutsideDirective } from '../shared/directives/click-outside/click-outside.component';
-
 @Component({
   selector: 'app-main-layout',
   standalone: true,
@@ -24,12 +22,11 @@ import { ClickOutsideDirective } from '../shared/directives/click-outside/click-
     ConnectionStatusComponent,
     PwaInstallPromptComponent,
     UiErrorLoggerComponent,
-    SyncIndicatorComponent,
     ClickOutsideDirective
   ],
   templateUrl: './main-layout.component.html',
 })
-export class MainLayoutComponent implements AfterViewInit {
+export class MainLayoutComponent {
   authService = inject(BackendAuthService);
   private router = inject(Router);
   private destroyRef = inject(DestroyRef);
@@ -45,65 +42,19 @@ export class MainLayoutComponent implements AfterViewInit {
   // Estado del submenu de inventario
   inventorySubmenuOpen = signal(false);
 
-  // Control de visibilidad de botones flotantes
-  floatingButtonsVisible = signal(true);
-  private scrollTimeout: any;
-  private scrollListener?: () => void;
-
   // Estado del menu de usuario
   userMenuOpen = signal(false);
 
-  ngAfterViewInit() {
-    // Esperar un tick para que el DOM esté listo
-    const timeoutId = setTimeout(() => {
-      const mainContent = document.querySelector('main .overflow-y-auto') as HTMLElement;
-      if (mainContent) {
-        this.scrollListener = () => this.handleScroll(mainContent);
-        mainContent.addEventListener('scroll', this.scrollListener);
-        
-        // 🧹 Cleanup automático con DestroyRef
-        this.destroyRef.onDestroy(() => {
-          mainContent.removeEventListener('scroll', this.scrollListener!);
-          if (this.scrollTimeout) {
-            clearTimeout(this.scrollTimeout);
-          }
-        });
-      }
-    }, 100);
-    
-    // 🧹 Limpiar el timeout inicial también
-    this.destroyRef.onDestroy(() => clearTimeout(timeoutId));
-  }
-
-  private handleScroll(element: HTMLElement) {
-    const scrollTop = element.scrollTop;
-    
-    // Fade out cuando se hace scroll (más de 80px)
-    if (scrollTop > 80) {
-      this.floatingButtonsVisible.set(false);
-    } else {
-      this.floatingButtonsVisible.set(true);
+  // Iniciales dinámicas para el usuario logueado
+  userInitials = computed(() => {
+    const user = this.authService.currentUser();
+    if (!user || !user.nombre) return 'SD';
+    const parts = user.nombre.trim().split(' ');
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[1][0]).toUpperCase();
     }
-
-    // Limpiar timeout anterior
-    if (this.scrollTimeout) {
-      clearTimeout(this.scrollTimeout);
-    }
-    
-    // Mostrar botones temporalmente cuando se detiene el scroll
-    this.scrollTimeout = setTimeout(() => {
-      if (scrollTop > 80) {
-        this.floatingButtonsVisible.set(true);
-        // Volver a ocultar después de 2 segundos
-        const hideTimeoutId = setTimeout(() => {
-          const currentScroll = element.scrollTop;
-          if (currentScroll > 80) {
-            this.floatingButtonsVisible.set(false);
-          }
-        }, 2000);
-      }
-    }, 150);
-  }
+    return user.nombre.substring(0, 2).toUpperCase();
+  });
 
   toggleSidebar() {
     this.sidebarCollapsed.update(val => !val);

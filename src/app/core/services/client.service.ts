@@ -62,7 +62,7 @@ export class ClientService {
    */
   private loadClients(): void {
     this.isLoading.set(true);
-    this.api.get<any>('clientes').subscribe({
+    this.api.get<any>('clientes?size=5000&sortDir=desc').subscribe({
       next: (response) => {
         // El backend puede devolver paginado o array directo
         const clients: Client[] = response && response.content

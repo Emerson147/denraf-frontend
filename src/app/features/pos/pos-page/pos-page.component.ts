@@ -17,10 +17,8 @@ import { UiTicketComponent } from '../../../shared/ui/ui-ticket/ui-ticket.compon
 import { UiSkeletonComponent } from '../../../shared/ui';
 import { SalesService } from '../../../core/services/sales.service';
 import { ProductService } from '../../../core/services/product.service';
-import { OfflineService } from '../../../core/services/offline.service';
-import { ToastService } from '../../../core/services/toast.service';
-import { AuthService } from '../../../core/auth/auth';
 import { BackendAuthService } from '../../../core/services/backend-auth.service';
+import { ToastService } from '../../../core/services/toast.service';
 import { LoggerService } from '../../../core/services/logger.service';
 import { ClientService } from '../../../core/services/client.service';
 import { Sale, SaleItem, Product, ProductVariant, VentaRequest, Client } from '../../../core/models';
@@ -53,10 +51,8 @@ export class PosPageComponent {
   // Servicios
   private salesService = inject(SalesService);
   private productService = inject(ProductService);
-  private offlineService = inject(OfflineService);
   private toastService = inject(ToastService);
-  private authService = inject(AuthService);
-  private backendAuth = inject(BackendAuthService);
+  private authService = inject(BackendAuthService);
   private logger = inject(LoggerService);
   private clientService = inject(ClientService);
   private destroyRef = inject(DestroyRef);
@@ -293,11 +289,8 @@ export class PosPageComponent {
   });
 
   // 🔄 ESTADO DE CONEXIÓN
-  isOnline = computed(() => this.offlineService.isOnline());
-  pendingSalesCount = computed(() => {
-    const pending = (this.offlineService as any).pendingSales?.() || [];
-    return Array.isArray(pending) ? pending.length : 0;
-  });
+  isOnline = computed(() => true);
+  pendingSalesCount = computed(() => 0);
 
   // Optimizado: Memoización eficiente de productos filtrados
   filteredProducts = computed(() => {
@@ -562,7 +555,7 @@ export class PosPageComponent {
     const total = this.total();
 
     // Obtener UUID del usuario logueado en Spring Boot
-    const loggedUser = this.backendAuth.currentUser();
+    const loggedUser = this.authService.currentUser();
     const vendedorUuid = loggedUser?.id || "908c700f-a335-4341-be6f-a62bfd7daa10"; // Fallback por seguridad
 
     // 🚀 NUEVA ESTRUCTURA: Payload JSON para Spring Boot Backend (VentaController)
@@ -580,19 +573,11 @@ export class PosPageComponent {
       }))
     };
 
-    // 🔌 DETECCIÓN AUTOMÁTICA: Online vs Offline
-
-    if (this.offlineService.isOnline()) {
-      // ✅ MODO ONLINE: Guardar directamente en Spring Boot
-      try {
-        const ventaResponse = await this.salesService.createVenta(ventaRequest);
-        this.logger.log('✅ Venta HTTP registrada en Backend:', ventaResponse);
-      } catch (error) {
-        this.logger.log('❌ Error registrando venta HTTP:', error);
-      }
-    } else {
-      // 📴 MODO OFFLINE: Guardar en IndexedDB (mantener lógica Legacy temporalmente)
-      this.toastService.warning('Venta Offline no compatible aún con la nueva API. Conéctate a Internet.');
+    try {
+      const ventaResponse = await this.salesService.createVenta(ventaRequest);
+      this.logger.log('✅ Venta HTTP registrada en Backend:', ventaResponse);
+    } catch (error) {
+      this.logger.log('❌ Error registrando venta HTTP:', error);
     }
   }
 

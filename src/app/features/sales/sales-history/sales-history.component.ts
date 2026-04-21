@@ -16,7 +16,7 @@ import { UiEmptyStateComponent } from '../../../shared/ui/ui-empty-state/ui-empt
 import { UiExportMenuComponent } from '../../../shared/ui/ui-export-menu/ui-export-menu.component';
 import { UiTicketComponent } from '../../../shared/ui/ui-ticket/ui-ticket.component';
 import { SalesService } from '../../../core/services/sales.service';
-import { AuthService } from '../../../core/auth/auth';
+import { BackendAuthService, UserDTO } from '../../../core/services/backend-auth.service';
 import { LoggerService } from '../../../core/services/logger.service';
 import { ExportService } from '../../../core/services/export.service';
 import { Sale } from '../../../core/models';
@@ -37,8 +37,11 @@ import { Sale } from '../../../core/models';
 })
 export class SalesHistoryComponent {
   salesService = inject(SalesService);
-  private authService = inject(AuthService);
+  private authService = inject(BackendAuthService);
   private logger = inject(LoggerService);
+  private exportService = inject(ExportService);
+
+  availableUsers: UserDTO[] = [];
 
   @ViewChild('searchInput') searchInput!: ElementRef<HTMLInputElement>;
 
@@ -60,9 +63,8 @@ export class SalesHistoryComponent {
   searchQuery = signal('');
   selectedPeriod = signal<'today' | 'week' | 'month' | 'all'>('all');
   
-  availableUsers = () => this.authService.getAvailableUsers();
-
   constructor() {
+    this.authService.getUsers().subscribe(users => this.availableUsers = users);
     // Escuchar cambios de periodo de manera reactiva para volver a pedir a backend
     effect(() => {
        const period = this.selectedPeriod();
@@ -179,8 +181,8 @@ export class SalesHistoryComponent {
   
   getVendorName(id?: string): string {
     if (!id) return 'Sistema';
-    const user = this.availableUsers().find((u) => u.id === id);
-    return user ? user.name : 'Vendedor ' + id.substring(0, 4);
+    const user = this.availableUsers.find((u: UserDTO) => u.id === id);
+    return user ? user.nombre : 'Vendedor ' + id.substring(0, 4);
   }
 
   getVendorInitial(id?: string): string {
@@ -232,7 +234,8 @@ export class SalesHistoryComponent {
     }));
   });
 
-  private exportService = inject(ExportService);
+
+
 
   exportToZenPDF() {
     console.log('Generando PDF Zen para las ventas...');

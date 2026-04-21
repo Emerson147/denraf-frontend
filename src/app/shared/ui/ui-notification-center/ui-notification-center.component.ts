@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed } from '@angular/core';
+import { Component, inject, signal, computed, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { NotificationService, Notification, NotificationType } from '../../../core/services/notification.service';
@@ -18,6 +18,8 @@ export class UiNotificationCenterComponent {
   themeService = inject(ThemeService);
   
   isOpen = signal(false);
+  
+  @Input() dropdownPosition: 'bottom' | 'top' = 'bottom';
   isDarkMode = computed(() => this.themeService.darkMode());
 
   toggleDropdown() {

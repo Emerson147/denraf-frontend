@@ -7,7 +7,6 @@ import { NotificationService } from './notification.service';
 import { ToastService } from './toast.service';
 import { ProductService } from './product.service';
 import { ErrorHandlerService } from './error-handler.service';
-import { LocalDbService } from './local-db.service';
 import { ClientService } from './client.service';
 import { GamificationService } from './gamification.service';
 
@@ -22,7 +21,6 @@ export class SalesService {
   private toastService = inject(ToastService);
   private productService = inject(ProductService);
   private errorHandler = inject(ErrorHandlerService);
-  private localDb = inject(LocalDbService);
   private clientService = inject(ClientService);
   private gamificationService = inject(GamificationService);
   private http = inject(HttpClient);

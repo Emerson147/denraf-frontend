@@ -1,5 +1,5 @@
 <div class="h-full bg-stone-50 dark:bg-stone-950 p-4 sm:p-6 lg:p-8 transition-colors duration-300 ease-out">
-  <div class="w-full space-y-6 max-w-7xl mx-auto">
+  <div class="w-full space-y-6">
 
     <!-- HEADER -->
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -13,10 +13,15 @@
         </div>
       </div>
 
-      <button (click)="openCreateModal()" class="px-5 py-2.5 flex items-center justify-center gap-2 bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 text-sm font-bold rounded-xl hover:bg-black dark:hover:bg-stone-200 transition-colors shadow-lg">
-        <span class="material-icons-outlined text-[18px]">person_add</span>
-        Nuevo Usuario
-      </button>
+      <app-ui-button 
+        (onClick)="openCreateModal()" 
+        class="bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 rounded-xl shadow-lg"
+      >
+        <span class="flex items-center gap-2">
+          <span class="material-icons-outlined text-sm">person_add</span>
+          Nuevo Usuario
+        </span>
+      </app-ui-button>
     </div>
 
     <!-- MAIN BOX -->
@@ -99,74 +104,88 @@
   </div>
 
   <!-- MODAL BENTO SOLID PREMIUM -->
-  @if (isModalOpen()) {
-    <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div 
-        class="absolute inset-0 bg-stone-900/60 transition-opacity" 
-        (click)="closeModal()"
-      ></div>
-      
-      <div class="relative bg-white dark:bg-stone-900 border border-stone-200/60 dark:border-stone-800 rounded-3xl p-8 w-full max-w-md shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)] dark:shadow-[0_20px_50px_-12px_rgba(0,0,0,0.5)] animate-scale-in">
-        <h2 class="text-xl font-bold text-stone-900 dark:text-stone-100 mb-6 flex items-center gap-2">
-          <span class="material-icons-outlined text-stone-500">{{ isEditing() ? 'edit' : 'person_add' }}</span>
-          {{ isEditing() ? 'Editar Usuario' : 'Nuevo Usuario' }}
-        </h2>
-
-        <div class="space-y-4">
-          <!-- Nombre -->
-          <div>
-            <label class="block text-[11px] font-bold text-stone-500 dark:text-stone-400 uppercase tracking-widest mb-1.5">Nombre completo</label>
-            <input [(ngModel)]="formData().nombre" type="text" placeholder="Ej: Diana Prince" class="w-full bg-stone-50 dark:bg-stone-800 border border-stone-200/60 dark:border-stone-700/50 rounded-xl px-4 py-3 text-sm font-semibold text-stone-800 dark:text-stone-200 focus:outline-none focus:ring-2 focus:ring-stone-400 placeholder:font-normal placeholder:opacity-50">
-          </div>
-
-          <!-- Email -->
-          <div>
-            <label class="block text-[11px] font-bold text-stone-500 dark:text-stone-400 uppercase tracking-widest mb-1.5">Correo Electrónico (Credencial)</label>
-            <input [(ngModel)]="formData().email" type="email" placeholder="ejemplo@denraf.com" class="w-full bg-stone-50 dark:bg-stone-800 border border-stone-200/60 dark:border-stone-700/50 rounded-xl px-4 py-3 text-sm font-semibold text-stone-800 dark:text-stone-200 focus:outline-none focus:ring-2 focus:ring-stone-400 placeholder:font-normal placeholder:opacity-50">
-          </div>
-
-          <div class="grid grid-cols-2 gap-4">
-            <!-- ROL -->
-            <div>
-              <label class="block text-[11px] font-bold text-stone-500 dark:text-stone-400 uppercase tracking-widest mb-1.5">Rol / Permisos</label>
-              <select [(ngModel)]="formData().rol" class="w-full bg-stone-50 dark:bg-stone-800 border border-stone-200/60 dark:border-stone-700/50 rounded-xl px-4 py-3 text-sm font-semibold text-stone-800 dark:text-stone-200 focus:outline-none focus:ring-2 focus:ring-stone-400">
-                <option value="VENDEDOR">Asesor (Caja)</option>
-                <option value="ADMIN">Administrador</option>
-              </select>
-            </div>
-            
-            <!-- CONTRASEÑA -->
-            <div>
-              <label class="block text-[11px] font-bold text-stone-500 dark:text-stone-400 uppercase tracking-widest mb-1.5">
-                 Contraseña {{ isEditing() ? '(Opcional)' : '' }}
-              </label>
-              <input [(ngModel)]="formData().password" type="password" [placeholder]="isEditing() ? 'Dejar en blanco' : '****'" class="w-full bg-stone-50 dark:bg-stone-800 border border-stone-200/60 dark:border-stone-700/50 rounded-xl px-4 py-3 text-sm font-semibold text-stone-800 dark:text-stone-200 focus:outline-none focus:ring-2 focus:ring-stone-400 placeholder:font-normal placeholder:opacity-50">
-            </div>
-          </div>
-          
-          <!-- ERROR ALERT -->
-          @if (formError()) {
-             <div class="bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400 text-xs font-bold p-3 rounded-lg flex items-center gap-2">
-                <span class="material-icons-outlined text-sm">error_outline</span>
-                {{ formError() }}
-             </div>
-          }
-        </div>
-
-        <div class="mt-8 flex items-center justify-end gap-3">
-          <button (click)="closeModal()" class="px-5 py-2.5 rounded-xl text-[13px] font-bold text-stone-500 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors">
-            Cancelar
-          </button>
-          <button (click)="saveUser()" [disabled]="isSaving()" class="px-6 py-2.5 rounded-xl text-[13px] font-bold text-white bg-stone-900 hover:bg-stone-800 dark:bg-stone-100 dark:hover:bg-white dark:text-stone-900 transition-all shadow-md active:scale-95 disabled:opacity-50">
-            <div class="flex items-center justify-center gap-2">
-               @if (isSaving()) {
-                  <span class="material-icons-outlined text-sm animate-spin">refresh</span>
-               }
-               {{ isEditing() ? 'Guardar Cambios' : 'Crear Usuario' }}
-            </div>
-          </button>
-        </div>
+  <app-ui-animated-dialog [isOpen]="isModalOpen()" (isOpenChange)="isModalOpen.set($event)">
+    <div class="flex items-center justify-between mb-6 border-b border-stone-100 dark:border-stone-800 pb-4">
+      <div>
+        <h2 class="text-xl font-serif font-bold text-stone-900 dark:text-stone-100">{{ isEditing() ? 'Editar Usuario' : 'Nuevo Usuario' }}</h2>
+        <p class="text-xs text-stone-400 font-medium tracking-wide uppercase">{{ isEditing() ? 'Actualizar credenciales' : 'Registrar nueva cuenta' }}</p>
+      </div>
+      <div class="h-10 w-10 rounded-xl bg-stone-100 dark:bg-stone-800 flex items-center justify-center text-stone-600 dark:text-stone-300">
+        <span class="material-icons-outlined text-lg">{{ isEditing() ? 'edit' : 'person_add' }}</span>
       </div>
     </div>
-  }
+
+    <div class="space-y-4">
+      <!-- Nombre -->
+      <div class="space-y-1">
+        <app-ui-label>Nombre completo <span class="text-rose-500">*</span></app-ui-label>
+        <app-ui-input 
+          [(ngModel)]="formData().nombre" 
+          placeholder="Ej: Diana Prince"
+        ></app-ui-input>
+      </div>
+
+      <!-- Email -->
+      <div class="space-y-1">
+        <app-ui-label>Correo Electrónico (Credencial) <span class="text-rose-500">*</span></app-ui-label>
+        <app-ui-input 
+          [(ngModel)]="formData().email" 
+          type="email" 
+          placeholder="ejemplo@denraf.com"
+        ></app-ui-input>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <!-- ROL -->
+        <div class="space-y-1">
+          <app-ui-label>Rol / Permisos <span class="text-rose-500">*</span></app-ui-label>
+          <select [(ngModel)]="formData().rol" class="h-10 w-full rounded-lg border border-stone-200 dark:border-stone-600 bg-white dark:bg-stone-800 text-sm px-3 font-medium text-stone-800 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-stone-400">
+            <option value="VENDEDOR">Asesor (Caja)</option>
+            <option value="ADMIN">Administrador</option>
+          </select>
+        </div>
+        
+        <!-- CONTRASEÑA -->
+        <div class="space-y-1">
+          <app-ui-label>Contraseña {{ isEditing() ? '(Opcional)' : '*' }}</app-ui-label>
+          <app-ui-input 
+            [(ngModel)]="formData().password" 
+            type="password" 
+            [placeholder]="isEditing() ? 'Dejar en blanco' : '****'"
+          ></app-ui-input>
+        </div>
+      </div>
+      
+      <!-- ERROR ALERT -->
+      @if (formError()) {
+         <div class="p-3 bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800 rounded-lg flex items-center gap-2">
+            <span class="material-icons-outlined text-sm text-rose-600 dark:text-rose-400">error</span>
+            <span class="text-sm text-rose-600 dark:text-rose-400">{{ formError() }}</span>
+         </div>
+      }
+
+      <div class="flex gap-3 pt-4">
+        <app-ui-button 
+          variant="outline" 
+          class="w-1/3 border-stone-200 rounded-xl" 
+          (onClick)="closeModal()"
+        >
+          Cancelar
+        </app-ui-button>
+
+        <app-ui-button 
+          class="w-2/3 bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 rounded-xl shadow-lg" 
+          (onClick)="saveUser()" 
+          [disabled]="isSaving()"
+        >
+          <span class="flex items-center justify-center gap-2">
+            @if (isSaving()) {
+              <span class="material-icons-outlined text-sm animate-spin">refresh</span>
+            }
+            {{ isEditing() ? 'Guardar Cambios' : 'Crear Usuario' }}
+          </span>
+        </app-ui-button>
+      </div>
+    </div>
+  </app-ui-animated-dialog>
 </div>

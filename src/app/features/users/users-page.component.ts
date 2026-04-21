@@ -3,13 +3,21 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BackendAuthService, UserDTO } from '../../core/services/backend-auth.service';
 import { ToastService } from '../../core/services/toast.service';
+import { UiAnimatedDialogComponent } from '../../shared/ui/ui-animated-dialog/ui-animated-dialog.component';
+import { UiInputComponent } from '../../shared/ui/ui-input/ui-input.component';
+import { UiButtonComponent } from '../../shared/ui/ui-button/ui-button.component';
+import { UiLabelComponent } from '../../shared/ui/ui-label/ui-label.component';
 
 @Component({
   selector: 'app-users-page',
   standalone: true,
   imports: [
     CommonModule, 
-    FormsModule
+    FormsModule,
+    UiAnimatedDialogComponent,
+    UiInputComponent,
+    UiButtonComponent,
+    UiLabelComponent
   ],
   templateUrl: './users-page.component.html'
 })

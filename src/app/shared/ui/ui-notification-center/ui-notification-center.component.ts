@@ -1,14 +1,13 @@
-import { Component, inject, signal, computed, Input } from '@angular/core';
+import { Component, inject, signal, computed, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { NotificationService, Notification, NotificationType } from '../../../core/services/notification.service';
-import { ClickOutsideDirective } from '../../directives/click-outside/click-outside.component';
+import { NotificationService, Notification, NotificationType, NotificationCategory } from '../../../core/services/notification.service';
 import { ThemeService } from '../../../core/theme/theme.service';
 
 @Component({
   selector: 'app-ui-notification-center',
   standalone: true,
-  imports: [CommonModule, ClickOutsideDirective],
+  imports: [CommonModule],
   templateUrl: './ui-notification-center.component.html',
   styleUrl: './ui-notification-center.component.css'
 })
@@ -17,39 +16,66 @@ export class UiNotificationCenterComponent {
   router = inject(Router);
   themeService = inject(ThemeService);
   
-  isOpen = signal(false);
+  /** Whether the slide-over panel is open */
+  panelOpen = signal(false);
   
-  @Input() dropdownPosition: 'bottom' | 'top' = 'bottom';
+  /** Active filter tab */
+  activeFilter = signal<'all' | 'critical' | 'sales' | 'stock'>('all');
+
   isDarkMode = computed(() => this.themeService.darkMode());
 
-  toggleDropdown() {
-    this.isOpen.update(v => !v);
+  /** Filtered notifications based on active tab */
+  filteredGroups = computed(() => {
+    const groups = this.notificationService.groupedNotifications();
+    const filter = this.activeFilter();
+
+    if (filter === 'all') return groups;
+
+    return groups
+      .map(group => ({
+        ...group,
+        items: group.items.filter(n => {
+          if (filter === 'critical') return n.priority === 'critical' || n.priority === 'important';
+          if (filter === 'sales') return n.category === 'sales';
+          if (filter === 'stock') return n.category === 'stock';
+          return true;
+        })
+      }))
+      .filter(group => group.items.length > 0);
+  });
+
+  togglePanel() {
+    this.panelOpen.update(v => !v);
   }
 
-  closeDropdown() {
-    this.isOpen.set(false);
+  openPanel() {
+    this.panelOpen.set(true);
+  }
+
+  closePanel() {
+    this.panelOpen.set(false);
+  }
+
+  setFilter(filter: 'all' | 'critical' | 'sales' | 'stock') {
+    this.activeFilter.set(filter);
   }
 
   handleNotificationClick(notification: Notification) {
-    // Marcar como leída
     if (!notification.read) {
       this.notificationService.markAsRead(notification.id);
     }
-
-    // Si tiene acción, navegar
     if (notification.actionRoute) {
       this.router.navigate([notification.actionRoute]);
-      this.closeDropdown();
+      this.closePanel();
     }
   }
 
   handleAction(notification: Notification, event: Event) {
     event.stopPropagation();
-    
     if (notification.actionRoute) {
       this.router.navigate([notification.actionRoute]);
       this.notificationService.markAsRead(notification.id);
-      this.closeDropdown();
+      this.closePanel();
     }
   }
 
@@ -66,17 +92,29 @@ export class UiNotificationCenterComponent {
     this.notificationService.clearAll();
   }
 
-  getIconClass(type: NotificationType): string {
-    const baseClass = 'w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0';
-    
-    const typeColors: Record<NotificationType, string> = {
-      success: 'bg-emerald-100 text-emerald-700',
-      info: 'bg-blue-100 text-blue-700',
-      warning: 'bg-amber-100 text-amber-700',
-      error: 'bg-rose-100 text-rose-700'
-    };
+  goToNotificationsPage() {
+    this.closePanel();
+    this.router.navigate(['/notifications']);
+  }
 
-    return `${baseClass} ${typeColors[type]}`;
+  getIconClass(type: NotificationType): string {
+    const colors: Record<NotificationType, string> = {
+      success: 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400',
+      info: 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400',
+      warning: 'bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400',
+      error: 'bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400'
+    };
+    return `w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${colors[type]}`;
+  }
+
+  getPriorityDot(notification: Notification): string {
+    if (notification.read) return '';
+    const colors: Record<string, string> = {
+      critical: 'bg-rose-500',
+      important: 'bg-amber-500',
+      info: 'bg-blue-400'
+    };
+    return colors[notification.priority] || 'bg-blue-400';
   }
 
   formatTime(timestamp: Date): string {

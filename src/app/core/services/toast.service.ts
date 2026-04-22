@@ -47,6 +47,8 @@ export class ToastService {
       const title = options?.title || this.getDefaultTitle(type);
       this.notificationService.add({
         type,
+        priority: type === 'error' ? 'critical' : type === 'warning' ? 'important' : 'info',
+        category: 'system',
         title,
         message,
         icon: this.getIcon(type),

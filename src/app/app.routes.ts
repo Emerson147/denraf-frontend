@@ -70,6 +70,10 @@ export const routes: Routes = [
       {
         path: 'users', // gestión de usuarios (solo admin)
         loadComponent: () => import('./features/users/users-page.component').then(m => m.UsersPageComponent)
+      },
+      {
+        path: 'notifications', // centro de notificaciones
+        loadComponent: () => import('./features/notifications/notifications-page.component').then(m => m.NotificationsPageComponent)
       }           
     ]
   },

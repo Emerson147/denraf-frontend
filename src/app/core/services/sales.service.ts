@@ -292,12 +292,18 @@ export class SalesService {
     return `V-${date}-${time}`;
   }
 
-  // 🔔 Sistema de notificaciones automáticas (Simplificado)
+  // 🔔 Sistema de notificaciones automáticas
   private checkAndNotify(sale: Sale) {
     if (sale.status === 'completed') {
       this.toastService.success(
-        `Venta completada por $${sale.total.toLocaleString()}`,
+        `Venta completada por S/${sale.total.toLocaleString()}`,
         3000
+      );
+      // Persistent notification (direct, no engine to avoid circular dep)
+      this.notificationService.success(
+        'Venta completada',
+        `${sale.saleNumber || 'Venta'} — S/ ${sale.total.toLocaleString('es-PE', { minimumFractionDigits: 2 })}`,
+        { category: 'sales', actionLabel: 'Ver detalle', actionRoute: '/sales' }
       );
     }
   }

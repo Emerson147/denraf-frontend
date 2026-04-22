@@ -2,10 +2,14 @@ import { Injectable, signal, computed, inject } from '@angular/core';
 import { LoggerService } from './logger.service';
 
 export type NotificationType = 'info' | 'success' | 'warning' | 'error';
+export type NotificationPriority = 'critical' | 'important' | 'info';
+export type NotificationCategory = 'stock' | 'sales' | 'goals' | 'system';
 
 export interface Notification {
   id: string;
   type: NotificationType;
+  priority: NotificationPriority;
+  category: NotificationCategory;
   title: string;
   message: string;
   timestamp: Date;
@@ -13,6 +17,8 @@ export interface Notification {
   icon?: string;
   actionLabel?: string;
   actionRoute?: string;
+  /** Key for deduplication — same key won't be added twice per session */
+  dedupeKey?: string;
 }
 
 @Injectable({
@@ -23,22 +29,64 @@ export class NotificationService {
   private readonly STORAGE_KEY = 'denraf-notifications';
   private notifications = signal<Notification[]>([]);
   
-  // Computed signals
+  /** Track deduplication keys for this session */
+  private sessionDedupeKeys = new Set<string>();
+
+  // ─── Computed signals ──────────────────────────────────────
   allNotifications = computed(() => this.notifications());
   unreadNotifications = computed(() => this.notifications().filter(n => !n.read));
   unreadCount = computed(() => this.unreadNotifications().length);
   
-  // Últimas 5 notificaciones para el dropdown
-  recentNotifications = computed(() => 
-    this.notifications().slice(0, 5)
+  /** Recent notifications for the slide-over panel */
+  recentNotifications = computed(() => this.notifications().slice(0, 20));
+
+  /** Grouped by date: today, yesterday, this week, older */
+  groupedNotifications = computed(() => {
+    const all = this.notifications();
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const yesterday = new Date(today); yesterday.setDate(today.getDate() - 1);
+    const weekAgo = new Date(today); weekAgo.setDate(today.getDate() - 7);
+
+    const groups: { label: string; items: Notification[] }[] = [];
+    
+    const todayItems = all.filter(n => n.timestamp >= today);
+    const yesterdayItems = all.filter(n => n.timestamp >= yesterday && n.timestamp < today);
+    const weekItems = all.filter(n => n.timestamp >= weekAgo && n.timestamp < yesterday);
+    const olderItems = all.filter(n => n.timestamp < weekAgo);
+
+    if (todayItems.length) groups.push({ label: 'Hoy', items: todayItems });
+    if (yesterdayItems.length) groups.push({ label: 'Ayer', items: yesterdayItems });
+    if (weekItems.length) groups.push({ label: 'Esta semana', items: weekItems });
+    if (olderItems.length) groups.push({ label: 'Anteriores', items: olderItems });
+
+    return groups;
+  });
+
+  /** Filter by category */
+  getByCategory(category: NotificationCategory) {
+    return this.notifications().filter(n => n.category === category);
+  }
+
+  /** Critical + important only */
+  criticalNotifications = computed(() => 
+    this.notifications().filter(n => n.priority === 'critical' || n.priority === 'important')
   );
 
   constructor() {
     this.loadFromLocalStorage();
   }
 
-  // Agregar nueva notificación
+  // ─── Add notification with deduplication ───────────────────
   add(notification: Omit<Notification, 'id' | 'timestamp' | 'read'>) {
+    // Deduplication check
+    if (notification.dedupeKey) {
+      if (this.sessionDedupeKeys.has(notification.dedupeKey)) {
+        return null; // Already added this session
+      }
+      this.sessionDedupeKeys.add(notification.dedupeKey);
+    }
+
     const newNotification: Notification = {
       ...notification,
       id: this.generateId(),
@@ -52,51 +100,64 @@ export class NotificationService {
     return newNotification.id;
   }
 
-  // Notificación de éxito
-  success(title: string, message: string, options?: { actionLabel?: string; actionRoute?: string }) {
+  // ─── Convenience methods ───────────────────────────────────
+  success(title: string, message: string, options?: { 
+    actionLabel?: string; actionRoute?: string; 
+    category?: NotificationCategory; dedupeKey?: string 
+  }) {
     return this.add({
-      type: 'success',
-      title,
-      message,
-      icon: 'check_circle',
-      ...options
+      type: 'success', priority: 'info',
+      category: options?.category || 'system',
+      title, message, icon: 'check_circle',
+      actionLabel: options?.actionLabel,
+      actionRoute: options?.actionRoute,
+      dedupeKey: options?.dedupeKey
     });
   }
 
-  // Notificación de información
-  info(title: string, message: string, options?: { actionLabel?: string; actionRoute?: string }) {
+  info(title: string, message: string, options?: { 
+    actionLabel?: string; actionRoute?: string; 
+    category?: NotificationCategory; dedupeKey?: string 
+  }) {
     return this.add({
-      type: 'info',
-      title,
-      message,
-      icon: 'info',
-      ...options
+      type: 'info', priority: 'info',
+      category: options?.category || 'system',
+      title, message, icon: 'info',
+      actionLabel: options?.actionLabel,
+      actionRoute: options?.actionRoute,
+      dedupeKey: options?.dedupeKey
     });
   }
 
-  // Notificación de advertencia
-  warning(title: string, message: string, options?: { actionLabel?: string; actionRoute?: string }) {
+  warning(title: string, message: string, options?: { 
+    actionLabel?: string; actionRoute?: string; 
+    category?: NotificationCategory; priority?: NotificationPriority; dedupeKey?: string 
+  }) {
     return this.add({
-      type: 'warning',
-      title,
-      message,
-      icon: 'warning',
-      ...options
+      type: 'warning', priority: options?.priority || 'important',
+      category: options?.category || 'system',
+      title, message, icon: 'warning',
+      actionLabel: options?.actionLabel,
+      actionRoute: options?.actionRoute,
+      dedupeKey: options?.dedupeKey
     });
   }
 
-  // Notificación de error
-  error(title: string, message: string, options?: { actionLabel?: string; actionRoute?: string }) {
+  error(title: string, message: string, options?: { 
+    actionLabel?: string; actionRoute?: string; 
+    category?: NotificationCategory; dedupeKey?: string 
+  }) {
     return this.add({
-      type: 'error',
-      title,
-      message,
-      icon: 'error',
-      ...options
+      type: 'error', priority: 'critical',
+      category: options?.category || 'system',
+      title, message, icon: 'error',
+      actionLabel: options?.actionLabel,
+      actionRoute: options?.actionRoute,
+      dedupeKey: options?.dedupeKey
     });
   }
 
-  // Marcar como leída
+  // ─── Actions ───────────────────────────────────────────────
   markAsRead(id: string) {
     this.notifications.update(current =>
       current.map(n => n.id === id ? { ...n, read: true } : n)
@@ -104,7 +165,6 @@ export class NotificationService {
     this.saveToLocalStorage();
   }
 
-  // Marcar todas como leídas
   markAllAsRead() {
     this.notifications.update(current =>
       current.map(n => ({ ...n, read: true }))
@@ -112,7 +172,6 @@ export class NotificationService {
     this.saveToLocalStorage();
   }
 
-  // Eliminar notificación
   remove(id: string) {
     this.notifications.update(current =>
       current.filter(n => n.id !== id)
@@ -120,7 +179,6 @@ export class NotificationService {
     this.saveToLocalStorage();
   }
 
-  // Limpiar todas las notificaciones leídas
   clearRead() {
     this.notifications.update(current =>
       current.filter(n => !n.read)
@@ -128,18 +186,19 @@ export class NotificationService {
     this.saveToLocalStorage();
   }
 
-  // Limpiar todas
   clearAll() {
     this.notifications.set([]);
     this.saveToLocalStorage();
   }
 
-  // Persistencia
+  // ─── Persistence ───────────────────────────────────────────
   private saveToLocalStorage() {
     try {
-      const data = this.notifications().map(n => ({
+      // Keep max 100 notifications
+      const toSave = this.notifications().slice(0, 100);
+      const data = toSave.map(n => ({
         ...n,
-        timestamp: n.timestamp.toISOString()
+        timestamp: n.timestamp instanceof Date ? n.timestamp.toISOString() : n.timestamp
       }));
       localStorage.setItem(this.STORAGE_KEY, JSON.stringify(data));
     } catch (error) {
@@ -154,6 +213,8 @@ export class NotificationService {
         const data = JSON.parse(stored);
         const notifications = data.map((n: any) => ({
           ...n,
+          priority: n.priority || 'info',
+          category: n.category || 'system',
           timestamp: new Date(n.timestamp)
         }));
         this.notifications.set(notifications);

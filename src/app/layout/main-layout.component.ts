@@ -9,6 +9,7 @@ import { ConnectionStatusComponent } from '../shared/ui/connection-status/connec
 import { PwaInstallPromptComponent } from '../shared/ui/pwa-install-prompt/pwa-install-prompt.component';
 import { UiErrorLoggerComponent } from '../shared/ui/ui-error-logger/ui-error-logger.component';
 import { ClickOutsideDirective } from '../shared/directives/click-outside/click-outside.component';
+import { NotificationEngineService } from '../core/services/notification-engine.service';
 
 // ─── Interfaces ──────────────────────────────────────────────
 export interface NavItem {
@@ -48,6 +49,12 @@ export class MainLayoutComponent {
   authService = inject(BackendAuthService);
   private router = inject(Router);
   themeService = inject(ThemeService);
+  private notificationEngine = inject(NotificationEngineService);
+  
+  constructor() {
+    // Start the notification engine on layout init
+    this.notificationEngine.init();
+  }
   
   // ─── State ──────────────────────────────────────────────────
   sidebarCollapsed = signal(false);

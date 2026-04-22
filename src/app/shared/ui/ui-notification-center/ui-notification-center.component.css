@@ -1,45 +1,25 @@
-@keyframes slideDown {
+/* ─── Slide-over Panel Animation ─── */
+
+.notification-backdrop {
+  animation: fadeIn 200ms ease-out;
+}
+
+.notification-panel {
+  animation: slideInRight 280ms cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideInRight {
   from { 
-    opacity: 0;
-    transform: translateY(-10px);
+    transform: translateX(100%);
+    opacity: 0.5;
   }
   to { 
+    transform: translateX(0);
     opacity: 1;
-    transform: translateY(0);
   }
-}
-
-.animate-slideDown {
-  animation: slideDown 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-/* Line clamp para texto largo */
-.line-clamp-2 {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-/* Hover effect para botón delete */
-.group:hover .group-hover\:opacity-100 {
-  opacity: 1;
-}
-
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background: rgb(214 211 209);
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: rgb(168 162 158);
 }

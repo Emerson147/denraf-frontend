@@ -212,7 +212,7 @@
           class="flex items-center gap-1 transition-all duration-300 w-full" 
           [ngClass]="sidebarCollapsed() ? 'flex-col' : 'justify-between'"
         >
-          <app-ui-notification-center dropdownPosition="top" />
+          <app-ui-notification-center />
           
           <button 
             (click)="themeService.toggle()"

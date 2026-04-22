@@ -1,93 +1,145 @@
-<div class="relative">
-  <!-- Bell Button -->
-  <button
-    type="button"
-    (click)="toggleDropdown()"
-    class="relative h-9 w-9 rounded-xl hover:bg-stone-100 dark:hover:bg-stone-800/60 flex items-center justify-center text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 transition-all"
-    [class.bg-stone-100]="isOpen() && !isDarkMode()"
-    [class.dark:bg-stone-800/60]="isOpen() && isDarkMode()"
-    [class.text-stone-600]="isOpen() && !isDarkMode()"
-    [class.dark:text-stone-300]="isOpen() && isDarkMode()">
-    
-    <span class="material-icons-outlined text-[19px]">
-      notifications
-    </span>
-    
-    <!-- Badge Contador -->
-    @if (notificationService.unreadCount() > 0) {
-      <span class="absolute top-0 right-0 w-4 h-4 bg-rose-500 dark:bg-rose-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center animate-pulse">
-        {{ notificationService.unreadCount() > 9 ? '9+' : notificationService.unreadCount() }}
-      </span>
-    }
-  </button>
+<!-- ═══════════════════════════════════════════
+     🔔 NOTIFICATION CENTER — Bell + Slide-Over Panel
+     ═══════════════════════════════════════════ -->
 
-  <!-- Dropdown -->
-  @if (isOpen()) {
-    <div 
-      class="absolute bg-white dark:bg-stone-900 rounded-2xl shadow-2xl border border-stone-200 dark:border-stone-700 z-[100] transition-colors duration-100"
-      [ngClass]="{
-        'right-0 w-[calc(100vw-2rem)] sm:w-96 max-w-md top-full mt-2 origin-top-right animate-slideDown': dropdownPosition === 'bottom',
-        'left-0 w-80 sm:w-96 bottom-full mb-2 origin-bottom-left animate-scale-in': dropdownPosition === 'top'
-      }"
-      appClickOutside
-      (clickedOutside)="closeDropdown()">
-      
-      <!-- Header -->
-      <div class="px-4 py-3 border-b border-stone-200 dark:border-stone-700 flex items-center justify-between">
-        <div>
-          <h3 class="font-semibold text-stone-900 dark:text-stone-100">Notificaciones</h3>
+<!-- Bell Button (always visible) -->
+<button
+  type="button"
+  (click)="togglePanel()"
+  class="relative h-9 w-9 rounded-xl hover:bg-stone-100 dark:hover:bg-stone-800/60 flex items-center justify-center text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 transition-all"
+  [class.bg-stone-100]="panelOpen() && !isDarkMode()"
+  [class.dark:bg-stone-800]="panelOpen() && isDarkMode()">
+  
+  <span class="material-icons-outlined text-[19px]">notifications</span>
+  
+  <!-- Badge -->
+  @if (notificationService.unreadCount() > 0) {
+    <span class="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] bg-rose-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1 ring-2 ring-white dark:ring-stone-900">
+      {{ notificationService.unreadCount() > 99 ? '99+' : notificationService.unreadCount() }}
+    </span>
+  }
+</button>
+
+<!-- ═══════════════════════════════════════════
+     SLIDE-OVER PANEL (from right)
+     ═══════════════════════════════════════════ -->
+@if (panelOpen()) {
+  <!-- Backdrop -->
+  <div 
+    class="fixed inset-0 bg-black/20 dark:bg-black/40 backdrop-blur-[2px] z-[80] transition-opacity notification-backdrop"
+    (click)="closePanel()">
+  </div>
+
+  <!-- Panel -->
+  <div class="fixed top-0 right-0 h-full w-full sm:w-[400px] bg-white dark:bg-stone-900 z-[90] flex flex-col shadow-2xl notification-panel border-l border-stone-100 dark:border-stone-800">
+    
+    <!-- ─── Header ─── -->
+    <div class="px-5 pt-5 pb-3 border-b border-stone-100 dark:border-stone-800">
+      <div class="flex items-center justify-between mb-3">
+        <div class="flex items-center gap-2.5">
+          <span class="material-icons-outlined text-stone-900 dark:text-stone-100 text-[22px]">notifications</span>
+          <h2 class="text-[17px] font-semibold text-stone-900 dark:text-stone-100 tracking-tight">
+            Notificaciones
+          </h2>
           @if (notificationService.unreadCount() > 0) {
-            <p class="text-xs text-stone-500 dark:text-stone-400">
-              {{ notificationService.unreadCount() }} sin leer
-            </p>
+            <span class="min-w-[20px] h-5 bg-rose-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1.5">
+              {{ notificationService.unreadCount() }}
+            </span>
           }
         </div>
-        
+
         <div class="flex items-center gap-1">
           @if (notificationService.unreadCount() > 0) {
             <button
               (click)="markAllAsRead()"
               class="p-1.5 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
               title="Marcar todas como leídas">
-              <span class="material-icons-outlined text-stone-600 dark:text-stone-300 text-lg">done_all</span>
+              <span class="material-icons-outlined text-stone-500 dark:text-stone-400 text-[18px]">done_all</span>
             </button>
           }
-          
-          @if (notificationService.allNotifications().length > 0) {
-            <button
-              (click)="clearAll()"
-              class="p-1.5 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
-              title="Limpiar todas">
-              <span class="material-icons-outlined text-stone-600 dark:text-stone-300 text-lg">delete_sweep</span>
-            </button>
-          }
+          <button
+            (click)="closePanel()"
+            class="p-1.5 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+            title="Cerrar">
+            <span class="material-icons-outlined text-stone-500 dark:text-stone-400 text-[18px]">close</span>
+          </button>
         </div>
       </div>
 
-      <!-- Lista de Notificaciones -->
-      <div class="max-h-96 overflow-y-auto">
-        @if (notificationService.recentNotifications().length === 0) {
-          <!-- Estado vacío -->
-          <div class="px-4 py-12 text-center">
-            <span class="material-icons-outlined text-stone-300 dark:text-stone-700 text-5xl mb-3">
+      <!-- Filter Tabs -->
+      <div class="flex gap-1 bg-stone-50 dark:bg-stone-800/60 rounded-xl p-1">
+        <button 
+          (click)="setFilter('all')"
+          class="flex-1 px-3 py-1.5 rounded-lg text-[11px] font-semibold uppercase tracking-wider transition-all"
+          [ngClass]="activeFilter() === 'all' 
+            ? 'bg-white dark:bg-stone-700 text-stone-900 dark:text-white shadow-sm' 
+            : 'text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-200'">
+          Todas
+        </button>
+        <button 
+          (click)="setFilter('critical')"
+          class="flex-1 px-3 py-1.5 rounded-lg text-[11px] font-semibold uppercase tracking-wider transition-all"
+          [ngClass]="activeFilter() === 'critical' 
+            ? 'bg-white dark:bg-stone-700 text-stone-900 dark:text-white shadow-sm' 
+            : 'text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-200'">
+          Críticas
+        </button>
+        <button 
+          (click)="setFilter('sales')"
+          class="flex-1 px-3 py-1.5 rounded-lg text-[11px] font-semibold uppercase tracking-wider transition-all"
+          [ngClass]="activeFilter() === 'sales' 
+            ? 'bg-white dark:bg-stone-700 text-stone-900 dark:text-white shadow-sm' 
+            : 'text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-200'">
+          Ventas
+        </button>
+        <button 
+          (click)="setFilter('stock')"
+          class="flex-1 px-3 py-1.5 rounded-lg text-[11px] font-semibold uppercase tracking-wider transition-all"
+          [ngClass]="activeFilter() === 'stock' 
+            ? 'bg-white dark:bg-stone-700 text-stone-900 dark:text-white shadow-sm' 
+            : 'text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-200'">
+          Stock
+        </button>
+      </div>
+    </div>
+
+    <!-- ─── Notification List ─── -->
+    <div class="flex-1 overflow-y-auto no-scrollbar">
+      @if (filteredGroups().length === 0) {
+        <!-- Empty State -->
+        <div class="flex flex-col items-center justify-center h-full px-6 py-16">
+          <div class="w-16 h-16 rounded-2xl bg-stone-100 dark:bg-stone-800 flex items-center justify-center mb-4">
+            <span class="material-icons-outlined text-stone-300 dark:text-stone-600 text-3xl">
               notifications_none
             </span>
-            <p class="text-stone-500 dark:text-stone-400 text-sm">
-              No hay notificaciones
-            </p>
           </div>
-        } @else {
-          @for (notification of notificationService.recentNotifications(); track notification.id) {
+          <p class="text-stone-500 dark:text-stone-400 text-sm font-medium">
+            No hay notificaciones
+          </p>
+          <p class="text-stone-400 dark:text-stone-500 text-xs mt-1">
+            Te avisaremos cuando algo importante suceda
+          </p>
+        </div>
+      } @else {
+        @for (group of filteredGroups(); track group.label) {
+          <!-- Date Group Label -->
+          <div class="px-5 pt-4 pb-1.5">
+            <span class="text-[10px] font-bold uppercase tracking-[0.15em] text-stone-400 dark:text-stone-500">
+              {{ group.label }}
+            </span>
+          </div>
+
+          @for (notification of group.items; track notification.id) {
             <div 
-              class="px-4 py-3 border-b border-stone-100 dark:border-stone-800 hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors cursor-pointer group"
-              [class.bg-stone-50/50]="!notification.read && !isDarkMode()"
-              [class.dark:bg-stone-800/30]="!notification.read && isDarkMode()"
+              class="px-4 py-3 mx-1.5 rounded-xl hover:bg-stone-50 dark:hover:bg-stone-800/40 transition-all cursor-pointer group"
+              [class.bg-stone-50/60]="!notification.read && !isDarkMode()"
+              [class.dark:bg-stone-800/20]="!notification.read && isDarkMode()"
               (click)="handleNotificationClick(notification)">
               
               <div class="flex gap-3">
                 <!-- Icon -->
                 <div [class]="getIconClass(notification.type)">
-                  <span class="material-icons-outlined text-lg">
+                  <span class="material-icons-outlined text-[17px]">
                     {{ notification.icon }}
                   </span>
                 </div>
@@ -95,55 +147,65 @@
                 <!-- Content -->
                 <div class="flex-1 min-w-0">
                   <div class="flex items-start justify-between gap-2">
-                    <h4 class="font-medium text-stone-900 dark:text-stone-100 text-sm">
+                    <h4 class="font-semibold text-stone-900 dark:text-stone-100 text-[13px] leading-tight">
                       {{ notification.title }}
                     </h4>
                     
+                    <!-- Priority dot (unread) -->
                     @if (!notification.read) {
-                      <span class="w-2 h-2 bg-rose-500 dark:bg-rose-600 rounded-full mt-1 flex-shrink-0"></span>
+                      <span class="w-2 h-2 rounded-full mt-1 shrink-0" [ngClass]="getPriorityDot(notification)"></span>
                     }
                   </div>
                   
-                  <p class="text-xs text-stone-600 dark:text-stone-400 mt-0.5 line-clamp-2">
+                  <p class="text-[12px] text-stone-500 dark:text-stone-400 mt-0.5 leading-relaxed line-clamp-2">
                     {{ notification.message }}
                   </p>
                   
                   <div class="flex items-center justify-between mt-2">
-                    <span class="text-xs text-stone-500 dark:text-stone-500">
+                    <span class="text-[11px] text-stone-400 dark:text-stone-500">
                       {{ formatTime(notification.timestamp) }}
                     </span>
                     
                     @if (notification.actionLabel) {
                       <button
                         (click)="handleAction(notification, $event)"
-                        class="text-xs font-medium text-stone-700 dark:text-stone-300 hover:text-stone-900 dark:hover:text-stone-100 px-2 py-1 rounded hover:bg-stone-100 dark:hover:bg-stone-700 transition-colors">
+                        class="text-[11px] font-semibold text-stone-600 dark:text-stone-300 hover:text-stone-900 dark:hover:text-white px-2 py-0.5 rounded-md hover:bg-stone-100 dark:hover:bg-stone-700 transition-all">
                         {{ notification.actionLabel }}
                       </button>
                     }
                   </div>
                 </div>
 
-                <!-- Delete Button -->
+                <!-- Delete (hover) -->
                 <button
                   (click)="deleteNotification(notification.id, $event)"
-                  class="p-1 rounded hover:bg-stone-200 dark:hover:bg-stone-700 transition-colors opacity-0 group-hover:opacity-100"
+                  class="p-1 rounded-lg hover:bg-stone-200 dark:hover:bg-stone-700 transition-all opacity-0 group-hover:opacity-100 self-start mt-0.5"
                   title="Eliminar">
-                  <span class="material-icons-outlined text-stone-500 dark:text-stone-400 text-sm">close</span>
+                  <span class="material-icons-outlined text-stone-400 dark:text-stone-500 text-[14px]">close</span>
                 </button>
               </div>
             </div>
           }
         }
-      </div>
-
-      <!-- Footer -->
-      @if (notificationService.allNotifications().length > 5) {
-        <div class="px-4 py-2 border-t border-stone-200 dark:border-stone-700 text-center">
-          <button class="text-sm text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 font-medium">
-            Ver todas las notificaciones
-          </button>
-        </div>
       }
     </div>
-  }
-</div>
+
+    <!-- ─── Footer ─── -->
+    <div class="px-5 py-3 border-t border-stone-100 dark:border-stone-800 flex items-center justify-between">
+      <button 
+        (click)="goToNotificationsPage()"
+        class="text-[12px] font-semibold text-stone-600 dark:text-stone-300 hover:text-stone-900 dark:hover:text-white transition-colors flex items-center gap-1">
+        Ver todas
+        <span class="material-icons-outlined text-[14px]">arrow_forward</span>
+      </button>
+
+      @if (notificationService.allNotifications().length > 0) {
+        <button
+          (click)="clearAll()"
+          class="text-[11px] text-stone-400 dark:text-stone-500 hover:text-rose-500 dark:hover:text-rose-400 transition-colors">
+          Limpiar todo
+        </button>
+      }
+    </div>
+  </div>
+}

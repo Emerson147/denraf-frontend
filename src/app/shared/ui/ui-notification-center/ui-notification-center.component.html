@@ -24,13 +24,13 @@
   <!-- Dropdown -->
   @if (isOpen()) {
     <div 
-      class="absolute right-0 w-[calc(100vw-2rem)] sm:w-96 max-w-md bg-white dark:bg-stone-900 rounded-2xl shadow-2xl border border-stone-200 dark:border-stone-700 z-[100] transition-colors duration-100"
+      class="absolute bg-white dark:bg-stone-900 rounded-2xl shadow-2xl border border-stone-200 dark:border-stone-700 z-[100] transition-colors duration-100"
       [ngClass]="{
-        'top-full mt-2 origin-top-right animate-slideDown': dropdownPosition === 'bottom',
-        'bottom-full mb-2 origin-bottom-right animate-scale-in': dropdownPosition === 'top'
+        'right-0 w-[calc(100vw-2rem)] sm:w-96 max-w-md top-full mt-2 origin-top-right animate-slideDown': dropdownPosition === 'bottom',
+        'left-0 w-80 sm:w-96 bottom-full mb-2 origin-bottom-left animate-scale-in': dropdownPosition === 'top'
       }"
       appClickOutside
-      (clickOutside)="closeDropdown()">
+      (clickedOutside)="closeDropdown()">
       
       <!-- Header -->
       <div class="px-4 py-3 border-b border-stone-200 dark:border-stone-700 flex items-center justify-between">

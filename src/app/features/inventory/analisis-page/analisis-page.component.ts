@@ -5,6 +5,7 @@ import { InventoryService } from '../../../core/services/inventory.service';
 import { ProductService } from '../../../core/services/product.service';
 import { ApexChartConfigService } from '../../../core/services/apex-chart-config.service';
 import { BackendLiquidacionService } from '../../../core/services/backend-liquidacion.service';
+import { UiPageHeaderComponent } from '../../../shared/ui/ui-page-header/ui-page-header.component';
 import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
@@ -14,6 +15,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
   imports: [
     CommonModule,
     NgApexchartsModule,
+    UiPageHeaderComponent,
   ],
   templateUrl: './analisis-page.component.html',
   styleUrls: ['./analisis-page.component.css']

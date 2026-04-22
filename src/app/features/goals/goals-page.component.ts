@@ -4,30 +4,27 @@ import { FormsModule } from '@angular/forms';
 import { GamificationService } from '../../core/services/gamification.service';
 import { ThemeService } from '../../core/theme/theme.service';
 import { BackendAuthService } from '../../core/services/backend-auth.service';
+import { UiPageHeaderComponent } from '../../shared/ui/ui-page-header/ui-page-header.component';
 
 @Component({
   selector: 'app-goals-page',
   standalone: true,
-  imports: [CommonModule, DecimalPipe, FormsModule],
+  imports: [CommonModule, DecimalPipe, FormsModule, UiPageHeaderComponent],
   template: `
-    <div class="h-full bg-stone-50 dark:bg-stone-950 p-4 sm:p-6 lg:p-8 transition-colors duration-300 ease-out">
+    <div class="min-h-screen bg-stone-50 dark:bg-stone-950 p-4 sm:p-6 lg:p-8 transition-colors duration-300 ease-out">
       <div class="w-full space-y-6">
 
         <!-- ══════════════════════════════════════════ -->
-        <!-- HEADER                                     -->
+        <!-- HEADER (shared component)                  -->
         <!-- ══════════════════════════════════════════ -->
-        <div class="flex items-start justify-between">
-          <div>
-            <h1 class="text-2xl sm:text-3xl font-bold text-stone-900 dark:text-stone-100 tracking-tight">
-              Metas y logros
-            </h1>
-            <p class="text-sm text-stone-500 dark:text-stone-400 mt-1">
-              DenRaf · Desempeño de {{ currentUser()?.nombre ?? 'Usuario' }}
-            </p>
-          </div>
-          <!-- Racha badge en header (igual al "Crecimiento" tag de Reportes) -->
-          <div class="px-4 py-2 rounded-full border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 flex items-center gap-2">
-            <span class="text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider">Racha</span>
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <app-ui-page-header 
+            title="Metas y logros" 
+            [subtitle]="'DenRaf · Desempeño de ' + (currentUser()?.nombre ?? 'Usuario')" 
+            materialIcon="emoji_events" />
+          <!-- Racha badge -->
+          <div class="px-4 py-2 rounded-full border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 flex items-center gap-2 shadow-sm">
+            <span class="text-[10px] font-bold text-stone-500 dark:text-stone-400 uppercase tracking-widest">Racha</span>
             <div class="flex items-center gap-1"
               [class.text-orange-500]="gamification.stats().currentStreak > 0"
               [class.text-stone-400]="gamification.stats().currentStreak === 0">
@@ -44,7 +41,7 @@ import { BackendAuthService } from '../../core/services/backend-auth.service';
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
 
           <!-- Nivel actual -->
-          <div class="bg-white dark:bg-stone-900 border border-stone-200/60 dark:border-stone-800 rounded-2xl p-4 flex items-center gap-4 hover:border-stone-300 dark:hover:border-stone-700 transition-colors">
+          <div class="bg-white dark:bg-stone-900 border border-stone-200/60 dark:border-stone-800 rounded-3xl p-4 flex items-center gap-4 hover:border-stone-300 dark:hover:border-stone-700 transition-colors">
             <div class="w-10 h-10 rounded-full bg-stone-100 dark:bg-stone-800 flex items-center justify-center text-stone-600 dark:text-stone-400">
               <span class="material-icons-outlined text-lg">military_tech</span>
             </div>
@@ -59,7 +56,7 @@ import { BackendAuthService } from '../../core/services/backend-auth.service';
           </div>
 
           <!-- Puntos totales -->
-          <div class="bg-white dark:bg-stone-900 border border-stone-200/60 dark:border-stone-800 rounded-2xl p-4 flex items-center gap-4 hover:border-stone-300 dark:hover:border-stone-700 transition-colors">
+          <div class="bg-white dark:bg-stone-900 border border-stone-200/60 dark:border-stone-800 rounded-3xl p-4 flex items-center gap-4 hover:border-stone-300 dark:hover:border-stone-700 transition-colors">
             <div class="w-10 h-10 rounded-full bg-stone-100 dark:bg-stone-800 flex items-center justify-center text-stone-600 dark:text-stone-400">
               <span class="material-icons-outlined text-lg">stars</span>
             </div>
@@ -77,7 +74,7 @@ import { BackendAuthService } from '../../core/services/backend-auth.service';
           </div>
 
           <!-- Racha activa -->
-          <div class="bg-white dark:bg-stone-900 border border-stone-200/60 dark:border-stone-800 rounded-2xl p-4 flex items-center gap-4 hover:border-stone-300 dark:hover:border-stone-700 transition-colors">
+          <div class="bg-white dark:bg-stone-900 border border-stone-200/60 dark:border-stone-800 rounded-3xl p-4 flex items-center gap-4 hover:border-stone-300 dark:hover:border-stone-700 transition-colors">
             <div class="w-10 h-10 rounded-full flex items-center justify-center transition-colors"
               [class.bg-orange-100]="gamification.stats().currentStreak > 0"
               [class.dark:bg-orange-900/30]="gamification.stats().currentStreak > 0"
@@ -106,7 +103,7 @@ import { BackendAuthService } from '../../core/services/backend-auth.service';
           </div>
 
           <!-- Galardones -->
-          <div class="bg-white dark:bg-stone-900 border border-stone-200/60 dark:border-stone-800 rounded-2xl p-4 flex items-center gap-4 hover:border-stone-300 dark:hover:border-stone-700 transition-colors">
+          <div class="bg-white dark:bg-stone-900 border border-stone-200/60 dark:border-stone-800 rounded-3xl p-4 flex items-center gap-4 hover:border-stone-300 dark:hover:border-stone-700 transition-colors">
             <div class="w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center text-amber-600 dark:text-amber-400">
               <span class="material-icons-outlined text-lg">emoji_events</span>
             </div>
@@ -389,9 +386,9 @@ import { BackendAuthService } from '../../core/services/backend-auth.service';
       <!-- MODAL ASIGNAR META -->
       @if (showGoalModal()) {
         <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <!-- Backdrop base oscuro -->
+          <!-- Backdrop -->
           <div 
-            class="absolute inset-0 bg-stone-900/60 transition-opacity" 
+            class="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity" 
             (click)="closeGoalModal()"
           ></div>
           

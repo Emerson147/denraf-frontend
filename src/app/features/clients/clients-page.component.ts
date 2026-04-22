@@ -5,13 +5,14 @@ import { UiButtonComponent } from '../../shared/ui/ui-button/ui-button.component
 import { UiAnimatedDialogComponent } from '../../shared/ui/ui-animated-dialog/ui-animated-dialog.component';
 import { UiLabelComponent } from '../../shared/ui/ui-label/ui-label.component';
 import { UiSkeletonComponent } from '../../shared/ui/ui-skeleton/ui-skeleton.component';
+import { UiPageHeaderComponent } from '../../shared/ui/ui-page-header/ui-page-header.component';
 import { ClientService } from '../../core/services/client.service';
 import { Client } from '../../core/models';
 
 @Component({
   selector: 'app-clients-page',
   standalone: true,
-  imports: [CommonModule, UiInputComponent, UiButtonComponent, UiAnimatedDialogComponent, UiLabelComponent, UiSkeletonComponent],
+  imports: [CommonModule, UiInputComponent, UiButtonComponent, UiAnimatedDialogComponent, UiLabelComponent, UiSkeletonComponent, UiPageHeaderComponent],
   templateUrl: './clients-page.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

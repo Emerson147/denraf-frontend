@@ -1,7 +1,8 @@
 <div
   class="min-h-screen bg-stone-50 dark:bg-stone-950 p-4 sm:p-6 lg:p-8 transition-colors duration-300 ease-out"
+  (click)="closeDropdowns()"
 >
-  <div class="w-full space-y-6">
+  <div class="w-full space-y-6 relative">
     <!-- Header Estandarizado -->
     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
       <app-ui-page-header
@@ -17,13 +18,28 @@
       
       <!-- Buscador y Acciones Principales -->
       <div class="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto mt-2 sm:mt-0">
-        <app-ui-input
-          [value]="searchQuery()"
-          (valueChange)="onSearchChange($event)"
-          placeholder="Buscar producto..."
-          class="w-full sm:w-64 bg-white dark:bg-stone-900 border border-stone-200/60 dark:border-stone-800 shadow-sm rounded-xl"
-        ></app-ui-input>
+        <div class="relative w-full sm:w-64 group">
+          <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-stone-400 group-focus-within:text-stone-900 dark:group-focus-within:text-stone-100 transition-colors">
+            <span class="material-icons-outlined text-[18px]">search</span>
+          </div>
+          <input
+            type="text"
+            [value]="searchQuery()"
+            (input)="onSearchChange($any($event.target).value)"
+            placeholder="Buscar..."
+            class="w-full h-10 pl-11 pr-4 bg-stone-200/50 dark:bg-stone-800/50 hover:bg-stone-200/80 dark:hover:bg-stone-800/80 rounded-full text-[13px] font-medium focus:outline-hidden focus:ring-2 focus:ring-stone-900 dark:focus:ring-stone-100 transition-all placeholder:text-stone-400 dark:placeholder:text-stone-500 text-stone-900 dark:text-stone-100 border-none"
+          />
+        </div>
         
+        <div class="flex items-center gap-2 w-full sm:w-auto bg-white dark:bg-stone-900 border border-stone-200/60 dark:border-stone-800 p-1 rounded-xl shadow-sm">
+          <button (click)="toggleViewMode('list')" [ngClass]="viewMode() === 'list' ? 'bg-stone-100 dark:bg-stone-800 text-stone-900 dark:text-stone-100' : 'text-stone-400 hover:text-stone-600 dark:hover:text-stone-300'" class="p-1.5 rounded-lg transition-colors flex items-center justify-center cursor-pointer" title="Vista de lista">
+            <span class="material-icons-outlined text-[18px]">table_rows</span>
+          </button>
+          <button (click)="toggleViewMode('grid')" [ngClass]="viewMode() === 'grid' ? 'bg-stone-100 dark:bg-stone-800 text-stone-900 dark:text-stone-100' : 'text-stone-400 hover:text-stone-600 dark:hover:text-stone-300'" class="p-1.5 rounded-lg transition-colors flex items-center justify-center cursor-pointer" title="Vista de cuadrícula">
+            <span class="material-icons-outlined text-[18px]">grid_view</span>
+          </button>
+        </div>
+
         <button (click)="openCreate()" class="w-full sm:w-auto bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 rounded-xl px-5 py-2.5 font-medium shadow-sm hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 text-sm whitespace-nowrap">
           <span class="material-icons-outlined text-sm">add</span>
           Nuevo Producto
@@ -31,139 +47,252 @@
       </div>
     </div>
 
-    <!-- Barra de Filtros (Chips) -->
-    <div class="flex items-center gap-2 mb-6 overflow-x-auto pb-2 no-scrollbar px-1">
-      <button (click)="clearFilters()" [ngClass]="!selectedCategory() && !searchQuery() ? 'bg-stone-900 text-white shadow-md' : 'bg-white dark:bg-stone-800 text-stone-600 dark:text-stone-300 border border-stone-200 dark:border-stone-700 hover:bg-stone-50 dark:hover:bg-stone-700'" class="px-5 py-2 rounded-full text-[13px] font-bold transition-all cursor-pointer whitespace-nowrap">
-        Todos los productos
+    <!-- Barra de Acciones en Lote Flotante -->
+    @if (selectedProducts().length > 0) {
+      <div class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 px-6 py-3 rounded-full shadow-2xl flex items-center gap-6 animate-in slide-in-from-bottom-8 fade-in duration-300">
+        <span class="text-sm font-bold flex items-center gap-2">
+          <span class="flex h-6 w-6 rounded-full bg-stone-800 dark:bg-stone-200 items-center justify-center text-xs">{{ selectedProducts().length }}</span>
+          seleccionados
+        </span>
+        <div class="h-4 w-px bg-stone-700 dark:bg-stone-300"></div>
+        <div class="flex items-center gap-2">
+          <button class="px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-stone-800 dark:hover:bg-stone-200 transition-colors flex items-center gap-1.5">
+            <span class="material-icons-outlined text-[16px]">label</span>
+            Categorizar
+          </button>
+          <button class="px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-stone-800 dark:hover:bg-stone-200 transition-colors flex items-center gap-1.5">
+            <span class="material-icons-outlined text-[16px]">sell</span>
+            Precios
+          </button>
+          <button class="px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-stone-800 dark:hover:bg-stone-200 transition-colors flex items-center gap-1.5">
+            <span class="material-icons-outlined text-[16px]">download</span>
+            Exportar
+          </button>
+          
+          <div class="w-px h-4 bg-stone-700 dark:bg-stone-300 mx-1"></div>
+          
+          <button class="px-3 py-1.5 rounded-lg text-sm font-medium text-red-400 hover:text-red-300 hover:bg-red-900/20 dark:text-red-600 dark:hover:text-red-700 dark:hover:bg-red-100 transition-colors flex items-center gap-1.5">
+            <span class="material-icons-outlined text-[16px]">delete</span>
+            Archivar
+          </button>
+          
+          <button (click)="clearSelection()" class="px-3 py-1.5 rounded-lg text-sm font-medium text-stone-400 hover:text-white dark:hover:text-stone-900 transition-colors ml-1">
+            Cancelar
+          </button>
+        </div>
+      </div>
+    }
+
+    <!-- Barra de Filtros Minimalista -->
+    <div class="flex items-center gap-1.5 mb-8 overflow-x-auto no-scrollbar px-1">
+      <button 
+        (click)="clearFilters()" 
+        class="px-4 py-1.5 rounded-full text-[13px] font-medium transition-all duration-300 cursor-pointer whitespace-nowrap"
+        [ngClass]="!selectedCategory() && !searchQuery() ? 'bg-stone-900 text-white dark:bg-stone-100 dark:text-stone-900 shadow-sm' : 'bg-transparent text-stone-500 dark:text-stone-400 hover:bg-stone-200/50 dark:hover:bg-stone-800/50'"
+      >
+        Todos
       </button>
       
       @for (cat of ['Casacas', 'Pantalones', 'Polos', 'Jeans', 'Accesorios', 'Calzado']; track cat) {
-      <button (click)="applyCategory(cat)" [ngClass]="selectedCategory() === cat ? 'bg-stone-900 text-white shadow-md' : 'bg-white dark:bg-stone-800 text-stone-600 dark:text-stone-300 border border-stone-200 dark:border-stone-700 hover:bg-stone-50 dark:hover:bg-stone-700'" class="flex items-center gap-1.5 px-4 py-2 rounded-full text-[13px] font-medium transition-all cursor-pointer whitespace-nowrap">
-        <span class="material-icons-outlined text-[16px]">{{ getCategoryIcon(cat) }}</span>
+      <button 
+        (click)="applyCategory(cat)" 
+        class="flex items-center gap-1.5 px-4 py-1.5 rounded-full text-[13px] font-medium transition-all duration-300 cursor-pointer whitespace-nowrap"
+        [ngClass]="selectedCategory() === cat ? 'bg-stone-900 text-white dark:bg-stone-100 dark:text-stone-900 shadow-sm' : 'bg-transparent text-stone-500 dark:text-stone-400 hover:bg-stone-200/50 dark:hover:bg-stone-800/50'"
+      >
+        <span class="material-icons-outlined text-[16px]" [class.opacity-50]="selectedCategory() !== cat">{{ getCategoryIcon(cat) }}</span>
         {{ cat }}
       </button>
       }
     </div>
 
-    <!-- Contenedor de la Tabla -->
-    <div class="bg-white dark:bg-stone-900 rounded-3xl border border-stone-200/60 dark:border-stone-800 shadow-sm overflow-hidden transition-colors duration-300">
-      <!-- Tabla Minimalista Zen -->
-      <div class="overflow-x-auto">
-        <table class="w-full text-left border-collapse">
-          <thead>
-            <tr class="border-b border-stone-100 dark:border-stone-800 text-stone-400 dark:text-stone-500 text-xs tracking-wider uppercase bg-stone-50/50 dark:bg-stone-900/50">
-              <th class="px-6 py-4 font-medium">Producto</th>
-              <th class="px-6 py-4 font-medium">Identificadores</th>
-              <th class="px-6 py-4 font-medium text-center">Inventario</th>
-              <th class="px-6 py-4 font-medium text-right">Cotización</th>
-              <th class="px-6 py-4 font-medium text-right">Acciones</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-stone-50 dark:divide-stone-800/60">
-            @for (product of paginatedProducts(); track product.id) {
-            <tr class="group hover:bg-stone-50/50 dark:hover:bg-stone-800/30 transition-colors duration-200">
-              <!-- Producto: Imagen + Nombre + Categoría -->
-              <td class="px-6 py-4">
-                <div class="flex items-center gap-4">
-                  <div class="h-12 w-12 rounded-xl bg-stone-100 dark:bg-stone-800 overflow-hidden shrink-0 border border-stone-200/50 dark:border-stone-700/50">
-                    <img [src]="product.image" appImageFallback [alt]="product.name" class="h-full w-full object-cover" />
+    <!-- Contenedor de Vistas -->
+    @if (viewMode() === 'list') {
+      <div class="bg-white dark:bg-stone-900 rounded-3xl border border-stone-200/60 dark:border-stone-800 shadow-sm overflow-hidden transition-colors duration-300">
+        <!-- Tabla Minimalista Zen -->
+        <div class="overflow-x-auto transition-all duration-300">
+          <table class="w-full text-left border-collapse">
+            <thead class="sticky top-0 bg-stone-50/90 dark:bg-stone-900/90 backdrop-blur-md z-10">
+              <tr class="border-b border-stone-100 dark:border-stone-800 text-stone-400 dark:text-stone-500 text-xs tracking-wider uppercase">
+                <th class="px-6 py-4 w-12 text-center">
+                  <input type="checkbox" [checked]="isAllSelected()" (change)="toggleAllSelection()" class="w-4 h-4 rounded border-stone-300 text-stone-900 focus:ring-stone-900 dark:border-stone-600 dark:bg-stone-800 cursor-pointer transition-all" />
+                </th>
+                <th class="px-6 py-4 font-medium">Producto</th>
+                <th class="px-6 py-4 font-medium">Identificadores</th>
+                <th class="px-6 py-4 font-medium text-center">Inventario</th>
+                <th class="px-6 py-4 font-medium text-right">Cotización</th>
+                <th class="px-6 py-4 font-medium text-right sticky right-0 bg-stone-50/90 dark:bg-stone-900/90 backdrop-blur-md">Acciones</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-stone-50/50 dark:divide-stone-800/30">
+              @for (product of paginatedProducts(); track product.id; let idx = $index) {
+              <tr class="group hover:bg-stone-50/80 dark:hover:bg-stone-800/40 transition-colors duration-200 animate-in fade-in slide-in-from-bottom-2 fill-mode-both" [style.animation-delay]="(idx * 40) + 'ms'">
+                <td class="px-6 py-4 text-center">
+                  <input type="checkbox" [checked]="selectedProducts().includes(product.id)" (change)="toggleSelection(product.id)" class="w-4 h-4 rounded border-stone-300 text-stone-900 focus:ring-stone-900 dark:border-stone-600 dark:bg-stone-800 cursor-pointer transition-all" />
+                </td>
+                
+                <!-- Producto: Imagen + Nombre + Categoría -->
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-4">
+                    <div class="h-12 w-12 rounded-xl bg-stone-100 dark:bg-stone-800 overflow-hidden shrink-0 border border-stone-200/50 dark:border-stone-700/50 relative group-hover:shadow-md transition-all">
+                      <img [src]="product.image" appImageFallback [alt]="product.name" class="h-full w-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                    </div>
+                    <div>
+                      <h3 class="text-sm font-semibold text-stone-900 dark:text-stone-100 group-hover:text-stone-700 transition-colors cursor-pointer" (click)="openEdit(product.id)">{{ product.name }}</h3>
+                      <span class="text-xs text-stone-500 font-medium px-2 py-0.5 rounded-md bg-stone-100 dark:bg-stone-800 mt-1 inline-block">
+                        {{ product.category }}
+                      </span>
+                    </div>
                   </div>
-                  <div>
-                    <h3 class="text-sm font-semibold text-stone-900 dark:text-stone-100 group-hover:text-stone-700 transition-colors">{{ product.name }}</h3>
-                    <span class="text-xs text-stone-500 font-medium px-2 py-0.5 rounded-md bg-stone-100 dark:bg-stone-800 mt-1 inline-block">
-                      {{ product.category }}
+                </td>
+  
+                <!-- Identificadores: Marca + Código -->
+                <td class="px-6 py-4">
+                  <div class="flex flex-col gap-1">
+                    <span class="text-xs font-semibold text-stone-700 dark:text-stone-300">{{ product.brand || 'No asignada' }}</span>
+                    <span class="text-[11px] font-mono text-stone-400 dark:text-stone-500 flex items-center gap-1 bg-stone-100 dark:bg-stone-800/50 w-fit px-1.5 py-0.5 rounded">
+                      <span class="material-icons-outlined text-[12px]">qr_code_2</span>
+                      {{ product.barcode || 'Sin código' }}
                     </span>
                   </div>
-                </div>
-              </td>
-
-              <!-- Identificadores: Marca + Código -->
-              <td class="px-6 py-4">
-                <div class="flex flex-col gap-1">
-                  <span class="text-xs font-semibold text-stone-700 dark:text-stone-300">{{ product.brand || 'No asignada' }}</span>
-                  <span class="text-[11px] font-mono text-stone-400 dark:text-stone-500 flex items-center gap-1">
-                    <span class="material-icons-outlined text-[12px]">qr_code_2</span>
-                    {{ product.barcode || 'Sin código' }}
-                  </span>
-                </div>
-              </td>
-
-              <!-- Inventario -->
-              <td class="px-6 py-4">
-                <div class="flex flex-col items-center gap-1.5">
-                  <span class="text-sm font-bold flex items-center gap-1.5"
-                    [ngClass]="product.stock <= product.minStock ? 'text-red-600 dark:text-red-400' : 'text-stone-900 dark:text-stone-100'">
-                    @if(product.stock <= product.minStock) {
-                      <span class="material-icons-outlined text-[14px]">warning</span>
+                </td>
+  
+                <!-- Inventario -->
+                <td class="px-6 py-4">
+                  <div class="flex flex-col items-center gap-1.5">
+                    <span class="text-sm font-black flex items-center gap-1.5"
+                      [ngClass]="product.stock <= product.minStock ? 'text-red-600 dark:text-red-400' : 'text-stone-900 dark:text-stone-100'">
+                      @if(product.stock <= product.minStock) {
+                        <span class="material-icons-outlined text-[14px]">warning</span>
+                      }
+                      {{ product.stock }} und.
+                    </span>
+                    @if (product.variants && product.variants.length > 0) {
+                      <button (click)="toggleTableRow(product.id)" class="text-[10px] focus:outline-hidden uppercase tracking-wider text-stone-500 hover:text-stone-900 bg-stone-200/50 hover:bg-stone-200 px-2 py-1 rounded transition-colors font-bold flex items-center gap-1 cursor-pointer">
+                        {{ product.variants.length }} var.
+                        <span class="material-icons-outlined text-[12px] transition-transform duration-300" [class.rotate-180]="expandedTableProductId() === product.id">expand_more</span>
+                      </button>
                     }
-                    {{ product.stock }} und.
-                  </span>
-                  @if (product.variants && product.variants.length > 0) {
-                    <button (click)="toggleTableRow(product.id)" class="text-[10px] focus:outline-hidden uppercase tracking-wider text-stone-500 hover:text-stone-900 bg-stone-200/50 hover:bg-stone-200 px-2 py-1 rounded transition-colors font-bold flex items-center gap-1 cursor-pointer">
-                      {{ product.variants.length }} var.
-                      <span class="material-icons-outlined text-[12px]">{{ expandedTableProductId() === product.id ? 'expand_less' : 'expand_more' }}</span>
+                  </div>
+                </td>
+  
+                <!-- Cotización -->
+                <td class="px-6 py-4 text-right">
+                  <div class="flex flex-col items-end gap-1">
+                    <span class="text-sm font-black text-stone-900 dark:text-stone-100">S/ {{ product.price | number:'1.2-2' }}</span>
+                    <span class="text-xs text-stone-400 font-medium">Costo: S/ {{ product.cost | number:'1.2-2' }}</span>
+                  </div>
+                </td>
+  
+                <!-- Acciones -->
+                <td class="px-6 py-4 text-right sticky right-0 bg-white group-hover:bg-stone-50/80 dark:bg-stone-900 dark:group-hover:bg-stone-800/40 transition-colors">
+                  <div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <button (click)="openEdit(product.id)" title="Editar" class="h-8 w-8 rounded-lg bg-stone-100 dark:bg-stone-800 hover:bg-stone-200 dark:hover:bg-stone-700 text-stone-600 dark:text-stone-300 transition-colors flex items-center justify-center cursor-pointer">
+                      <span class="material-icons-outlined text-[16px]">edit</span>
                     </button>
-                  }
-                </div>
-              </td>
-
-              <!-- Cotización -->
-              <td class="px-6 py-4 text-right">
-                <div class="flex flex-col items-end gap-1">
-                  <span class="text-sm font-bold text-stone-900 dark:text-stone-100">S/ {{ product.price | number:'1.2-2' }}</span>
-                  <span class="text-xs text-stone-400">Costo: S/ {{ product.cost | number:'1.2-2' }}</span>
-                </div>
-              </td>
-
-              <!-- Acciones -->
-              <td class="px-6 py-4 text-right">
-                <div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <button (click)="openEdit(product.id)" title="Editar" class="h-8 w-8 rounded-lg bg-stone-100 dark:bg-stone-800 hover:bg-stone-200 dark:hover:bg-stone-700 text-stone-600 dark:text-stone-300 transition-colors flex items-center justify-center cursor-pointer">
-                    <span class="material-icons-outlined text-[16px]">edit</span>
-                  </button>
-                  <button (click)="handleAction('delete', product.id)" title="Eliminar" class="h-8 w-8 rounded-lg bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/40 text-red-600 dark:text-red-400 transition-colors flex items-center justify-center cursor-pointer">
-                    <span class="material-icons-outlined text-[16px]">delete</span>
-                  </button>
-                </div>
-              </td>
-            </tr>
-            
-            <!-- ✅ Fila Expandible para Variantes -->
-            @if(expandedTableProductId() === product.id && product.variants && product.variants.length > 0) {
-            <tr class="bg-stone-100/40 dark:bg-stone-900/40 border-b border-stone-100 dark:border-stone-800">
-              <td colspan="5" class="py-4 px-6 md:px-12">
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 bg-white dark:bg-stone-800 p-4 rounded-xl shadow-sm border border-stone-100 dark:border-stone-700">
-                  @for(variant of product.variants; track variant.id) {
-                    <div class="flex items-center justify-between p-2 rounded-lg border border-stone-100 dark:border-stone-700 bg-stone-50 dark:bg-stone-900">
-                      <div class="flex items-center gap-2">
-                        <span class="h-5 w-5 bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 flex items-center justify-center rounded text-[10px] font-bold">{{ variant.size }}</span>
-                        <span class="text-xs text-stone-600 dark:text-stone-300 font-medium">{{ variant.color }}</span>
-                      </div>
-                      <span class="text-xs font-bold" [ngClass]="variant.stock <= 0 ? 'text-red-500' : 'text-teal-600 dark:text-teal-400'">{{ variant.stock }}</span>
-                    </div>
-                  }
-                </div>
-              </td>
-            </tr>
-            }
-            } @empty {
-              <tr>
-                <td colspan="5" class="px-6 py-16 text-center">
-                  <div class="flex flex-col items-center gap-3">
-                    <div class="h-16 w-16 bg-stone-100 dark:bg-stone-800 rounded-full flex items-center justify-center">
-                      <span class="material-icons-outlined text-2xl text-stone-400">inventory_2</span>
-                    </div>
-                    <p class="text-stone-500 dark:text-stone-400 font-medium">No se encontraron productos</p>
+                    <button (click)="handleAction('delete', product.id)" title="Eliminar" class="h-8 w-8 rounded-lg bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/40 text-red-600 dark:text-red-400 transition-colors flex items-center justify-center cursor-pointer">
+                      <span class="material-icons-outlined text-[16px]">delete</span>
+                    </button>
                   </div>
                 </td>
               </tr>
-            }
-          </tbody>
-        </table>
+              
+              <!-- ✅ Fila Expandible para Variantes con Animación Fluida -->
+              <tr>
+                <td colspan="6" class="p-0">
+                  <div class="grid transition-all duration-300 ease-in-out" [ngStyle]="{'grid-template-rows': expandedTableProductId() === product.id ? '1fr' : '0fr'}">
+                    <div class="overflow-hidden">
+                      @if(product.variants && product.variants.length > 0) {
+                        <div class="bg-stone-50/50 dark:bg-stone-900/50 py-4 px-6 md:px-12 border-b border-stone-100 dark:border-stone-800">
+                          <div class="grid grid-cols-2 md:grid-cols-4 gap-3 bg-white dark:bg-stone-800 p-4 rounded-xl shadow-xs border border-stone-100 dark:border-stone-700">
+                            @for(variant of product.variants; track variant.id) {
+                              <div class="flex items-center justify-between p-2.5 rounded-lg border border-stone-100 dark:border-stone-700/50 bg-stone-50/50 dark:bg-stone-900/50 hover:bg-white dark:hover:bg-stone-800 transition-colors">
+                                <div class="flex items-center gap-2.5">
+                                  <span class="h-6 w-6 bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 flex items-center justify-center rounded-md text-[11px] font-black">{{ variant.size }}</span>
+                                  <span class="text-xs text-stone-600 dark:text-stone-300 font-medium">{{ variant.color }}</span>
+                                </div>
+                                <span class="text-xs font-black px-2 py-1 rounded bg-white dark:bg-stone-900 shadow-sm border border-stone-100 dark:border-stone-700" [ngClass]="variant.stock <= 0 ? 'text-red-500' : 'text-teal-600 dark:text-teal-400'">{{ variant.stock }}</span>
+                              </div>
+                            }
+                          </div>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                </td>
+              </tr>
+              } @empty {
+                <tr>
+                  <td colspan="6" class="px-6 py-24 text-center">
+                    <div class="flex flex-col items-center gap-4">
+                      <div class="h-20 w-20 bg-stone-100 dark:bg-stone-800 rounded-2xl flex items-center justify-center shadow-inner">
+                        <span class="material-icons-outlined text-3xl text-stone-400">inventory_2</span>
+                      </div>
+                      <div>
+                        <p class="text-stone-800 dark:text-stone-200 font-bold text-lg mb-1">No hay productos</p>
+                        <p class="text-stone-500 dark:text-stone-400 text-sm">Ajusta los filtros o crea un nuevo producto.</p>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
       </div>
+    }
+
+    <!-- Vista de Cuadrícula (Bento Cards) -->
+    @if (viewMode() === 'grid') {
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        @for (product of paginatedProducts(); track product.id; let idx = $index) {
+          <div class="bg-white dark:bg-stone-900 rounded-3xl border border-stone-200/60 dark:border-stone-800 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden flex flex-col group animate-in fade-in zoom-in-95 fill-mode-both" [style.animation-delay]="(idx * 40) + 'ms'">
+            <!-- Imagen Hero -->
+            <div class="h-48 w-full bg-stone-100 dark:bg-stone-800 relative overflow-hidden cursor-pointer" (click)="openEdit(product.id)">
+              <img [src]="product.image" appImageFallback [alt]="product.name" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" />
+              <!-- Badge Categoría -->
+              <div class="absolute top-3 left-3 bg-white/90 dark:bg-stone-900/90 backdrop-blur text-xs font-bold px-2.5 py-1 rounded-lg text-stone-800 dark:text-stone-200 shadow-sm">
+                {{ product.category }}
+              </div>
+              <!-- Checkbox -->
+              <div class="absolute top-3 right-3 z-10" (click)="$event.stopPropagation()">
+                <input type="checkbox" [checked]="selectedProducts().includes(product.id)" (change)="toggleSelection(product.id)" class="w-5 h-5 rounded border-stone-300 text-stone-900 focus:ring-stone-900 dark:border-stone-600 bg-white/80 dark:bg-stone-800/80 cursor-pointer backdrop-blur shadow-sm" />
+              </div>
+            </div>
+            
+            <!-- Contenido de la Tarjeta -->
+            <div class="p-5 flex-1 flex flex-col">
+              <div class="flex justify-between items-start mb-2">
+                <h3 class="text-base font-bold text-stone-900 dark:text-stone-100 leading-tight cursor-pointer hover:text-stone-600 transition-colors" (click)="openEdit(product.id)">{{ product.name }}</h3>
+                <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300" (click)="$event.stopPropagation()">
+                  <button (click)="openEdit(product.id)" class="text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 p-1.5 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors cursor-pointer" title="Editar">
+                    <span class="material-icons-outlined text-[18px]">edit</span>
+                  </button>
+                  <button (click)="handleAction('delete', product.id)" class="text-stone-400 hover:text-red-600 dark:hover:text-red-400 p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors cursor-pointer" title="Archivar">
+                    <span class="material-icons-outlined text-[18px]">delete</span>
+                  </button>
+                </div>
+              </div>
+              
+              <div class="text-xs text-stone-500 font-mono mb-4">{{ product.barcode || 'Sin código' }}</div>
+              
+              <div class="mt-auto pt-4 border-t border-stone-100 dark:border-stone-800 flex items-end justify-between">
+                <div>
+                  <p class="text-[10px] uppercase tracking-widest text-stone-400 font-bold mb-0.5">Precio</p>
+                  <p class="text-lg font-black text-stone-900 dark:text-white">S/ {{ product.price | number:'1.2-2' }}</p>
+                </div>
+                <div class="text-right">
+                  <p class="text-[10px] uppercase tracking-widest text-stone-400 font-bold mb-0.5">Stock</p>
+                  <p class="text-sm font-bold" [ngClass]="product.stock <= product.minStock ? 'text-red-600 dark:text-red-400' : 'text-teal-600 dark:text-teal-400'">{{ product.stock }} und.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    }
 
       <!-- Paginación Footer -->
-      <div class="p-4 border-t border-stone-100 dark:border-stone-800 flex items-center justify-between bg-stone-50/50 dark:bg-stone-900/30">
+      <div class="p-4 border-t border-stone-100 dark:border-stone-800 flex items-center justify-between bg-stone-50/50 dark:bg-stone-900/30 rounded-b-3xl">
         <span class="text-xs font-medium text-stone-500">
           Mostrando pág. {{ currentPage() }} de {{ totalPages() }} ({{ filteredProducts().length }} total)
         </span>
@@ -182,7 +311,6 @@
           </button>
         </div>
       </div>
-    </div>
   </div>
 </div>
 
@@ -202,15 +330,22 @@
     </div>
   </div>
 
-  <!-- TABS NAV -->
-  <div class="flex gap-2 mb-8 bg-stone-100/50 dark:bg-stone-800/50 p-1 rounded-xl">
-    <button type="button" (click)="activeModalTab.set('INFO')" [ngClass]="activeModalTab() === 'INFO' ? 'bg-white dark:bg-stone-700 shadow-sm text-stone-900 dark:text-stone-100 font-semibold' : 'text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-200'" class="flex-1 py-2 text-sm rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer outline-hidden">
+  <!-- TABS NAV con Indicador Animado -->
+  <div class="relative flex mb-8 bg-stone-100 dark:bg-stone-800/60 p-1.5 rounded-2xl isolate">
+    <!-- Sliding Indicator -->
+    <div class="absolute inset-y-1.5 bg-white dark:bg-stone-700 rounded-xl shadow-xs transition-all duration-300 ease-out z-0"
+         [ngStyle]="{
+           'width': 'calc(33.333% - 4px)',
+           'left': activeModalTab() === 'INFO' ? '6px' : activeModalTab() === 'VARIANTS' ? 'calc(33.333% + 2px)' : 'calc(66.666% - 2px)'
+         }"></div>
+         
+    <button type="button" (click)="activeModalTab.set('INFO')" [ngClass]="activeModalTab() === 'INFO' ? 'text-stone-900 dark:text-stone-100 font-bold' : 'text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-200'" class="flex-1 py-2.5 text-sm rounded-xl transition-colors duration-300 flex items-center justify-center gap-2 cursor-pointer outline-hidden z-10 font-medium">
       <span class="material-icons-outlined text-[18px]">info</span> Información
     </button>
-    <button type="button" (click)="activeModalTab.set('VARIANTS')" [ngClass]="activeModalTab() === 'VARIANTS' ? 'bg-white dark:bg-stone-700 shadow-sm text-stone-900 dark:text-stone-100 font-semibold' : 'text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-200'" class="flex-1 py-2 text-sm rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer outline-hidden">
-      <span class="material-icons-outlined text-[18px]">style</span> Variantes y Stock
+    <button type="button" (click)="activeModalTab.set('VARIANTS')" [ngClass]="activeModalTab() === 'VARIANTS' ? 'text-stone-900 dark:text-stone-100 font-bold' : 'text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-200'" class="flex-1 py-2.5 text-sm rounded-xl transition-colors duration-300 flex items-center justify-center gap-2 cursor-pointer outline-hidden z-10 font-medium">
+      <span class="material-icons-outlined text-[18px]">style</span> Variantes
     </button>
-    <button type="button" (click)="activeModalTab.set('FINANCE')" [ngClass]="activeModalTab() === 'FINANCE' ? 'bg-white dark:bg-stone-700 shadow-sm text-stone-900 dark:text-stone-100 font-semibold' : 'text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-200'" class="flex-1 py-2 text-sm rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer outline-hidden">
+    <button type="button" (click)="activeModalTab.set('FINANCE')" [ngClass]="activeModalTab() === 'FINANCE' ? 'text-stone-900 dark:text-stone-100 font-bold' : 'text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-200'" class="flex-1 py-2.5 text-sm rounded-xl transition-colors duration-300 flex items-center justify-center gap-2 cursor-pointer outline-hidden z-10 font-medium">
       <span class="material-icons-outlined text-[18px]">payments</span> Finanzas
     </button>
   </div>
@@ -225,7 +360,11 @@
       <app-ui-label class="mb-2 block">Fotografía del Producto</app-ui-label>
       <div
         (click)="fileInput.click()"
-        class="relative group h-56 w-full rounded-2xl border-2 border-dashed border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-900/50 hover:bg-stone-100 dark:hover:bg-stone-800/80 transition-colors flex flex-col items-center justify-center cursor-pointer overflow-hidden"
+        (dragover)="onDragOver($event)"
+        (dragleave)="onDragLeave($event)"
+        (drop)="onDrop($event)"
+        class="relative group h-56 w-full rounded-2xl border-2 border-dashed transition-all duration-300 flex flex-col items-center justify-center cursor-pointer overflow-hidden"
+        [ngClass]="isDragging() ? 'border-teal-500 bg-teal-50/50 dark:bg-teal-900/10 scale-[1.02]' : 'border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-900/50 hover:bg-stone-100 dark:hover:bg-stone-800/80'"
       >
         <input
           #fileInput
@@ -240,19 +379,22 @@
         <div
           class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
         >
-          <span class="text-white text-sm font-medium flex items-center gap-2">
-            <span class="material-icons-outlined">edit</span>
+          <span class="text-white text-sm font-medium flex items-center gap-2 bg-black/50 px-4 py-2 rounded-full backdrop-blur-sm">
+            <span class="material-icons-outlined text-[18px]">edit</span>
             Cambiar imagen
           </span>
         </div>
         } @else {
-        <div class="text-center group-hover:scale-105 transition-transform duration-300">
+        <div class="text-center group-hover:scale-105 transition-transform duration-300 pointer-events-none">
           <div
-            class="mx-auto h-12 w-12 rounded-full bg-white dark:bg-stone-800 shadow-sm flex items-center justify-center mb-3 border border-stone-100 dark:border-stone-700"
+            class="mx-auto h-12 w-12 rounded-full shadow-sm flex items-center justify-center mb-3 border transition-colors"
+            [ngClass]="isDragging() ? 'bg-teal-100 dark:bg-teal-900/50 border-teal-200 dark:border-teal-800 text-teal-600 dark:text-teal-400' : 'bg-white dark:bg-stone-800 border-stone-100 dark:border-stone-700 text-stone-400 dark:text-stone-500'"
           >
-            <span class="material-icons-outlined text-stone-400 dark:text-stone-500 text-2xl">add_a_photo</span>
+            <span class="material-icons-outlined text-2xl">add_a_photo</span>
           </div>
-          <p class="text-sm text-stone-600 dark:text-stone-300 font-medium">Click para subir</p>
+          <p class="text-sm font-bold transition-colors" [ngClass]="isDragging() ? 'text-teal-700 dark:text-teal-400' : 'text-stone-700 dark:text-stone-300'">
+            {{ isDragging() ? 'Suelta la imagen aquí' : 'Haz clic o arrastra' }}
+          </p>
           <p class="text-xs text-stone-400 dark:text-stone-500 mt-1">JPG, PNG • Max 2MB</p>
         </div>
         }

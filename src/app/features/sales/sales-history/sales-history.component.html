@@ -16,146 +16,124 @@
       </div>
     </app-ui-page-header>
 
-    <!-- Resumen Cards BENTO / STRIPE -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-      <div class="bg-white dark:bg-stone-900 p-6 rounded-2xl border border-stone-200/50 dark:border-stone-800/80 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.05)] flex items-center justify-between">
-        <div>
-          <p class="text-xs font-semibold text-stone-500 uppercase tracking-widest mb-1">Volumen</p>
-          <h3 class="text-3xl font-bold tracking-tight text-stone-900 dark:text-white">{{ summary().count }}</h3>
-        </div>
-        <div class="h-12 w-12 rounded-full bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400 flex items-center justify-center">
-          <span class="material-icons-outlined">payments</span>
+    <!-- Resumen Cards Minimalistas -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="bg-transparent p-4 flex flex-col justify-between border-l-2 border-stone-200 dark:border-stone-800">
+        <p class="text-[10px] font-bold text-stone-400 dark:text-stone-500 uppercase tracking-widest mb-2">Volumen de Transacciones</p>
+        <div class="flex items-end gap-3">
+          <h3 class="text-4xl font-bold tracking-tight text-stone-900 dark:text-stone-100">{{ summary().count }}</h3>
+          <span class="material-icons-outlined text-stone-300 dark:text-stone-700 pb-1">receipt_long</span>
         </div>
       </div>
       
-      <div class="bg-white dark:bg-stone-900 p-6 rounded-2xl border border-stone-200/50 dark:border-stone-800/80 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.05)] flex items-center justify-between">
-        <div>
-          <p class="text-xs font-semibold text-stone-500 uppercase tracking-widest mb-1">Ingresos</p>
-          <h3 class="text-3xl font-bold tracking-tight text-emerald-600 dark:text-emerald-400">S/ {{ summary().total | number : '1.2-2' }}</h3>
-        </div>
-        <div class="h-12 w-12 rounded-full bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-400 flex items-center justify-center">
-          <span class="material-icons-outlined">trending_up</span>
+      <div class="bg-transparent p-4 flex flex-col justify-between border-l-2 border-stone-200 dark:border-stone-800">
+        <p class="text-[10px] font-bold text-stone-400 dark:text-stone-500 uppercase tracking-widest mb-2">Ingresos Totales</p>
+        <div class="flex items-end gap-3">
+          <h3 class="text-4xl font-bold tracking-tight text-stone-900 dark:text-stone-100">S/ {{ summary().total | number : '1.2-2' }}</h3>
+          <span class="material-icons-outlined text-stone-300 dark:text-stone-700 pb-1">trending_up</span>
         </div>
       </div>
 
-      <div class="bg-white dark:bg-stone-900 p-6 rounded-2xl border border-stone-200/50 dark:border-stone-800/80 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.05)] flex items-center justify-between">
-        <div>
-          <p class="text-xs font-semibold text-stone-500 uppercase tracking-widest mb-1">Ticket Promedio</p>
-          <h3 class="text-3xl font-bold tracking-tight text-stone-900 dark:text-zinc-100">S/ {{ summary().average | number : '1.2-2' }}</h3>
-        </div>
-        <div class="h-12 w-12 rounded-full bg-indigo-50 text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-400 flex items-center justify-center">
-          <span class="material-icons-outlined">shopping_bag</span>
+      <div class="bg-transparent p-4 flex flex-col justify-between border-l-2 border-stone-200 dark:border-stone-800">
+        <p class="text-[10px] font-bold text-stone-400 dark:text-stone-500 uppercase tracking-widest mb-2">Ticket Promedio</p>
+        <div class="flex items-end gap-3">
+          <h3 class="text-4xl font-bold tracking-tight text-stone-900 dark:text-zinc-100">S/ {{ summary().average | number : '1.2-2' }}</h3>
+          <span class="material-icons-outlined text-stone-300 dark:text-stone-700 pb-1">shopping_bag</span>
         </div>
       </div>
     </div>
 
-    <!-- Controles (SearchBar + iOS Segmented Controls) -->
-    <div class="flex flex-col sm:flex-row gap-4 justify-between items-center bg-white/70 backdrop-blur-md border border-stone-200/60 dark:bg-stone-900/70 p-4 rounded-2xl dark:border-stone-800 shadow-sm z-20 sticky top-4">
+    <!-- Controles Minimalistas -->
+    <div class="flex flex-col sm:flex-row gap-6 justify-between items-center z-20 sticky top-4 pt-2 pb-4 bg-gradient-to-b from-[#f8fafc] dark:from-[#09090b] to-transparent">
       
-      <!-- Búsqueda -->
-      <div class="relative w-full sm:w-96">
-        <span class="absolute left-3 top-1/2 -translate-y-1/2 material-icons-outlined text-stone-400">search</span>
+      <!-- Búsqueda Soft Pill -->
+      <div class="relative w-full sm:w-72 group">
+        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-stone-400 group-focus-within:text-stone-900 dark:group-focus-within:text-stone-100 transition-colors">
+          <span class="material-icons-outlined text-[18px]">search</span>
+        </div>
         <input
           #searchInput
           type="text"
-          placeholder="Buscar factura o cliente (F2)..."
+          placeholder="Buscar factura (F2)..."
           [value]="searchQuery()"
           (input)="searchQuery.set($any($event.target).value)"
-          class="w-full pl-10 pr-4 py-2.5 bg-stone-100 dark:bg-stone-800/50 border-none rounded-xl focus:ring-2 focus:ring-blue-500/50 transition-all text-sm font-medium dark:text-white placeholder:text-stone-400"
+          class="w-full h-10 pl-11 pr-4 bg-stone-200/50 dark:bg-stone-800/50 hover:bg-stone-200/80 dark:hover:bg-stone-800/80 rounded-full text-[13px] font-medium focus:outline-hidden focus:ring-2 focus:ring-stone-900 dark:focus:ring-stone-100 transition-all placeholder:text-stone-400 dark:placeholder:text-stone-500 text-stone-900 dark:text-stone-100 border-none"
         />
       </div>
 
-      <!-- Segmented Control estilo iOS / Stripe -->
-      <div class="p-1 bg-stone-100 dark:bg-stone-800/70 rounded-xl flex">
+      <!-- Filtros Flotantes Zen -->
+      <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar px-1">
+        @for (period of ['today', 'week', 'month', 'all']; track period) {
         <button 
-          (click)="selectedPeriod.set('today')" 
-          [class.bg-white]="selectedPeriod() === 'today'" [class.text-stone-900]="selectedPeriod() === 'today'" [class.shadow-sm]="selectedPeriod() === 'today'"
-          [class.text-stone-500]="selectedPeriod() !== 'today'" [class.dark:text-stone-400]="selectedPeriod() !== 'today'" [class.dark:bg-stone-600]="selectedPeriod() === 'today'" [class.dark:text-white]="selectedPeriod() === 'today'"
-          class="px-4 py-1.5 text-sm font-semibold rounded-lg transition-all duration-200"
-        >Hoy</button>
-        <button 
-          (click)="selectedPeriod.set('week')" 
-          [class.bg-white]="selectedPeriod() === 'week'" [class.text-stone-900]="selectedPeriod() === 'week'" [class.shadow-sm]="selectedPeriod() === 'week'"
-          [class.text-stone-500]="selectedPeriod() !== 'week'" [class.dark:text-stone-400]="selectedPeriod() !== 'week'" [class.dark:bg-stone-600]="selectedPeriod() === 'week'" [class.dark:text-white]="selectedPeriod() === 'week'"
-          class="px-4 py-1.5 text-sm font-semibold rounded-lg transition-all duration-200"
-        >Semana</button>
-        <button 
-          (click)="selectedPeriod.set('month')" 
-          [class.bg-white]="selectedPeriod() === 'month'" [class.text-stone-900]="selectedPeriod() === 'month'" [class.shadow-sm]="selectedPeriod() === 'month'"
-          [class.text-stone-500]="selectedPeriod() !== 'month'" [class.dark:text-stone-400]="selectedPeriod() !== 'month'" [class.dark:bg-stone-600]="selectedPeriod() === 'month'" [class.dark:text-white]="selectedPeriod() === 'month'"
-          class="px-4 py-1.5 text-sm font-semibold rounded-lg transition-all duration-200"
-        >Mes</button>
-        <button 
-          (click)="selectedPeriod.set('all')" 
-          [class.bg-white]="selectedPeriod() === 'all'" [class.text-stone-900]="selectedPeriod() === 'all'" [class.shadow-sm]="selectedPeriod() === 'all'"
-          [class.text-stone-500]="selectedPeriod() !== 'all'" [class.dark:text-stone-400]="selectedPeriod() !== 'all'" [class.dark:bg-stone-600]="selectedPeriod() === 'all'" [class.dark:text-white]="selectedPeriod() === 'all'"
-          class="px-4 py-1.5 text-sm font-semibold rounded-lg transition-all duration-200"
-        >Todas</button>
+          (click)="selectedPeriod.set($any(period))" 
+          class="px-4 py-1.5 rounded-full text-[13px] font-medium transition-all duration-300 cursor-pointer whitespace-nowrap"
+          [ngClass]="selectedPeriod() === period ? 'bg-stone-900 text-white dark:bg-stone-100 dark:text-stone-900 shadow-sm' : 'bg-transparent text-stone-500 dark:text-stone-400 hover:bg-stone-200/50 dark:hover:bg-stone-800/50'"
+        >
+          {{ period === 'today' ? 'Hoy' : period === 'week' ? 'Semana' : period === 'month' ? 'Mes' : 'Todas' }}
+        </button>
+        }
       </div>
-
     </div>
 
-    <!-- TABLA DE DATOS (Estilo Stripe) -->
-    <div class="bg-white dark:bg-stone-900 border border-stone-200/60 dark:border-stone-800 shadow-sm rounded-2xl overflow-hidden">
+    <!-- TABLA DE DATOS (Zen Minimalista) -->
+    <div class="bg-white dark:bg-stone-900 rounded-3xl border border-stone-200/60 dark:border-stone-800 shadow-sm overflow-hidden transition-colors duration-300">
       
       @if (filteredSales().length === 0 && !salesService.isLoading()) {
         <app-ui-empty-state icon="receipt_long" title="Sin resultados" description="No encontramos ninguna venta en este periodo." />
       } @else if (salesService.isLoading()) {
-        <div class="p-12 flex justify-center items-center"><div class="animate-spin h-8 w-8 border-4 border-stone-200 border-t-blue-600 rounded-full"></div></div>
+        <div class="p-12 flex justify-center items-center"><div class="animate-spin h-8 w-8 border-4 border-stone-200 border-t-stone-900 dark:border-t-stone-100 rounded-full"></div></div>
       } @else {
         <div class="overflow-x-auto">
           <table class="w-full text-left border-collapse text-sm">
-            <thead>
-              <tr class="border-b border-stone-100 dark:border-stone-800 bg-stone-50/50 dark:bg-stone-900">
-                <th class="px-6 py-4 font-semibold text-stone-500 dark:text-stone-400">Factura</th>
-                <th class="px-6 py-4 font-semibold text-stone-500 dark:text-stone-400">Fecha</th>
-                <th class="px-6 py-4 font-semibold text-stone-500 dark:text-stone-400">Cliente</th>
-                <th class="px-6 py-4 font-semibold text-stone-500 dark:text-stone-400 hidden sm:table-cell">Productos</th>
-                <th class="px-6 py-4 font-semibold text-stone-500 dark:text-stone-400 text-right">Total</th>
-                <th class="px-6 py-4 font-semibold text-stone-500 dark:text-stone-400 text-center">Estado</th>
-                <th class="px-6 py-4 font-semibold text-stone-500 dark:text-stone-400 text-right"></th>
+            <thead class="sticky top-0 bg-stone-50/90 dark:bg-stone-900/90 backdrop-blur-md z-10">
+              <tr class="border-b border-stone-100 dark:border-stone-800 text-stone-400 dark:text-stone-500 text-xs tracking-wider uppercase">
+                <th class="px-6 py-4 font-medium">Factura</th>
+                <th class="px-6 py-4 font-medium">Fecha</th>
+                <th class="px-6 py-4 font-medium">Cliente</th>
+                <th class="px-6 py-4 font-medium hidden sm:table-cell">Productos</th>
+                <th class="px-6 py-4 font-medium text-right">Total</th>
+                <th class="px-6 py-4 font-medium text-center">Estado</th>
+                <th class="px-6 py-4 font-medium text-right sticky right-0 bg-stone-50/90 dark:bg-stone-900/90 backdrop-blur-md">Acciones</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-stone-100 dark:divide-stone-800">
-              @for (sale of filteredSales(); track sale.id) {
-                <tr class="hover:bg-stone-50/70 dark:hover:bg-stone-800/40 transition-colors group">
+            <tbody class="divide-y divide-stone-50/50 dark:divide-stone-800/30">
+              @for (sale of filteredSales(); track sale.id; let idx = $index) {
+                <tr class="group hover:bg-stone-50/80 dark:hover:bg-stone-800/40 transition-colors duration-200 animate-in fade-in slide-in-from-bottom-2 fill-mode-both" [style.animation-delay]="(idx * 40) + 'ms'">
                   <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="flex items-center gap-2">
-                       <span class="font-mono text-stone-900 dark:text-stone-200 font-medium">{{ sale.saleNumber }}</span>
-                    </div>
+                    <span class="font-mono text-stone-900 dark:text-stone-200 font-bold bg-stone-100 dark:bg-stone-800/50 px-2 py-1 rounded-md text-xs">{{ sale.saleNumber }}</span>
                   </td>
-                  <td class="px-6 py-4 text-stone-500 dark:text-stone-400">
-                    {{ sale.date | date : 'dd/MM, h:mm a' }}
+                  <td class="px-6 py-4 text-xs font-medium text-stone-500 dark:text-stone-400">
+                    {{ sale.date | date : 'dd MMM, h:mm a' }}
                   </td>
                   <td class="px-6 py-4">
-                    <span class="font-medium text-stone-700 dark:text-stone-300">{{ sale.customer?.name || 'Venta Casual' }}</span>
+                    <span class="font-bold text-sm text-stone-800 dark:text-stone-200">{{ sale.customer?.name || 'Cliente Casual' }}</span>
                   </td>
                   <td class="px-6 py-4 hidden sm:table-cell">
-                    <span class="text-stone-500 dark:text-stone-400 line-clamp-1 max-w-[200px]">
+                    <span class="text-[11px] font-bold tracking-widest text-stone-400 dark:text-stone-500 uppercase bg-stone-50 dark:bg-stone-800/40 px-2.5 py-1 rounded-full border border-stone-100 dark:border-stone-700/50">
                       {{ sale.items.length }} Items
                     </span>
                   </td>
                   <td class="px-6 py-4 text-right">
-                    <span class="font-bold text-stone-900 dark:text-white">S/ {{ sale.total | number : '1.2-2' }}</span>
+                    <span class="font-black text-stone-900 dark:text-white">S/ {{ sale.total | number : '1.2-2' }}</span>
                   </td>
                   <td class="px-6 py-4 text-center">
-                    <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-bold tracking-wider uppercase border"
-                          [class]="getStatusBadge(sale.status).class">
+                    <div class="inline-flex items-center gap-1.5 text-[10px] font-bold tracking-widest uppercase"
+                         [ngClass]="sale.status === 'completed' ? 'text-emerald-600 dark:text-emerald-400' : sale.status === 'pending' ? 'text-amber-600 dark:text-amber-400' : 'text-red-600 dark:text-red-400'">
+                      <span class="w-1.5 h-1.5 rounded-full" [ngClass]="sale.status === 'completed' ? 'bg-emerald-500' : sale.status === 'pending' ? 'bg-amber-500' : 'bg-red-500'"></span>
                       {{ getStatusBadge(sale.status).label }}
-                    </span>
+                    </div>
                   </td>
-                  <td class="px-6 py-4 text-right whitespace-nowrap">
-                    <!-- Acciones (Solo visibles en Hover) -->
-                    <div class="px-2 py-3 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity justify-end">
-                      <button (click)="viewDetails(sale); $event.stopPropagation()" class="p-1.5 rounded-lg text-stone-500 hover:text-stone-700 hover:bg-stone-200/50 dark:hover:bg-stone-700/50 dark:text-stone-400 dark:hover:text-stone-200 transition-all cursor-pointer" title="Ver Detalles">
-                        <span class="material-icons-outlined text-[18px]">visibility</span>
+                  <td class="px-6 py-4 text-right whitespace-nowrap sticky right-0 bg-white group-hover:bg-stone-50/80 dark:bg-stone-900 dark:group-hover:bg-stone-800/40 transition-colors">
+                    <div class="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <button (click)="viewDetails(sale); $event.stopPropagation()" class="h-8 w-8 rounded-lg bg-transparent hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 transition-colors flex items-center justify-center cursor-pointer" title="Ver Detalles">
+                        <span class="material-icons-outlined text-[16px]">visibility</span>
                       </button>
-                      <button (click)="printTicket(sale); $event.stopPropagation()" class="p-1.5 rounded-lg text-blue-500 hover:text-blue-700 hover:bg-blue-100/50 dark:hover:bg-blue-900/30 dark:text-blue-400 dark:hover:text-blue-300 transition-all cursor-pointer" title="Imprimir Ticket">
-                        <span class="material-icons-outlined text-[18px]">receipt</span>
+                      <button (click)="printTicket(sale); $event.stopPropagation()" class="h-8 w-8 rounded-lg bg-transparent hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 transition-colors flex items-center justify-center cursor-pointer" title="Imprimir Ticket">
+                        <span class="material-icons-outlined text-[16px]">receipt</span>
                       </button>
                       @if (sale.status === 'completed') {
-                        <button (click)="openCancelModal(sale); $event.stopPropagation()" class="p-1.5 rounded-lg text-red-500 hover:text-red-700 hover:bg-red-100/50 dark:hover:bg-red-900/30 dark:text-red-400 dark:hover:text-red-300 transition-all cursor-pointer" title="Anular Venta">
-                          <span class="material-icons-outlined text-[18px]">cancel</span>
+                        <button (click)="openCancelModal(sale); $event.stopPropagation()" class="h-8 w-8 rounded-lg bg-transparent hover:bg-red-50 dark:hover:bg-red-900/20 text-stone-400 hover:text-red-600 dark:hover:text-red-400 transition-colors flex items-center justify-center cursor-pointer" title="Anular Venta">
+                          <span class="material-icons-outlined text-[16px]">block</span>
                         </button>
                       }
                     </div>
@@ -199,90 +177,88 @@
       }
     </div>
 
-    <!-- Modal Detalles iOS Style Premium -->
+    <!-- Modal Detalles Premium Receipt -->
     @if (selectedSale()) {
-      <div class="fixed inset-0 z-50 flex justify-center items-end sm:items-center bg-stone-900/40 dark:bg-black/60 backdrop-blur-[4px] animate-in fade-in" (click)="closeDetails()">
-        <div class="bg-white dark:bg-[#1c1c1e] w-full sm:w-[480px] sm:rounded-3xl rounded-t-3xl shadow-2xl overflow-hidden animate-in slide-in-from-bottom-[50%] sm:zoom-in-95" (click)="$event.stopPropagation()">
+      <div class="fixed inset-0 z-50 flex justify-center items-center bg-stone-900/40 dark:bg-black/60 backdrop-blur-[4px] animate-in fade-in" (click)="closeDetails()">
+        <div class="bg-[#fafafa] dark:bg-[#111111] w-full max-w-[420px] rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 font-sans text-sm relative border border-stone-200/50 dark:border-stone-800" (click)="$event.stopPropagation()">
           
           <!-- Header -->
-          <div class="relative bg-stone-50/80 dark:bg-[#2c2c2e] p-6 border-b border-stone-100 dark:border-stone-800/80">
-            <button (click)="closeDetails()" class="absolute top-6 right-6 h-8 w-8 rounded-full bg-stone-200/50 dark:bg-stone-700/50 hover:bg-stone-200 hover:scale-105 flex items-center justify-center transition-all text-stone-600 dark:text-stone-300">
+          <div class="p-8 pb-6 border-b-2 border-dashed border-stone-200 dark:border-stone-800 flex flex-col items-center text-center relative mt-2">
+            <button (click)="closeDetails()" class="absolute top-0 right-4 h-8 w-8 rounded-full hover:bg-stone-200 dark:hover:bg-stone-800 flex items-center justify-center transition-all text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 cursor-pointer">
               <span class="material-icons-outlined text-sm">close</span>
             </button>
-            <div class="flex flex-col items-center justify-center text-center mt-2">
-              <div class="h-16 w-16 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center mb-3 shadow-sm border border-blue-200/50 dark:border-blue-800/50">
-                <span class="material-icons-outlined text-3xl">receipt_long</span>
-              </div>
-              <h4 class="text-2xl font-bold tracking-tight text-stone-900 dark:text-white">{{ selectedSale()!.saleNumber }}</h4>
-              <p class="text-sm text-stone-500 mt-1 dark:text-stone-400">{{ selectedSale()!.date | date:'dd MMM yyyy, h:mm a' }}</p>
-              
-              <div class="mt-4 inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold tracking-wide uppercase border bg-white dark:bg-stone-800 shadow-sm" [class]="getStatusBadge(selectedSale()!.status).class">
-                <span class="w-1.5 h-1.5 rounded-full" [class.bg-emerald-500]="selectedSale()!.status === 'completed'" [class.bg-amber-500]="selectedSale()!.status === 'pending'" [class.bg-red-500]="selectedSale()!.status === 'cancelled'"></span>
-                {{ getStatusBadge(selectedSale()!.status).label }}
-              </div>
+            <div class="mb-4 text-stone-300 dark:text-stone-700">
+              <span class="material-icons-outlined text-5xl">receipt_long</span>
+            </div>
+            <h4 class="text-xl font-bold tracking-tight text-stone-900 dark:text-white uppercase">{{ selectedSale()!.saleNumber }}</h4>
+            <p class="text-xs text-stone-500 mt-1 dark:text-stone-400 uppercase tracking-widest">{{ selectedSale()!.date | date:'dd/MM/yyyy HH:mm' }}</p>
+            
+            <div class="mt-4 inline-flex items-center gap-1.5 text-[10px] font-bold tracking-widest uppercase"
+                 [ngClass]="selectedSale()!.status === 'completed' ? 'text-emerald-600 dark:text-emerald-400' : selectedSale()!.status === 'pending' ? 'text-amber-600 dark:text-amber-400' : 'text-red-600 dark:text-red-400'">
+              <span class="w-1.5 h-1.5 rounded-full" [ngClass]="selectedSale()!.status === 'completed' ? 'bg-emerald-500' : selectedSale()!.status === 'pending' ? 'bg-amber-500' : 'bg-red-500'"></span>
+              {{ getStatusBadge(selectedSale()!.status).label }}
             </div>
           </div>
 
           <!-- Body -->
-          <div class="p-6">
-            <div class="flex gap-4 mb-6">
-              <div class="flex-1 bg-stone-50 dark:bg-stone-800/40 p-4 rounded-2xl border border-stone-100 dark:border-stone-800">
-                <p class="text-xs text-stone-500 mb-1 flex items-center gap-1"><span class="material-icons-outlined text-[14px]">person</span> Cliente</p>
-                <p class="font-semibold text-stone-900 dark:text-stone-200">{{ selectedSale()!.customer?.name || 'Cliente Casual' }}</p>
+          <div class="p-8 py-6">
+            <div class="flex justify-between mb-8 text-xs">
+              <div>
+                <p class="text-stone-400 uppercase tracking-widest mb-1 font-sans text-[10px] font-bold">Cliente</p>
+                <p class="font-bold text-stone-900 dark:text-stone-200 uppercase">{{ selectedSale()!.customer?.name || 'Cliente Casual' }}</p>
               </div>
-              <div class="flex-1 bg-stone-50 dark:bg-stone-800/40 p-4 rounded-2xl border border-stone-100 dark:border-stone-800">
-                <p class="text-xs text-stone-500 mb-1 flex items-center gap-1"><span class="material-icons-outlined text-[14px]">credit_card</span> Pago</p>
-                <p class="font-semibold text-stone-900 dark:text-stone-200">{{ getPaymentMethodLabel(selectedSale()!.paymentMethod) }}</p>
+              <div class="text-right">
+                <p class="text-stone-400 uppercase tracking-widest mb-1 font-sans text-[10px] font-bold">Pago</p>
+                <p class="font-bold text-stone-900 dark:text-stone-200 uppercase">{{ getPaymentMethodLabel(selectedSale()!.paymentMethod) }}</p>
               </div>
             </div>
 
             <!-- Items -->
             <div>
-              <h5 class="text-xs font-bold text-stone-400 uppercase tracking-widest mb-3 ml-2">Artículos ({{ selectedSale()!.items.length }})</h5>
-              <div class="bg-stone-50/50 dark:bg-stone-800/20 rounded-2xl p-4 border border-stone-100 dark:border-stone-800/50">
-                <div class="space-y-3.5">
-                  @for (item of selectedSale()!.items; track item.productId) {
-                    <div class="flex justify-between items-start text-sm">
-                      <div class="flex gap-3">
-                        <div class="w-8 h-8 rounded-lg bg-stone-200/50 dark:bg-stone-700/50 flex items-center justify-center text-stone-500 dark:text-stone-400 mt-0.5 shrink-0">
-                          <span class="font-bold text-xs">{{ item.quantity }}x</span>
-                        </div>
-                        <div>
-                          <span class="font-medium text-stone-800 dark:text-stone-200 line-clamp-2 max-w-[200px] leading-snug">{{ item.productName }}</span>
-                          <span class="text-xs text-stone-500 mt-0.5 block">S/ {{ item.unitPrice | number:'1.2-2' }} c/u</span>
-                        </div>
-                      </div>
-                      <span class="font-semibold text-stone-700 dark:text-stone-300 shrink-0">S/ {{ item.subtotal | number:'1.2-2' }}</span>
+              <div class="flex justify-between text-[10px] text-stone-400 uppercase tracking-widest mb-3 pb-2 border-b border-stone-200 dark:border-stone-800 font-sans font-bold">
+                <span>Cant / Desc</span>
+                <span>Importe</span>
+              </div>
+              <div class="space-y-4 pt-2">
+                @for (item of selectedSale()!.items; track item.productId) {
+                  <div class="flex justify-between items-start text-xs">
+                    <div class="pr-4">
+                      <span class="font-bold text-stone-800 dark:text-stone-200 mr-2">{{ item.quantity }}x</span>
+                      <span class="text-stone-600 dark:text-stone-400 uppercase">{{ item.productName }}</span>
+                      <span class="text-stone-400 block mt-1 ml-6">S/ {{ item.unitPrice | number:'1.2-2' }} c/u</span>
                     </div>
-                  }
-                </div>
+                    <span class="font-bold text-stone-900 dark:text-stone-100 whitespace-nowrap">S/ {{ item.subtotal | number:'1.2-2' }}</span>
+                  </div>
+                }
               </div>
             </div>
           </div>
           
           <!-- Footer Totals -->
-          <div class="bg-stone-50 dark:bg-[#2c2c2e] p-6 border-t border-dashed border-stone-200/80 dark:border-stone-700">
-            <!-- Desglose sutil -->
-            <div class="space-y-2 mb-4 text-sm px-2">
-              <div class="flex justify-between text-stone-500">
-                <span>Subtotal</span>
+          <div class="p-8 pt-6 border-t-2 border-dashed border-stone-200 dark:border-stone-800 bg-stone-100/50 dark:bg-[#151515]">
+            <div class="space-y-2 mb-4 text-xs font-medium text-stone-500 uppercase">
+              <div class="flex justify-between">
+                <span>SUBTOTAL</span>
                 <span>S/ {{ selectedSale()!.subtotal | number:'1.2-2' }}</span>
               </div>
               @if (selectedSale()!.discount > 0) {
-                <div class="flex justify-between text-emerald-500 font-medium">
-                  <span>Descuento</span>
+                <div class="flex justify-between">
+                  <span>DESCUENTO</span>
                   <span>- S/ {{ selectedSale()!.discount | number:'1.2-2' }}</span>
                 </div>
               }
             </div>
             
             <!-- Gran Total -->
-            <div class="flex justify-between items-center text-xl font-bold bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 shadow-sm rounded-xl p-4">
-              <span class="text-stone-900 dark:text-white">Pagado Total</span>
-              <span class="text-blue-600 dark:text-blue-500">S/ {{ selectedSale()!.total | number:'1.2-2' }}</span>
+            <div class="flex justify-between items-center text-lg font-black border-t-2 border-stone-900 dark:border-stone-100 pt-4 mt-2">
+              <span class="text-stone-900 dark:text-white uppercase">Total</span>
+              <span class="text-stone-900 dark:text-white">S/ {{ selectedSale()!.total | number:'1.2-2' }}</span>
+            </div>
+            
+            <div class="mt-8 text-center text-[10px] text-stone-400 uppercase tracking-widest font-sans font-bold">
+              *** Fin de Transacción ***
             </div>
           </div>
-
         </div>
       </div>
     }

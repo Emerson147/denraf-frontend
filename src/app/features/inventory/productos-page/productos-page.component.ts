@@ -65,6 +65,12 @@ export class ProductosPageComponent {
   isUploadingImage = signal(false);
   uploadProgress = signal(0);
   selectedFile = signal<File | null>(null);
+  isDragging = signal(false); // 🆕 Estado para drag & drop
+
+  // 🆕 Estados para UI Avanzada
+  viewMode = signal<'list' | 'grid'>('list');
+  selectedProducts = signal<string[]>([]);
+  activeDropdownId = signal<string | null>(null);
 
   // Productos desde el servicio central
   products = this.productService.products;
@@ -213,6 +219,80 @@ export class ProductosPageComponent {
 
   generateBarcode() {
     this.productBarcode.set(`BAR-${Math.floor(Math.random() * 1000000)}`);
+  }
+
+  // 🆕 MÉTODOS DE UI AVANZADA (Selección, Vista, Dropdown)
+  
+  toggleViewMode(mode: 'list' | 'grid') {
+    this.viewMode.set(mode);
+  }
+
+  toggleSelection(productId: string) {
+    const current = this.selectedProducts();
+    if (current.includes(productId)) {
+      this.selectedProducts.set(current.filter(id => id !== productId));
+    } else {
+      this.selectedProducts.set([...current, productId]);
+    }
+  }
+
+  toggleAllSelection() {
+    const currentPaginated = this.paginatedProducts().map(p => p.id);
+    const selected = this.selectedProducts();
+    const allVisibleSelected = currentPaginated.every(id => selected.includes(id));
+    
+    if (allVisibleSelected) {
+      this.selectedProducts.set(selected.filter(id => !currentPaginated.includes(id)));
+    } else {
+      const newSelection = Array.from(new Set([...selected, ...currentPaginated]));
+      this.selectedProducts.set(newSelection);
+    }
+  }
+
+  isAllSelected(): boolean {
+    const currentPaginated = this.paginatedProducts();
+    if (currentPaginated.length === 0) return false;
+    return currentPaginated.every(p => this.selectedProducts().includes(p.id));
+  }
+
+  clearSelection() {
+    this.selectedProducts.set([]);
+  }
+
+  toggleDropdown(productId: string, event: Event) {
+    event.stopPropagation();
+    this.activeDropdownId.set(this.activeDropdownId() === productId ? null : productId);
+  }
+
+  closeDropdowns() {
+    this.activeDropdownId.set(null);
+  }
+
+  // 🆕 Drag & Drop de Imágenes
+  onDragOver(event: DragEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragging.set(true);
+  }
+
+  onDragLeave(event: DragEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragging.set(false);
+  }
+
+  onDrop(event: DragEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragging.set(false);
+    
+    const files = event.dataTransfer?.files;
+    if (files && files.length > 0) {
+      const file = files[0];
+      if (file.type.startsWith('image/')) {
+        this.handleFile(file);
+      }
+    }
   }
 
   // MÉTODOS
@@ -460,16 +540,17 @@ export class ProductosPageComponent {
   onFileSelected(event: Event) {
     const file = (event.target as HTMLInputElement).files?.[0];
     if (file) {
-      // Guardar archivo para subir después
-      this.selectedFile.set(file);
-
-      // Mostrar preview local
-      const reader = new FileReader();
-      reader.onload = () => {
-        this.selectedImage.set(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+      this.handleFile(file);
     }
+  }
+
+  private handleFile(file: File) {
+    this.selectedFile.set(file);
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.selectedImage.set(reader.result as string);
+    };
+    reader.readAsDataURL(file);
   }
 
   async saveProduct() {

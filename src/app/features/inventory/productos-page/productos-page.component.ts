@@ -19,6 +19,7 @@ import {
   UiButtonComponent,
   UiAnimatedDialogComponent,
   UiLabelComponent,
+  UiPageHeaderComponent,
 } from '../../../shared/ui';
 import { ImageFallbackDirective } from '../../../shared/directives/image-fallback.directive';
 
@@ -32,6 +33,7 @@ import { ImageFallbackDirective } from '../../../shared/directives/image-fallbac
     UiButtonComponent,
     UiAnimatedDialogComponent,
     UiLabelComponent,
+    UiPageHeaderComponent,
     ImageFallbackDirective,
   ],
   templateUrl: './productos-page.component.html',

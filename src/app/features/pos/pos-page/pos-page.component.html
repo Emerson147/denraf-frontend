@@ -1,20 +1,20 @@
-<div class="relative flex flex-col md:flex-row h-[calc(100vh-2rem)] gap-4 md:gap-5 p-3 md:p-5 w-full bg-stone-100 dark:bg-[#0a0a0a] transition-colors duration-300">
+<div class="relative flex flex-col md:flex-row h-[calc(100vh-2rem)] gap-4 md:gap-5 p-3 md:p-5 w-full bg-stone-50 dark:bg-[#0a0a0a] transition-colors duration-300">
       
-      <!-- Panel izquierdo: Productos (Bento Glass) -->
-      <div class="flex-1 flex flex-col gap-5 min-w-0 bg-white/40 dark:bg-stone-900/30 backdrop-blur-2xl rounded-[2rem] border border-white/60 dark:border-stone-800/50 p-4 md:p-6 shadow-xl shadow-stone-200/20 dark:shadow-black/20">
+      <!-- Panel izquierdo: Productos -->
+      <div class="flex-1 flex flex-col gap-5 min-w-0 bg-transparent p-2 md:p-4">
         
         <!-- Header con búsqueda y filtros -->
         <div class="space-y-3">
           <!-- Header Zen Garden con icono -->
           <div class="flex items-center justify-between gap-3">
             <div class="flex items-center gap-3 shrink-0">
-              <div class="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-stone-200/50 dark:bg-stone-700/50 flex items-center justify-center transition-colors duration-300">
-                <span class="material-icons-outlined text-xl md:text-2xl text-stone-600 dark:text-stone-300">point_of_sale</span>
+              <div class="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-stone-900 dark:bg-white flex items-center justify-center transition-colors duration-300">
+                <span class="material-icons-outlined text-xl md:text-2xl text-white dark:text-stone-900">point_of_sale</span>
               </div>
               <div>
-                <h1 class="text-lg md:text-xl font-serif font-bold text-stone-800 dark:text-stone-100">POS</h1>
-                <div class="hidden md:flex items-center gap-2">
-                  <p class="text-xs text-stone-500 dark:text-stone-400">Punto de Venta</p>
+                <h1 class="text-xl md:text-2xl font-bold tracking-tight text-stone-900 dark:text-white">Punto de Venta</h1>
+                <div class="hidden md:flex items-center gap-2 mt-0.5">
+                  <p class="text-xs font-medium text-stone-500 dark:text-stone-400">Terminal POS</p>
                   <!-- Indicador de conexión ultra compacto -->
                 @if (!isOnline()) {
                   <div class="flex items-center gap-1 px-2 py-0.5 rounded-md bg-orange-100 border border-orange-200">
@@ -39,49 +39,49 @@
             </div>
             
             <!-- Buscador principal -->
-            <div class="relative flex-1 md:w-96 md:flex-none">
-              <span class="absolute left-2 md:left-3 top-1/2 -translate-y-1/2 material-icons-outlined text-stone-400 dark:text-stone-500 text-lg md:text-xl">search</span>
+            <div class="relative flex-1 md:w-96 md:flex-none group">
+              <span class="absolute left-4 top-1/2 -translate-y-1/2 material-icons-outlined text-stone-400 dark:text-stone-500 transition-colors group-focus-within:text-stone-900 dark:group-focus-within:text-white">search</span>
               <input
                 #searchInput
                 type="text"
-                placeholder="Buscar producto..."
+                placeholder="Buscar producto o escanear código..."
                 [(ngModel)]="searchQuery"
                 (input)="onSearchChange($event)"
-                class="w-full pl-8 md:pl-10 pr-3 md:pr-16 py-2 md:py-2.5 bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-stone-400 dark:focus:ring-stone-500 focus:border-transparent text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 transition-all duration-300 text-sm"
+                class="w-full pl-11 pr-16 py-3 bg-stone-200/50 dark:bg-stone-800/50 border-none rounded-full focus:outline-none focus:ring-2 focus:ring-stone-900/10 dark:focus:ring-white/10 text-stone-900 dark:text-white placeholder:text-stone-500 dark:placeholder:text-stone-400 transition-all text-sm font-medium"
                 autocomplete="off"
               />
-              <kbd class="hidden md:inline-block absolute right-3 top-1/2 -translate-y-1/2 px-1.5 py-0.5 text-[10px] bg-stone-200 dark:bg-stone-600 text-stone-600 dark:text-stone-300 rounded border border-stone-300 dark:border-stone-500 font-mono font-semibold">F2</kbd>
+              <kbd class="hidden md:inline-block absolute right-4 top-1/2 -translate-y-1/2 px-2 py-0.5 text-[10px] bg-stone-300/50 dark:bg-stone-700/50 text-stone-600 dark:text-stone-300 rounded font-mono font-bold tracking-widest uppercase">F2</kbd>
             </div>
           </div>
 
           <!-- Filtros por categoría -->
-          <div class="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
+          <div class="flex gap-1.5 overflow-x-auto pb-2 no-scrollbar">
             <button
               (click)="selectedCategory.set(null)"
               [class.bg-stone-900]="selectedCategory() === null"
-              [class.dark:bg-stone-100]="selectedCategory() === null"
+              [class.dark:bg-white]="selectedCategory() === null"
               [class.text-white]="selectedCategory() === null"
               [class.dark:text-stone-900]="selectedCategory() === null"
-              [class.bg-stone-100]="selectedCategory() !== null"
-              [class.dark:bg-stone-800]="selectedCategory() !== null"
-              [class.text-stone-600]="selectedCategory() !== null"
-              [class.dark:text-stone-300]="selectedCategory() !== null"
-              class="relative px-4 py-2 rounded-full text-sm font-medium transition-all duration-150 whitespace-nowrap hover:scale-105 active:scale-95"
+              [class.bg-transparent]="selectedCategory() !== null"
+              [class.text-stone-500]="selectedCategory() !== null"
+              [class.hover:bg-stone-100]="selectedCategory() !== null"
+              [class.dark:hover:bg-stone-800]="selectedCategory() !== null"
+              class="px-4 py-1.5 rounded-full text-xs font-bold tracking-wide transition-all duration-200 whitespace-nowrap"
             >
-              Todas
+              TODAS
             </button>
             @for (category of categories(); track category) {
               <button
                 (click)="selectedCategory.set(category)"
                 [class.bg-stone-900]="selectedCategory() === category"
-                [class.dark:bg-stone-100]="selectedCategory() === category"
+                [class.dark:bg-white]="selectedCategory() === category"
                 [class.text-white]="selectedCategory() === category"
                 [class.dark:text-stone-900]="selectedCategory() === category"
-                [class.bg-stone-100]="selectedCategory() !== category"
-                [class.dark:bg-stone-800]="selectedCategory() !== category"
-                [class.text-stone-600]="selectedCategory() !== category"
-                [class.dark:text-stone-300]="selectedCategory() !== category"
-                class="relative px-4 py-2 rounded-full text-sm font-medium transition-all duration-150 whitespace-nowrap hover:scale-105 active:scale-95"
+                [class.bg-transparent]="selectedCategory() !== category"
+                [class.text-stone-500]="selectedCategory() !== category"
+                [class.hover:bg-stone-100]="selectedCategory() !== category"
+                [class.dark:hover:bg-stone-800]="selectedCategory() !== category"
+                class="px-4 py-1.5 rounded-full text-xs font-bold tracking-wide uppercase transition-all duration-200 whitespace-nowrap"
               >
                 {{ category }}
               </button>
@@ -123,16 +123,16 @@
                   [disabled]="product.stock === 0"
                   [class.opacity-50]="product.stock === 0"
                   [class.cursor-not-allowed]="product.stock === 0"
-                  class="group relative flex flex-col text-left bg-white/80 dark:bg-stone-800/80 backdrop-blur-md rounded-2xl border border-stone-200/60 dark:border-stone-700/60 shadow-sm hover:shadow-xl hover:shadow-stone-300/40 dark:hover:shadow-stone-900/50 hover:border-stone-300 dark:hover:border-stone-500 hover:-translate-y-1 transition-all duration-300 ease-out overflow-hidden disabled:hover:border-stone-200/60 disabled:hover:-translate-y-0"
+                  class="group relative flex flex-col text-left bg-white dark:bg-[#111111] rounded-2xl border border-stone-200 dark:border-stone-800 shadow-sm hover:shadow-xl hover:shadow-stone-200/50 dark:hover:shadow-stone-900/50 hover:border-stone-300 dark:hover:border-stone-700 hover:-translate-y-1 transition-all duration-300 ease-out overflow-hidden disabled:hover:border-stone-200 disabled:hover:-translate-y-0"
                   (click)="addToCart(product)"
                   [attr.aria-label]="'Agregar ' + product.name + ' al carrito'"
                 >
-                  <div class="aspect-square w-full overflow-hidden bg-stone-100 dark:bg-stone-900 relative p-1.5 rounded-t-2xl">
+                  <div class="aspect-[4/3] w-full overflow-hidden bg-stone-50 dark:bg-stone-900 relative p-1 rounded-t-2xl">
                     @if (product.image) {
                       <img 
                         [src]="product.image" 
                         [alt]="product.name"
-                        class="h-full w-full object-cover rounded-xl shadow-inner border border-stone-200/50 dark:border-stone-700/50"
+                        class="h-full w-full object-cover rounded-xl"
                         loading="lazy"
                       />
                     } @else {
@@ -141,28 +141,21 @@
                       </div>
                     }
                     
-                    <!-- Badge de stock mejorado con alerta visual -->
-                    <div class="absolute top-2 right-2 flex flex-col gap-1 items-end">
-                      <span 
-                        [class.bg-white/95]="product.stock > 10"
-                        [class.bg-orange-500]="product.stock <= 10 && product.stock > 5"
-                        [class.bg-red-500]="product.stock <= 5 && product.stock > 0"
-                        [class.bg-stone-500]="product.stock === 0"
-                        [class.text-stone-600]="product.stock > 10"
-                        [class.text-white]="product.stock <= 10"
-                        [class.animate-pulse]="product.stock <= 5 && product.stock > 0"
-                        class="text-[10px] font-bold px-2 py-1 rounded-md shadow-lg flex items-center gap-1"
-                      >
-                        @if (product.stock <= 5 && product.stock > 0) {
-                          <span class="material-icons-outlined text-xs">warning</span>
-                        }
-                        {{ product.stock === 0 ? 'Agotado' : product.stock + ' un.' }}
-                      </span>
+                    <!-- Badge de stock minimalista -->
+                    <div class="absolute top-2 right-2">
+                      <div class="flex items-center gap-1.5 px-2.5 py-1 bg-white/90 dark:bg-stone-900/90 backdrop-blur-md rounded-full shadow-sm border border-stone-200/50 dark:border-stone-700/50">
+                        <span class="w-1.5 h-1.5 rounded-full"
+                              [ngClass]="product.stock > 10 ? 'bg-emerald-500' : product.stock > 0 ? 'bg-amber-500 animate-pulse' : 'bg-red-500'"></span>
+                        <span class="text-[10px] font-bold uppercase tracking-wider"
+                              [ngClass]="product.stock === 0 ? 'text-red-600 dark:text-red-400' : 'text-stone-700 dark:text-stone-300'">
+                          {{ product.stock === 0 ? 'Agotado' : product.stock + ' un' }}
+                        </span>
+                      </div>
                     </div>
 
                     @if (product.stock === 0) {
-                      <div class="absolute inset-0 bg-black/60 flex items-center justify-center">
-                        <span class="text-white font-bold text-sm">SIN STOCK</span>
+                      <div class="absolute inset-0 bg-white/40 dark:bg-black/40 backdrop-blur-[2px] flex items-center justify-center">
+                        <span class="text-red-600 dark:text-red-400 font-bold text-sm bg-white dark:bg-stone-900 px-3 py-1 rounded-full shadow-lg border border-red-100 dark:border-red-900/30">AGOTADO</span>
                       </div>
                     }
                   </div>
@@ -202,8 +195,8 @@
         </div>
       </div>
 
-      <!-- Panel derecho: Carrito (Bento Glass Panel Desktop) -->
-      <div class="hidden md:flex w-[380px] shrink-0 flex-col bg-white/70 dark:bg-stone-900/40 backdrop-blur-3xl rounded-[2rem] border border-white/80 dark:border-stone-800/60 shadow-2xl shadow-stone-200/50 dark:shadow-black/40 overflow-hidden transition-colors duration-300">
+      <!-- Panel derecho: Carrito (Receipt Panel Desktop) -->
+      <div class="hidden md:flex w-[380px] lg:w-[420px] shrink-0 flex-col bg-white dark:bg-[#111111] rounded-[2rem] border border-stone-200 dark:border-stone-800 shadow-2xl shadow-stone-200/50 dark:shadow-black/40 overflow-hidden transition-colors duration-300">
         
         <!-- Header del carrito -->
         <div class="p-5 border-b border-stone-200/50 dark:border-stone-800/50 bg-transparent flex items-center justify-between">
@@ -242,70 +235,67 @@
           }
 
           @for (item of cart(); track item.product.id + '-' + (item.variant?.id || 'no-variant')) {
-            <div class="flex gap-3 items-start bg-white/40 dark:bg-stone-800/30 backdrop-blur-md rounded-2xl p-3 animate-in slide-in-from-right-4 duration-300 border border-stone-200/50 dark:border-stone-700/50 hover:border-stone-300 dark:hover:border-stone-600 transition-all">
+            <div class="flex gap-4 items-start py-4 border-b border-stone-100 dark:border-stone-800/50 animate-in fade-in duration-300 group">
               <!-- Imagen -->
-              <div class="h-16 w-16 rounded-xl bg-white dark:bg-stone-900 overflow-hidden shrink-0 border border-stone-100 dark:border-stone-800 p-1">
+              <div class="h-14 w-14 rounded-xl bg-stone-50 dark:bg-stone-800/50 overflow-hidden shrink-0 border border-stone-200/50 dark:border-stone-700/50">
                 <img 
                   [src]="item.product.image" 
                   [alt]="item.product.name"
                   loading="lazy"
-                  class="h-full w-full object-cover rounded-lg"
+                  class="h-full w-full object-cover"
                 />
               </div>
               
               <!-- Info del producto -->
-              <div class="flex-1 min-w-0">
-                <p class="text-sm font-semibold text-stone-800 dark:text-stone-100 truncate">
+              <div class="flex-1 min-w-0 pt-0.5">
+                <p class="text-sm font-bold text-stone-900 dark:text-stone-100 leading-tight">
                   {{ item.product.name }}
                 </p>
-                <p class="text-xs text-stone-500 dark:text-stone-400 mt-1">
-                  S/ {{ item.product.price | number:'1.2-2' }} c/u
-                </p>
-                @if (item.variant) {
-                  <p class="text-xs text-stone-700 dark:text-stone-300 mt-1.5 flex items-center gap-1.5">
-                    <span class="inline-flex items-center px-2 py-0.5 rounded bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 font-medium text-[10px]">
-                      {{ item.variant.size }}
-                    </span>
-                    <span class="text-stone-400 dark:text-stone-500">•</span>
-                    <span class="font-medium">{{ item.variant.color }}</span>
+                <div class="flex items-center gap-2 mt-1">
+                  <p class="text-[11px] text-stone-500 dark:text-stone-400 font-medium">
+                    S/ {{ item.product.price | number:'1.2-2' }} c/u
                   </p>
-                }
+                  @if (item.variant) {
+                    <span class="text-stone-300 dark:text-stone-600">•</span>
+                    <p class="text-[10px] text-stone-600 dark:text-stone-400 font-bold uppercase tracking-wider bg-stone-100 dark:bg-stone-800 px-1.5 py-0.5 rounded">
+                      {{ item.variant.size }} | {{ item.variant.color }}
+                    </p>
+                  }
+                </div>
                 
                 <!-- Subtotal del item -->
-                <p class="text-base font-bold text-stone-900 dark:text-stone-100 mt-2">
+                <p class="text-sm font-bold text-stone-900 dark:text-stone-100 mt-2.5">
                   S/ {{ (item.product.price * item.quantity) | number:'1.2-2' }}
                 </p>
               </div>
 
               <!-- Controles de cantidad -->
-              <div class="flex flex-col items-end gap-2 shrink-0">
+              <div class="flex flex-col items-end justify-between h-full py-0.5">
                 <button
                   (click)="removeFromCart(item.product.id, item.variant?.id)"
-                  class="text-stone-400 hover:text-red-500 transition-colors duration-300"
+                  class="text-stone-300 hover:text-red-500 transition-colors duration-200 opacity-0 group-hover:opacity-100"
                   aria-label="Eliminar del carrito"
                 >
-                  <span class="material-icons-outlined text-lg">close</span>
+                  <span class="material-icons-outlined text-sm">close</span>
                 </button>
                 
-                <div class="flex items-center gap-1 bg-white/50 dark:bg-stone-900/50 backdrop-blur-sm rounded-lg p-1 border border-stone-200/50 dark:border-stone-700/50 shadow-sm">
+                <div class="flex items-center gap-3 mt-4">
                   <button 
                     (click)="updateQuantity(item.product.id, item.variant?.id, -1)"
                     [disabled]="item.quantity <= 1"
-                    class="w-7 h-7 flex items-center justify-center rounded-md bg-transparent hover:bg-stone-200/50 dark:hover:bg-stone-800 text-stone-700 dark:text-stone-200 font-bold transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed active:scale-90"
-                    aria-label="Disminuir cantidad"
+                    class="w-6 h-6 flex items-center justify-center rounded-full text-stone-400 hover:text-stone-900 hover:bg-stone-100 dark:hover:text-white dark:hover:bg-stone-800 transition-all disabled:opacity-30"
                   >
-                    -
+                    <span class="material-icons-outlined text-[16px]">remove</span>
                   </button>
-                  <span class="text-sm font-bold w-6 text-center text-stone-900 dark:text-stone-100">
+                  <span class="text-sm font-bold w-4 text-center text-stone-900 dark:text-stone-100">
                     {{ item.quantity }}
                   </span>
                   <button 
                     (click)="updateQuantity(item.product.id, item.variant?.id, 1)"
                     [disabled]="item.quantity >= (item.variant ? item.variant.stock : item.product.stock)"
-                    class="w-7 h-7 flex items-center justify-center rounded-md bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 font-bold hover:bg-black dark:hover:bg-stone-200 transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed active:scale-90"
-                    aria-label="Aumentar cantidad"
+                    class="w-6 h-6 flex items-center justify-center rounded-full text-stone-400 hover:text-stone-900 hover:bg-stone-100 dark:hover:text-white dark:hover:bg-stone-800 transition-all disabled:opacity-30"
                   >
-                    +
+                    <span class="material-icons-outlined text-[16px]">add</span>
                   </button>
                 </div>
               </div>
@@ -396,21 +386,21 @@
               <div class="grid grid-cols-3 gap-2">
                 <button
                   (click)="quickPayment('cash')"
-                  class="px-2 py-2.5 bg-white/60 dark:bg-stone-800/60 backdrop-blur-sm rounded-xl border border-stone-200/50 dark:border-stone-700/50 hover:bg-emerald-50 hover:border-emerald-200 hover:text-emerald-700 dark:hover:bg-emerald-900/30 transition-all text-[11px] font-bold text-stone-600 dark:text-stone-300 active:scale-95 flex flex-col items-center gap-1"
+                  class="px-2 py-3 bg-transparent hover:bg-emerald-50 dark:hover:bg-emerald-900/20 rounded-xl transition-all text-[11px] font-bold text-stone-500 hover:text-emerald-700 dark:text-stone-400 dark:hover:text-emerald-400 active:scale-95 flex flex-col items-center gap-1.5 group"
                 >
-                  <span class="text-lg">💵</span> Efectivo
+                  <span class="text-2xl grayscale opacity-70 group-hover:grayscale-0 group-hover:opacity-100 transition-all">💵</span> EFECTIVO
                 </button>
                 <button
                   (click)="quickPayment('yape')"
-                  class="px-2 py-2.5 bg-white/60 dark:bg-stone-800/60 backdrop-blur-sm rounded-xl border border-stone-200/50 dark:border-stone-700/50 hover:bg-purple-50 hover:border-purple-200 hover:text-purple-700 dark:hover:bg-purple-900/30 transition-all text-[11px] font-bold text-stone-600 dark:text-stone-300 active:scale-95 flex flex-col items-center gap-1"
+                  class="px-2 py-3 bg-transparent hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-xl transition-all text-[11px] font-bold text-stone-500 hover:text-purple-700 dark:text-stone-400 dark:hover:text-purple-400 active:scale-95 flex flex-col items-center gap-1.5 group"
                 >
-                  <span class="text-lg">📱</span> Yape
+                  <span class="text-2xl grayscale opacity-70 group-hover:grayscale-0 group-hover:opacity-100 transition-all">📱</span> YAPE
                 </button>
                 <button
                   (click)="quickPayment('card')"
-                  class="px-2 py-2.5 bg-white/60 dark:bg-stone-800/60 backdrop-blur-sm rounded-xl border border-stone-200/50 dark:border-stone-700/50 hover:bg-blue-50 hover:border-blue-200 hover:text-blue-700 dark:hover:bg-blue-900/30 transition-all text-[11px] font-bold text-stone-600 dark:text-stone-300 active:scale-95 flex flex-col items-center gap-1"
+                  class="px-2 py-3 bg-transparent hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-xl transition-all text-[11px] font-bold text-stone-500 hover:text-blue-700 dark:text-stone-400 dark:hover:text-blue-400 active:scale-95 flex flex-col items-center gap-1.5 group"
                 >
-                  <span class="text-lg">💳</span> Tarjeta
+                  <span class="text-2xl grayscale opacity-70 group-hover:grayscale-0 group-hover:opacity-100 transition-all">💳</span> TARJETA
                 </button>
               </div>
             }
@@ -648,8 +638,8 @@
       @if (selectedProductForVariant()) {
         <div class="space-y-6">
           <!-- Imagen del producto -->
-          <div class="flex flex-col items-center gap-3 pb-5 border-b border-stone-100 dark:border-stone-700">
-            <div class="h-28 w-28 rounded-2xl bg-linear-to-br from-stone-50 to-stone-100 dark:from-stone-800 dark:to-stone-700 overflow-hidden shadow-sm">
+          <div class="flex items-center gap-4 pb-4 border-b border-stone-100 dark:border-stone-800">
+            <div class="h-16 w-16 rounded-xl bg-stone-50 dark:bg-stone-900 overflow-hidden shrink-0">
               <img 
                 [src]="selectedProductForVariant()!.image" 
                 [alt]="selectedProductForVariant()!.name"
@@ -657,66 +647,34 @@
                 class="h-full w-full object-cover"
               />
             </div>
-            <div class="text-center space-y-1">
-              <h3 class="text-lg font-bold text-stone-800 dark:text-stone-100 leading-tight">{{ selectedProductForVariant()!.name }}</h3>
-              <p class="text-2xl font-bold text-amber-600 dark:text-amber-500">S/ {{ selectedProductForVariant()!.price | number:'1.2-2' }}</p>
+            <div>
+              <h3 class="text-sm font-bold text-stone-900 dark:text-stone-100 leading-tight">{{ selectedProductForVariant()!.name }}</h3>
+              <p class="text-sm font-bold text-stone-500 mt-0.5">S/ {{ selectedProductForVariant()!.price | number:'1.2-2' }}</p>
             </div>
           </div>
 
           <!-- Lista de variantes minimalista -->
           <div class="space-y-2">
-            <p class="text-xs font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wide">Variantes Disponibles</p>
-            <div class="space-y-2 max-h-56 overflow-y-auto no-scrollbar pr-1">
+            <p class="text-[10px] font-bold text-stone-400 dark:text-stone-500 uppercase tracking-widest mb-3">Variantes Disponibles</p>
+            <div class="grid grid-cols-2 gap-2 max-h-60 overflow-y-auto no-scrollbar">
               @for (variant of selectedProductForVariant()!.variants; track variant.id) {
                 <button
                   type="button"
                   (click)="selectVariant(variant)"
                   [disabled]="variant.stock === 0"
-                  class="w-full group transition-all duration-200"
-                  [ngClass]="variant.stock === 0 ? 'opacity-40 cursor-not-allowed' : 'hover:scale-[1.02]'"
+                  class="w-full text-left transition-all duration-200"
+                  [ngClass]="variant.stock === 0 ? 'opacity-40 cursor-not-allowed' : 'active:scale-95'"
                 >
                   <div 
-                    class="flex items-center justify-between p-3 rounded-xl border transition-all duration-300"
+                    class="p-3 rounded-xl border transition-colors flex flex-col gap-1"
                     [ngClass]="selectedVariant()?.id === variant.id 
-                      ? 'border-stone-900 dark:border-stone-100 bg-stone-900 dark:bg-stone-100 shadow-md' 
-                      : 'border-stone-200 dark:border-stone-600 bg-white dark:bg-stone-800 hover:border-stone-300 dark:hover:border-stone-500'"
+                      ? 'border-stone-900 dark:border-white bg-stone-900 dark:bg-white text-white dark:text-stone-900' 
+                      : 'border-stone-200 dark:border-stone-800 bg-white dark:bg-[#111111] hover:border-stone-400 text-stone-900 dark:text-stone-100'"
                   >
-                    <div class="flex items-center gap-2.5">
-                      <div class="h-8 w-8 rounded-lg flex items-center justify-center font-bold text-xs transition-colors duration-300"
-                        [ngClass]="selectedVariant()?.id === variant.id 
-                          ? 'bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100' 
-                          : 'bg-stone-100 dark:bg-stone-700 text-stone-700 dark:text-stone-300 group-hover:bg-stone-200 dark:group-hover:bg-stone-600'"
-                      >
-                        {{ variant.size }}
-                      </div>
-                      <span class="font-medium text-sm transition-colors duration-300"
-                        [ngClass]="selectedVariant()?.id === variant.id 
-                          ? 'text-white dark:text-stone-900' 
-                          : 'text-stone-700 dark:text-stone-300'"
-                      >
-                        {{ variant.color }}
-                      </span>
-                    </div>
-                    <div class="flex items-center gap-2">
-                      <span class="text-xs font-medium transition-colors duration-300"
-                        [ngClass]="selectedVariant()?.id === variant.id 
-                          ? 'text-white/70 dark:text-stone-600' 
-                          : 'text-stone-400 dark:text-stone-500'"
-                      >
-                        Stock
-                      </span>
-                      <span class="text-sm font-bold transition-colors duration-300"
-                        [ngClass]="
-                          selectedVariant()?.id === variant.id 
-                            ? 'text-white dark:text-stone-900' 
-                            : variant.stock === 0 
-                              ? 'text-red-500' 
-                              : 'text-stone-900 dark:text-stone-100'
-                        "
-                      >
-                        {{ variant.stock }}
-                      </span>
-                    </div>
+                    <span class="font-bold text-xs">{{ variant.size }} • {{ variant.color }}</span>
+                    <span class="text-[10px] opacity-70">
+                      {{ variant.stock === 0 ? 'Agotado' : variant.stock + ' disp.' }}
+                    </span>
                   </div>
                 </button>
               }
@@ -797,7 +755,7 @@
           </div>
           <div>
             <h2 class="text-lg font-bold text-stone-800 dark:text-stone-100">Cliente Nuevo</h2>
-            <p class="text-[10px] text-stone-500 uppercase tracking-widest font-mono">Registro en Caja</p>
+            <p class="text-[10px] text-stone-500 uppercase tracking-widest font-bold">Registro en Caja</p>
           </div>
         </div>
 
@@ -833,14 +791,14 @@
           <button 
             type="button"
             (click)="showNewClientModal.set(false)"
-            class="px-4 py-3 bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-300 font-bold text-sm rounded-xl hover:bg-stone-50 transition-all font-mono"
+            class="px-4 py-3 bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-300 font-bold text-sm rounded-xl hover:bg-stone-50 transition-all"
           >
             CANCELAR
           </button>
           <button 
             type="button"
             (click)="saveNewClient()"
-            class="px-4 py-3 bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 font-bold text-sm rounded-xl hover:bg-black transition-all shadow-lg shadow-stone-900/20 active:scale-95 font-mono"
+            class="px-4 py-3 bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 font-bold text-sm rounded-xl hover:bg-black transition-all shadow-lg shadow-stone-900/20 active:scale-95"
           >
             GUARDAR
           </button>

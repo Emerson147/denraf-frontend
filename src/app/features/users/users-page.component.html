@@ -107,7 +107,7 @@
   <app-ui-animated-dialog [isOpen]="isModalOpen()" (isOpenChange)="isModalOpen.set($event)">
     <div class="flex items-center justify-between mb-6 border-b border-stone-100 dark:border-stone-800 pb-4">
       <div>
-        <h2 class="text-xl font-serif font-bold text-stone-900 dark:text-stone-100">{{ isEditing() ? 'Editar Usuario' : 'Nuevo Usuario' }}</h2>
+        <h2 class="text-xl font-bold text-stone-900 dark:text-stone-100">{{ isEditing() ? 'Editar Usuario' : 'Nuevo Usuario' }}</h2>
         <p class="text-xs text-stone-400 font-medium tracking-wide uppercase">{{ isEditing() ? 'Actualizar credenciales' : 'Registrar nueva cuenta' }}</p>
       </div>
       <div class="h-10 w-10 rounded-xl bg-stone-100 dark:bg-stone-800 flex items-center justify-center text-stone-600 dark:text-stone-300">

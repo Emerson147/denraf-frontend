@@ -36,7 +36,7 @@
           @if (isLoading()) {
             <div class="h-7 w-16 bg-stone-100 dark:bg-stone-800 rounded-lg animate-pulse"></div>
           } @else {
-            <p class="text-2xl font-serif font-bold text-stone-900 dark:text-stone-100">{{ clientService.totalClients() }}</p>
+            <p class="text-2xl font-bold text-stone-900 dark:text-stone-100">{{ clientService.totalClients() }}</p>
             <p class="text-xs text-stone-500 dark:text-stone-400 mt-0.5">Clientes registrados</p>
           }
         </div>
@@ -54,7 +54,7 @@
           @if (isLoading()) {
             <div class="h-7 w-12 bg-stone-100 dark:bg-stone-800 rounded-lg animate-pulse"></div>
           } @else {
-            <p class="text-2xl font-serif font-bold text-amber-600 dark:text-amber-500">{{ goldClients() }}</p>
+            <p class="text-2xl font-bold text-amber-600 dark:text-amber-500">{{ goldClients() }}</p>
             <p class="text-xs text-stone-500 dark:text-stone-400 mt-0.5">Alta recurrencia</p>
           }
         </div>
@@ -72,7 +72,7 @@
           @if (isLoading()) {
             <div class="h-7 w-24 bg-stone-100 dark:bg-stone-800 rounded-lg animate-pulse"></div>
           } @else {
-            <p class="text-2xl font-serif font-bold text-teal-700 dark:text-teal-400">
+            <p class="text-2xl font-bold text-teal-700 dark:text-teal-400">
               S/ {{ totalClientValue() | number: '1.0-0' }}
             </p>
           }
@@ -164,7 +164,7 @@
 
             <!-- Client Header -->
             <div class="relative z-10 flex items-start gap-4 mb-5">
-              <div class="h-12 w-12 rounded-xl bg-stone-100 dark:bg-stone-800 flex items-center justify-center text-lg font-serif font-semibold text-stone-600 dark:text-stone-300 shrink-0">
+              <div class="h-12 w-12 rounded-xl bg-stone-100 dark:bg-stone-800 flex items-center justify-center text-lg font-bold text-stone-600 dark:text-stone-300 shrink-0">
                 {{ client.name.charAt(0).toUpperCase() }}
               </div>
 
@@ -256,7 +256,7 @@
 <app-ui-animated-dialog [isOpen]="isDialogOpen()" (isOpenChange)="isDialogOpen.set($event)">
   <div class="flex items-center justify-between mb-6 border-b border-stone-100 dark:border-stone-800 pb-4">
     <div>
-      <h2 class="text-xl font-serif font-semibold text-stone-800 dark:text-stone-100">{{ modalTitle() }}</h2>
+      <h2 class="text-xl font-bold text-stone-800 dark:text-stone-100">{{ modalTitle() }}</h2>
       <p class="text-xs text-stone-400 dark:text-stone-500 font-medium tracking-wide uppercase">
         {{ isEditing() ? 'Actualizar datos del cliente' : 'Registro de perfil' }}
       </p>

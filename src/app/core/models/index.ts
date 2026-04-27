@@ -79,6 +79,7 @@ export interface InventoryMovement {
   movementNumber: string; // Ej: "MOV-001", "ENTRADA-001", "SALIDA-001"
   type: 'entrada' | 'salida' | 'ajuste' | 'devolucion';
   date: Date;
+  createdAt?: any; // Añadido para compatibilidad con Spring Boot
   productId: string;
   productName: string;
   variantId?: string;

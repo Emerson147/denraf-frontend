@@ -193,10 +193,30 @@ export class InventoryMovementsComponent {
   }
 
   /**
-   * Formatear fecha
+   * Formatear fecha (Maneja arrays de Spring Boot o strings ISO)
    */
-  formatDate(date: Date): string {
-    return new Date(date).toLocaleDateString('es-ES', {
+  formatDate(dateInput: any): string {
+    if (!dateInput) return 'Sin fecha';
+
+    let parsedDate: Date;
+    
+    // Si Spring Boot envía un array: [YYYY, MM, DD, HH, mm, ss]
+    if (Array.isArray(dateInput)) {
+      parsedDate = new Date(
+        dateInput[0], 
+        dateInput[1] - 1, // Los meses en JS son 0-11
+        dateInput[2], 
+        dateInput[3] || 0, 
+        dateInput[4] || 0, 
+        dateInput[5] || 0
+      );
+    } else {
+      parsedDate = new Date(dateInput);
+    }
+
+    if (isNaN(parsedDate.getTime())) return 'Fecha Inválida';
+
+    return parsedDate.toLocaleDateString('es-ES', {
       day: '2-digit',
       month: 'short',
       year: 'numeric',

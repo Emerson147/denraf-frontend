@@ -16,29 +16,41 @@
       </div>
     </app-ui-page-header>
 
-    <!-- Resumen Cards Minimalistas -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <div class="bg-transparent p-4 flex flex-col justify-between border-l-2 border-stone-200 dark:border-stone-800">
-        <p class="text-[10px] font-bold text-stone-400 dark:text-stone-500 uppercase tracking-widest mb-2">Volumen de Transacciones</p>
-        <div class="flex items-end gap-3">
-          <h3 class="text-4xl font-bold tracking-tight text-stone-900 dark:text-stone-100">{{ summary().count }}</h3>
-          <span class="material-icons-outlined text-stone-300 dark:text-stone-700 pb-1">receipt_long</span>
+    <!-- Resumen Bento Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+      <!-- Card: Volumen -->
+      <div class="relative overflow-hidden bg-white dark:bg-stone-900/40 p-6 rounded-[2rem] border border-stone-200/60 dark:border-stone-800 shadow-sm hover:shadow-md transition-all duration-500 group">
+        <div class="absolute -right-4 -top-4 w-24 h-24 bg-stone-100 dark:bg-stone-800/40 rounded-full blur-2xl group-hover:bg-stone-200/50 transition-colors duration-500"></div>
+        <p class="text-[10px] font-bold text-stone-400 dark:text-stone-500 uppercase tracking-[0.2em] mb-4">Volumen de Transacciones</p>
+        <div class="flex items-center justify-between">
+          <h3 class="text-4xl font-bold tracking-tight text-stone-900 dark:text-stone-100">{{ salesService.totalElements() }}</h3>
+          <div class="h-10 w-10 rounded-2xl bg-stone-100 dark:bg-stone-800 flex items-center justify-center text-stone-400 group-hover:text-stone-900 dark:group-hover:text-stone-100 transition-colors">
+            <span class="material-icons-outlined">analytics</span>
+          </div>
         </div>
       </div>
       
-      <div class="bg-transparent p-4 flex flex-col justify-between border-l-2 border-stone-200 dark:border-stone-800">
-        <p class="text-[10px] font-bold text-stone-400 dark:text-stone-500 uppercase tracking-widest mb-2">Ingresos Totales</p>
-        <div class="flex items-end gap-3">
+      <!-- Card: Ingresos -->
+      <div class="relative overflow-hidden bg-white dark:bg-stone-900/40 p-6 rounded-[2rem] border border-stone-200/60 dark:border-stone-800 shadow-sm hover:shadow-md transition-all duration-500 group">
+        <div class="absolute -right-4 -top-4 w-24 h-24 bg-emerald-50 dark:bg-emerald-900/10 rounded-full blur-2xl group-hover:bg-emerald-100/30 transition-colors duration-500"></div>
+        <p class="text-[10px] font-bold text-stone-400 dark:text-stone-500 uppercase tracking-[0.2em] mb-4 text-emerald-600/80 dark:text-emerald-400/80">Ingresos Totales</p>
+        <div class="flex items-center justify-between">
           <h3 class="text-4xl font-bold tracking-tight text-stone-900 dark:text-stone-100">S/ {{ summary().total | number : '1.2-2' }}</h3>
-          <span class="material-icons-outlined text-stone-300 dark:text-stone-700 pb-1">trending_up</span>
+          <div class="h-10 w-10 rounded-2xl bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400 transition-colors">
+            <span class="material-icons-outlined">payments</span>
+          </div>
         </div>
       </div>
 
-      <div class="bg-transparent p-4 flex flex-col justify-between border-l-2 border-stone-200 dark:border-stone-800">
-        <p class="text-[10px] font-bold text-stone-400 dark:text-stone-500 uppercase tracking-widest mb-2">Ticket Promedio</p>
-        <div class="flex items-end gap-3">
+      <!-- Card: Ticket Promedio -->
+      <div class="relative overflow-hidden bg-white dark:bg-stone-900/40 p-6 rounded-[2rem] border border-stone-200/60 dark:border-stone-800 shadow-sm hover:shadow-md transition-all duration-500 group">
+        <div class="absolute -right-4 -top-4 w-24 h-24 bg-amber-50 dark:bg-amber-900/10 rounded-full blur-2xl group-hover:bg-amber-100/30 transition-colors duration-500"></div>
+        <p class="text-[10px] font-bold text-stone-400 dark:text-stone-500 uppercase tracking-[0.2em] mb-4 text-amber-600/80 dark:text-amber-400/80">Ticket Promedio</p>
+        <div class="flex items-center justify-between">
           <h3 class="text-4xl font-bold tracking-tight text-stone-900 dark:text-zinc-100">S/ {{ summary().average | number : '1.2-2' }}</h3>
-          <span class="material-icons-outlined text-stone-300 dark:text-stone-700 pb-1">shopping_bag</span>
+          <div class="h-10 w-10 rounded-2xl bg-amber-50 dark:bg-amber-900/20 flex items-center justify-center text-amber-600 dark:text-amber-400 transition-colors">
+            <span class="material-icons-outlined">shopping_cart</span>
+          </div>
         </div>
       </div>
     </div>
@@ -75,65 +87,96 @@
       </div>
     </div>
 
-    <!-- TABLA DE DATOS (Zen Minimalista) -->
-    <div class="bg-white dark:bg-stone-900 rounded-3xl border border-stone-200/60 dark:border-stone-800 shadow-sm overflow-hidden transition-colors duration-300">
+    <!-- TABLA DE DATOS (Zen Canvas) -->
+    <div class="bg-white/80 dark:bg-stone-900/80 backdrop-blur-xl rounded-[2.5rem] border border-stone-200/60 dark:border-stone-800 shadow-xl shadow-stone-200/20 dark:shadow-none overflow-hidden transition-all duration-300">
       
       @if (filteredSales().length === 0 && !salesService.isLoading()) {
         <app-ui-empty-state icon="receipt_long" title="Sin resultados" description="No encontramos ninguna venta en este periodo." />
       } @else if (salesService.isLoading()) {
-        <div class="p-12 flex justify-center items-center"><div class="animate-spin h-8 w-8 border-4 border-stone-200 border-t-stone-900 dark:border-t-stone-100 rounded-full"></div></div>
+        <div class="p-24 flex flex-col justify-center items-center gap-4">
+          <div class="animate-spin h-10 w-10 border-[3px] border-stone-200 border-t-stone-900 dark:border-t-stone-100 rounded-full"></div>
+          <p class="text-xs font-bold text-stone-400 uppercase tracking-widest animate-pulse">Sincronizando...</p>
+        </div>
       } @else {
-        <div class="overflow-x-auto">
+        <div class="overflow-x-auto no-scrollbar">
           <table class="w-full text-left border-collapse text-sm">
-            <thead class="sticky top-0 bg-stone-50/90 dark:bg-stone-900/90 backdrop-blur-md z-10">
-              <tr class="border-b border-stone-100 dark:border-stone-800 text-stone-400 dark:text-stone-500 text-xs tracking-wider uppercase">
-                <th class="px-6 py-4 font-medium">Factura</th>
-                <th class="px-6 py-4 font-medium">Fecha</th>
-                <th class="px-6 py-4 font-medium">Cliente</th>
-                <th class="px-6 py-4 font-medium hidden sm:table-cell">Productos</th>
-                <th class="px-6 py-4 font-medium text-right">Total</th>
-                <th class="px-6 py-4 font-medium text-center">Estado</th>
-                <th class="px-6 py-4 font-medium text-right sticky right-0 bg-stone-50/90 dark:bg-stone-900/90 backdrop-blur-md">Acciones</th>
+            <thead>
+              <tr class="text-stone-400 dark:text-stone-500 text-[10px] font-bold tracking-[0.2em] uppercase">
+                <th class="px-8 py-6">Factura</th>
+                <th class="px-8 py-6">Fecha y Hora</th>
+                <th class="px-8 py-6">Información del Cliente</th>
+                <th class="px-8 py-6 hidden lg:table-cell">Volumen</th>
+                <th class="px-8 py-6 text-right">Total Neto</th>
+                <th class="px-8 py-6 text-center">Estado</th>
+                <th class="px-8 py-6 text-right sticky right-0 bg-white/90 dark:bg-stone-900/90 backdrop-blur-md">Gestión</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-stone-50/50 dark:divide-stone-800/30">
+            <tbody class="divide-y divide-stone-100 dark:divide-stone-800/50">
               @for (sale of filteredSales(); track sale.id; let idx = $index) {
-                <tr class="group hover:bg-stone-50/80 dark:hover:bg-stone-800/40 transition-colors duration-200 animate-in fade-in slide-in-from-bottom-2 fill-mode-both" [style.animation-delay]="(idx * 40) + 'ms'">
-                  <td class="px-6 py-4 whitespace-nowrap">
-                    <span class="font-mono text-stone-900 dark:text-stone-200 font-bold bg-stone-100 dark:bg-stone-800/50 px-2 py-1 rounded-md text-xs">{{ sale.saleNumber }}</span>
+                <tr class="group hover:bg-stone-50/50 dark:hover:bg-stone-800/30 transition-all duration-300 cursor-default animate-in fade-in slide-in-from-bottom-4 fill-mode-both" [style.animation-delay]="(idx * 30) + 'ms'">
+                  <td class="px-8 py-5">
+                    <div class="flex items-center gap-3">
+                      <div class="h-8 w-8 rounded-full bg-stone-100 dark:bg-stone-800 flex items-center justify-center text-stone-400 group-hover:bg-stone-900 dark:group-hover:bg-stone-100 group-hover:text-white dark:group-hover:text-stone-900 transition-all duration-500">
+                        <span class="material-icons-outlined text-[14px]">tag</span>
+                      </div>
+                      <span class="font-mono text-[13px] text-stone-900 dark:text-stone-100 font-bold tracking-tighter">{{ sale.saleNumber }}</span>
+                    </div>
                   </td>
-                  <td class="px-6 py-4 text-xs font-medium text-stone-500 dark:text-stone-400">
-                    {{ sale.date | date : 'dd MMM, h:mm a' }}
+                  <td class="px-8 py-5">
+                    <div class="flex flex-col gap-0.5">
+                      <span class="text-stone-900 dark:text-stone-200 font-semibold">{{ sale.date | date : 'dd MMM, yyyy' }}</span>
+                      <span class="text-[10px] text-stone-400 dark:text-stone-500 font-bold uppercase tracking-widest">{{ sale.date | date : 'h:mm a' }}</span>
+                    </div>
                   </td>
-                  <td class="px-6 py-4">
-                    <span class="font-bold text-sm text-stone-800 dark:text-stone-200">{{ sale.customer?.name || 'Cliente Casual' }}</span>
+                  <td class="px-8 py-5">
+                    <div class="flex items-center gap-3">
+                      <div class="h-9 w-9 rounded-2xl bg-stone-100 dark:bg-stone-800 flex items-center justify-center text-stone-400 font-bold text-sm">
+                        {{ (sale.customer?.name || 'C')[0] }}
+                      </div>
+                      <div class="flex flex-col">
+                        <span class="font-bold text-stone-900 dark:text-stone-100 leading-tight">{{ sale.customer?.name || 'Cliente Casual' }}</span>
+                        <span class="text-[10px] text-stone-400 dark:text-stone-500 font-medium tracking-tight">{{ sale.customer?.phone || 'Sin contacto' }}</span>
+                      </div>
+                    </div>
                   </td>
-                  <td class="px-6 py-4 hidden sm:table-cell">
-                    <span class="text-[11px] font-bold tracking-widest text-stone-400 dark:text-stone-500 uppercase bg-stone-50 dark:bg-stone-800/40 px-2.5 py-1 rounded-full border border-stone-100 dark:border-stone-700/50">
-                      {{ sale.items.length }} Items
-                    </span>
+                  <td class="px-8 py-5 hidden lg:table-cell">
+                    <div class="flex items-center gap-2">
+                      <div class="flex -space-x-2">
+                        @for (item of sale.items.slice(0, 3); track $index) {
+                          <div class="h-6 w-6 rounded-full border-2 border-white dark:border-stone-900 bg-stone-200 dark:bg-stone-700 flex items-center justify-center text-[8px] font-bold text-stone-500 overflow-hidden">
+                            {{ item.productName[0] }}
+                          </div>
+                        }
+                      </div>
+                      <span class="text-[11px] font-bold text-stone-500 dark:text-stone-400">
+                        {{ sale.items.length }} Items
+                      </span>
+                    </div>
                   </td>
-                  <td class="px-6 py-4 text-right">
-                    <span class="font-black text-stone-900 dark:text-white">S/ {{ sale.total | number : '1.2-2' }}</span>
+                  <td class="px-8 py-5 text-right">
+                    <div class="flex flex-col items-end">
+                      <span class="font-black text-[15px] text-stone-900 dark:text-white tracking-tight">S/ {{ sale.total | number : '1.2-2' }}</span>
+                      <span class="text-[9px] font-bold text-stone-400 dark:text-stone-500 uppercase tracking-tighter">{{ getPaymentMethodLabel(sale.paymentMethod) }}</span>
+                    </div>
                   </td>
-                  <td class="px-6 py-4 text-center">
-                    <div class="inline-flex items-center gap-1.5 text-[10px] font-bold tracking-widest uppercase"
-                         [ngClass]="sale.status === 'completed' ? 'text-emerald-600 dark:text-emerald-400' : sale.status === 'pending' ? 'text-amber-600 dark:text-amber-400' : 'text-red-600 dark:text-red-400'">
-                      <span class="w-1.5 h-1.5 rounded-full" [ngClass]="sale.status === 'completed' ? 'bg-emerald-500' : sale.status === 'pending' ? 'bg-amber-500' : 'bg-red-500'"></span>
+                  <td class="px-8 py-5 text-center">
+                    <div class="px-3 py-1.5 rounded-full inline-flex items-center gap-2 text-[9px] font-black tracking-[0.1em] uppercase transition-all duration-500"
+                         [ngClass]="sale.status === 'completed' ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 border border-emerald-100/50 dark:border-emerald-800/30' : sale.status === 'pending' ? 'bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 border border-amber-100/50 dark:border-amber-800/30' : 'bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border border-red-100/50 dark:border-red-800/30'">
+                      <span class="w-1.5 h-1.5 rounded-full animate-pulse" [ngClass]="sale.status === 'completed' ? 'bg-emerald-500' : sale.status === 'pending' ? 'bg-amber-500' : 'bg-red-500'"></span>
                       {{ getStatusBadge(sale.status).label }}
                     </div>
                   </td>
-                  <td class="px-6 py-4 text-right whitespace-nowrap sticky right-0 bg-white group-hover:bg-stone-50/80 dark:bg-stone-900 dark:group-hover:bg-stone-800/40 transition-colors">
-                    <div class="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <button (click)="viewDetails(sale); $event.stopPropagation()" class="h-8 w-8 rounded-lg bg-transparent hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 transition-colors flex items-center justify-center cursor-pointer" title="Ver Detalles">
-                        <span class="material-icons-outlined text-[16px]">visibility</span>
+                  <td class="px-8 py-5 text-right whitespace-nowrap sticky right-0 bg-white/95 dark:bg-stone-900/95 group-hover:bg-stone-50/95 dark:group-hover:bg-stone-800/95 transition-all duration-300">
+                    <div class="flex items-center justify-end gap-2 translate-x-2 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all duration-500">
+                      <button (click)="viewDetails(sale); $event.stopPropagation()" class="h-9 w-9 rounded-xl bg-white dark:bg-stone-800 shadow-sm border border-stone-200 dark:border-stone-700 text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 hover:border-stone-300 transition-all flex items-center justify-center cursor-pointer group/btn" title="Ver Detalles">
+                        <span class="material-icons-outlined text-[18px] group-hover/btn:scale-110 transition-transform">visibility</span>
                       </button>
-                      <button (click)="printTicket(sale); $event.stopPropagation()" class="h-8 w-8 rounded-lg bg-transparent hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 transition-colors flex items-center justify-center cursor-pointer" title="Imprimir Ticket">
-                        <span class="material-icons-outlined text-[16px]">receipt</span>
+                      <button (click)="printTicket(sale); $event.stopPropagation()" class="h-9 w-9 rounded-xl bg-white dark:bg-stone-800 shadow-sm border border-stone-200 dark:border-stone-700 text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 hover:border-stone-300 transition-all flex items-center justify-center cursor-pointer group/btn" title="Imprimir Ticket">
+                        <span class="material-icons-outlined text-[18px] group-hover/btn:scale-110 transition-transform">receipt</span>
                       </button>
                       @if (sale.status === 'completed') {
-                        <button (click)="openCancelModal(sale); $event.stopPropagation()" class="h-8 w-8 rounded-lg bg-transparent hover:bg-red-50 dark:hover:bg-red-900/20 text-stone-400 hover:text-red-600 dark:hover:text-red-400 transition-colors flex items-center justify-center cursor-pointer" title="Anular Venta">
-                          <span class="material-icons-outlined text-[16px]">block</span>
+                        <button (click)="openCancelModal(sale); $event.stopPropagation()" class="h-9 w-9 rounded-xl bg-red-50/50 dark:bg-red-900/20 shadow-sm border border-red-100 dark:border-red-900/30 text-red-400 hover:text-red-600 dark:hover:text-red-400 hover:border-red-200 transition-all flex items-center justify-center cursor-pointer group/btn" title="Anular Venta">
+                          <span class="material-icons-outlined text-[18px] group-hover/btn:scale-110 transition-transform">block</span>
                         </button>
                       }
                     </div>
@@ -178,91 +221,143 @@
     </div>
 
     <!-- Modal Detalles Premium Receipt -->
-    @if (selectedSale()) {
-      <div class="fixed inset-0 z-50 flex justify-center items-center bg-stone-900/40 dark:bg-black/60 backdrop-blur-[4px] animate-in fade-in" (click)="closeDetails()">
-        <div class="bg-[#fafafa] dark:bg-[#111111] w-full max-w-[420px] rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 font-sans text-sm relative border border-stone-200/50 dark:border-stone-800" (click)="$event.stopPropagation()">
-          
-          <!-- Header -->
-          <div class="p-8 pb-6 border-b-2 border-dashed border-stone-200 dark:border-stone-800 flex flex-col items-center text-center relative mt-2">
-            <button (click)="closeDetails()" class="absolute top-0 right-4 h-8 w-8 rounded-full hover:bg-stone-200 dark:hover:bg-stone-800 flex items-center justify-center transition-all text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 cursor-pointer">
-              <span class="material-icons-outlined text-sm">close</span>
-            </button>
-            <div class="mb-4 text-stone-300 dark:text-stone-700">
-              <span class="material-icons-outlined text-5xl">receipt_long</span>
-            </div>
-            <h4 class="text-xl font-bold tracking-tight text-stone-900 dark:text-white uppercase">{{ selectedSale()!.saleNumber }}</h4>
-            <p class="text-xs text-stone-500 mt-1 dark:text-stone-400 uppercase tracking-widest">{{ selectedSale()!.date | date:'dd/MM/yyyy HH:mm' }}</p>
-            
-            <div class="mt-4 inline-flex items-center gap-1.5 text-[10px] font-bold tracking-widest uppercase"
-                 [ngClass]="selectedSale()!.status === 'completed' ? 'text-emerald-600 dark:text-emerald-400' : selectedSale()!.status === 'pending' ? 'text-amber-600 dark:text-amber-400' : 'text-red-600 dark:text-red-400'">
-              <span class="w-1.5 h-1.5 rounded-full" [ngClass]="selectedSale()!.status === 'completed' ? 'bg-emerald-500' : selectedSale()!.status === 'pending' ? 'bg-amber-500' : 'bg-red-500'"></span>
-              {{ getStatusBadge(selectedSale()!.status).label }}
-            </div>
-          </div>
+   @if (selectedSale()) {
+  <div
+    class="fixed inset-0 z-50 flex justify-center items-center bg-stone-900/40 dark:bg-black/60 backdrop-blur-[6px] animate-in fade-in"
+    (click)="closeDetails()"
+  >
+    <!-- Ticket Container -->
+    <div
+      class="relative w-full max-w-[400px] mx-4 bg-white dark:bg-[#1c1c1c] shadow-2xl animate-in zoom-in-95 font-sans border border-stone-200/50 dark:border-stone-700/50"
+      style="clip-path: polygon(0 10px, 5% 0, 10% 10px, 15% 0, 20% 10px, 25% 0, 30% 10px, 35% 0, 40% 10px, 45% 0, 50% 10px, 55% 0, 60% 10px, 65% 0, 70% 10px, 75% 0, 80% 10px, 85% 0, 90% 10px, 95% 0, 100% 10px, 100% calc(100% - 10px), 95% 100%, 90% calc(100% - 10px), 85% 100%, 80% calc(100% - 10px), 75% 100%, 70% calc(100% - 10px), 65% 100%, 60% calc(100% - 10px), 55% 100%, 50% calc(100% - 10px), 45% 100%, 40% calc(100% - 10px), 35% 100%, 30% calc(100% - 10px), 25% 100%, 20% calc(100% - 10px), 15% 100%, 10% calc(100% - 10px), 5% 100%, 0 calc(100% - 10px))"
+      (click)="$event.stopPropagation()"
+    >
+      <!-- Header -->
+      <div class="pt-12 px-8 pb-6 flex flex-col items-center text-center relative">
+        <!-- Botón cerrar mejorado -->
+        <button
+          (click)="closeDetails()"
+          class="absolute top-4 right-4 h-9 w-9 rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 flex items-center justify-center transition-all text-stone-400 hover:text-stone-900 dark:hover:text-stone-200 focus:outline-none focus:ring-2 focus:ring-stone-400"
+          aria-label="Cerrar recibo"
+        >
+          <span class="material-icons-outlined text-lg">close</span>
+        </button>
 
-          <!-- Body -->
-          <div class="p-8 py-6">
-            <div class="flex justify-between mb-8 text-xs">
-              <div>
-                <p class="text-stone-400 uppercase tracking-widest mb-1 font-sans text-[10px] font-bold">Cliente</p>
-                <p class="font-bold text-stone-900 dark:text-stone-200 uppercase">{{ selectedSale()!.customer?.name || 'Cliente Casual' }}</p>
-              </div>
-              <div class="text-right">
-                <p class="text-stone-400 uppercase tracking-widest mb-1 font-sans text-[10px] font-bold">Pago</p>
-                <p class="font-bold text-stone-900 dark:text-stone-200 uppercase">{{ getPaymentMethodLabel(selectedSale()!.paymentMethod) }}</p>
-              </div>
-            </div>
+        <!-- Icono giratorio -->
+        <div
+          class="w-14 h-14 bg-stone-900 dark:bg-stone-100 rounded-2xl flex items-center justify-center text-white dark:text-stone-900 mb-5 shadow-lg transform rotate-3 group-hover:rotate-0 transition-transform duration-500"
+        >
+          <span class="material-icons-outlined text-2xl">receipt_long</span>
+        </div>
 
-            <!-- Items -->
-            <div>
-              <div class="flex justify-between text-[10px] text-stone-400 uppercase tracking-widest mb-3 pb-2 border-b border-stone-200 dark:border-stone-800 font-sans font-bold">
-                <span>Cant / Desc</span>
-                <span>Importe</span>
+        <h2 class="text-xl font-black tracking-tighter text-stone-900 dark:text-white uppercase">
+          {{ selectedSale()!.saleNumber }}
+        </h2>
+        <time
+          class="mt-2 px-3 py-1 bg-stone-100 dark:bg-stone-800 rounded-full text-[10px] text-stone-500 dark:text-stone-400 uppercase tracking-[0.2em] font-bold"
+          [attr.datetime]="selectedSale()!.date"
+        >
+          {{ selectedSale()!.date | date:'dd MMMM, yyyy · HH:mm' }}
+        </time>
+      </div>
+
+      <!-- Divisor punteado con "agujeros" -->
+      <div class="relative mx-6 border-t-2 border-dashed border-stone-200 dark:border-stone-700">
+        <div class="absolute -left-[14px] -top-[14px] w-7 h-7 bg-stone-900/40 dark:bg-black/60 rounded-full backdrop-blur-sm shadow-inner"></div>
+        <div class="absolute -right-[14px] -top-[14px] w-7 h-7 bg-stone-900/40 dark:bg-black/60 rounded-full backdrop-blur-sm shadow-inner"></div>
+      </div>
+
+      <!-- Cuerpo: Datos principales -->
+      <dl class="px-8 py-6 grid grid-cols-2 gap-6 text-[11px]">
+        <div>
+          <dt class="text-stone-400 uppercase tracking-[0.2em] mb-1 font-bold text-[10px]">Titular</dt>
+          <dd class="font-black text-stone-900 dark:text-stone-100 text-sm uppercase truncate">
+            {{ selectedSale()!.customer?.name || 'Cliente General' }}
+          </dd>
+        </div>
+        <div class="text-right">
+          <dt class="text-stone-400 uppercase tracking-[0.2em] mb-1 font-bold text-[10px]">Método</dt>
+          <dd class="flex items-center justify-end gap-1.5 font-black text-stone-900 dark:text-stone-100 text-sm uppercase">
+            <span class="material-icons-outlined text-[14px]">payments</span>
+            {{ getPaymentMethodLabel(selectedSale()!.paymentMethod) }}
+          </dd>
+        </div>
+      </dl>
+
+      <!-- Lista de productos -->
+      <div class="px-8 pb-8 space-y-5">
+        <div class="flex justify-between text-[10px] text-stone-400 uppercase tracking-[0.2em] font-black pb-2 border-b border-stone-100 dark:border-stone-800">
+          <span>Concepto</span>
+          <span>Subtotal</span>
+        </div>
+
+        @for (item of selectedSale()!.items; track item.productId) {
+          <div class="flex justify-between items-start group/item hover:bg-stone-50 dark:hover:bg-stone-800/30 p-1.5 -mx-1.5 rounded transition-colors">
+            <div class="flex flex-col gap-0.5">
+              <div class="flex items-baseline gap-2">
+                <span class="text-xs font-black text-stone-900 dark:text-white tabular-nums">{{ item.quantity }}x</span>
+                <span class="text-xs font-bold text-stone-700 dark:text-stone-300 uppercase tracking-tight leading-tight">{{ item.productName }}</span>
               </div>
-              <div class="space-y-4 pt-2">
-                @for (item of selectedSale()!.items; track item.productId) {
-                  <div class="flex justify-between items-start text-xs">
-                    <div class="pr-4">
-                      <span class="font-bold text-stone-800 dark:text-stone-200 mr-2">{{ item.quantity }}x</span>
-                      <span class="text-stone-600 dark:text-stone-400 uppercase">{{ item.productName }}</span>
-                      <span class="text-stone-400 block mt-1 ml-6">S/ {{ item.unitPrice | number:'1.2-2' }} c/u</span>
-                    </div>
-                    <span class="font-bold text-stone-900 dark:text-stone-100 whitespace-nowrap">S/ {{ item.subtotal | number:'1.2-2' }}</span>
-                  </div>
-                }
+              <div class="text-[10px] text-stone-400 ml-7 flex flex-wrap gap-x-2">
+                <span>P. Unit: S/ {{ item.unitPrice | number:'1.2-2' }}</span>
+                @if (item.size) { <span>Talle: {{ item.size }}</span> }
+                @if (item.color) { <span>Color: {{ item.color }}</span> }
               </div>
             </div>
+            <span class="font-mono text-xs font-bold text-stone-900 dark:text-stone-100 mt-0.5 tabular-nums">
+              S/ {{ item.subtotal | number:'1.2-2' }}
+            </span>
           </div>
-          
-          <!-- Footer Totals -->
-          <div class="p-8 pt-6 border-t-2 border-dashed border-stone-200 dark:border-stone-800 bg-stone-100/50 dark:bg-[#151515]">
-            <div class="space-y-2 mb-4 text-xs font-medium text-stone-500 uppercase">
-              <div class="flex justify-between">
-                <span>SUBTOTAL</span>
-                <span>S/ {{ selectedSale()!.subtotal | number:'1.2-2' }}</span>
-              </div>
-              @if (selectedSale()!.discount > 0) {
-                <div class="flex justify-between">
-                  <span>DESCUENTO</span>
-                  <span>- S/ {{ selectedSale()!.discount | number:'1.2-2' }}</span>
-                </div>
-              }
+        }
+      </div>
+
+      <!-- Footer con totales -->
+      <div class="px-8 pt-6 pb-10 bg-stone-50/80 dark:bg-white/5 relative backdrop-blur-sm">
+        <div class="absolute top-0 left-4 right-4 border-t-2 border-dashed border-stone-200 dark:border-stone-700"></div>
+
+        <dl class="space-y-2 mb-5 text-[11px]">
+          <div class="flex justify-between font-bold text-stone-400 uppercase tracking-wide">
+            <dt>Base imponible</dt>
+            <dd class="text-stone-600 dark:text-stone-300 tabular-nums">S/ {{ selectedSale()!.subtotal | number:'1.2-2' }}</dd>
+          </div>
+          @if (selectedSale()!.discount > 0) {
+            <div class="flex justify-between font-bold text-red-500 uppercase tracking-wide">
+              <dt>Descuento</dt>
+              <dd class="tabular-nums">- S/ {{ selectedSale()!.discount | number:'1.2-2' }}</dd>
             </div>
-            
-            <!-- Gran Total -->
-            <div class="flex justify-between items-center text-lg font-black border-t-2 border-stone-900 dark:border-stone-100 pt-4 mt-2">
-              <span class="text-stone-900 dark:text-white uppercase">Total</span>
-              <span class="text-stone-900 dark:text-white">S/ {{ selectedSale()!.total | number:'1.2-2' }}</span>
-            </div>
-            
-            <div class="mt-8 text-center text-[10px] text-stone-400 uppercase tracking-widest font-sans font-bold">
-              *** Fin de Transacción ***
-            </div>
+          }
+          <div class="flex justify-between font-bold text-stone-400 uppercase tracking-wide">
+            <dt>IGV (18%)</dt>
+            <dd class="text-stone-600 dark:text-stone-300 tabular-nums">S/ {{ (selectedSale()!.total - selectedSale()!.subtotal) | number:'1.2-2' }}</dd>
+          </div>
+        </dl>
+
+        <div class="flex justify-between items-center border-t-2 border-stone-800 dark:border-white pt-5">
+          <span class="text-sm font-black text-stone-900 dark:text-white uppercase tracking-[0.2em]">Total</span>
+          <dd class="text-2xl font-black text-stone-900 dark:text-white tracking-tighter tabular-nums">
+            S/ {{ selectedSale()!.total | number:'1.2-2' }}
+          </dd>
+        </div>
+
+        <!-- Acciones finales -->
+        <div class="mt-8 flex flex-col items-center gap-5">
+          <button
+            (click)="printTicket(selectedSale()!)"
+            class="flex items-center gap-2 px-4 py-2 bg-stone-900 dark:bg-white text-white dark:text-stone-900 rounded-full text-xs font-bold uppercase tracking-wider hover:scale-105 transition-transform focus:outline-none focus:ring-2 focus:ring-stone-500"
+            aria-label="Imprimir ticket"
+          >
+            <span class="material-icons-outlined text-sm">print</span>
+            Imprimir
+          </button>
+          <div class="flex flex-col items-center gap-1">
+            <div class="h-1 w-16 bg-stone-200 dark:bg-stone-700 rounded-full"></div>
+            <p class="text-[9px] font-black text-stone-400 uppercase tracking-[0.4em]">DenRaf · Zen Enterprise</p>
           </div>
         </div>
       </div>
-    }
-
+    </div>
+  </div>
+}
     <!-- Modal Anular iOS Style -->
     @if (cancelModalOpen()) {
       <div class="fixed inset-0 z-50 flex justify-center items-center bg-stone-900/40 dark:bg-black/60 backdrop-blur-sm animate-in fade-in" (click)="closeCancelModal()">

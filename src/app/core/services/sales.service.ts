@@ -35,6 +35,9 @@ export class SalesService {
   pageSize = signal(10);
   totalElements = signal(0);
   totalPages = signal(0);
+  currentFilters = signal<any>({});
+  totalFilteredRevenue = signal(0);
+  validElements = signal(0);
 
   // 🎯 Control de inicialización única
   private initialized = false;
@@ -55,59 +58,89 @@ export class SalesService {
    * 📡 OBTENER VENTAS PAGINADAS DESDE SPRING BOOT (NUEVO)
    * Extrae la información directamente desde PostgreSQL.
    */
+  private fullFilteredSales: any[] | null = null;
+
   async fetchPaginatedSales(page: number = 0, size: number = 10, filters?: any): Promise<void> {
     this.isLoading.set(true);
-    let url = `${this.apiUrl}?page=${page}&size=${size}&sortBy=createdAt&sortDir=desc`;
     
-    if (filters?.status) url += `&status=${filters.status}`;
-    if (filters?.desde) url += `&desde=${filters.desde}`;
-    if (filters?.hasta) url += `&hasta=${filters.hasta}`;
-
-    try {
-      console.log('📡 [Sales] Fetching de Spring Boot:', url);
-      const res: any = await firstValueFrom(this.http.get(url));
-      
-      const content = res.content || res;
-      
-      // Mapear los items al formato "Sale" que usaba Frontend
-      const mappedSales: Sale[] = content.map((raw: any) => {
-        return {
-          id: raw.id,
-          saleNumber: raw.saleNumber,
-          date: raw.createdAt || new Date().toISOString(),
-          total: raw.total ?? 0,
-          subtotal: raw.subtotal ?? 0,
-          discount: raw.discount ?? 0,
-          tax: raw.tax ?? 0,
-          paymentMethod: raw.paymentMethod || 'Efectivo',
-          items: (raw.items || []).map((i: any) => ({
-            productId: i.productId,
-            productName: i.productName,
-            quantity: i.quantity,
-            unitPrice: i.unitPrice ?? 0,
-            subtotal: i.subtotal ?? 0,
-            size: i.size,
-            color: i.color
-          })),
-          customerId: raw.customerId,
-          customer: raw.customerId ? this.clientService.getClientById(raw.customerId) || { name: 'Cliente Registrado', phone: '' } : undefined,
-          vendedorId: raw.vendedorId,
-          status: raw.status || 'completed',
-          saleType: raw.saleType || 'tienda',
-          notes: raw.notes || ''
-        };
-      });
-
-      this.salesSignal.set(mappedSales);
-      this.currentPage.set(res.number || 0);
-      this.totalElements.set(res.totalElements || mappedSales.length);
-      this.totalPages.set(res.totalPages || 1);
-
-      this.isLoading.set(false);
-    } catch(err) {
-      console.error('❌ [Sales] Error fetching sales from backend:', err);
-      this.isLoading.set(false);
+    // Use explicitly passed filters, or fallback to stored filters
+    const activeFilters = filters !== undefined ? filters : this.currentFilters();
+    const filtersChanged = JSON.stringify(activeFilters) !== JSON.stringify(this.currentFilters());
+    
+    if (filters !== undefined) {
+      this.currentFilters.set(filters);
     }
+
+    // If filters changed, or we don't have the full data, fetch ALL items for the period
+    if (filtersChanged || this.fullFilteredSales === null) {
+      // Pedimos un gran numero de registros para tener el total real
+      let url = `${this.apiUrl}?page=0&size=10000&sortBy=createdAt&sortDir=desc`;
+      
+      if (activeFilters?.status) url += `&status=${activeFilters.status}`;
+      if (activeFilters?.desde) url += `&desde=${activeFilters.desde}`;
+      if (activeFilters?.hasta) url += `&hasta=${activeFilters.hasta}`;
+
+      try {
+        console.log('📡 [Sales] Fetching ALL from Spring Boot for filters:', url);
+        const res: any = await firstValueFrom(this.http.get(url));
+        const isArray = Array.isArray(res);
+        this.fullFilteredSales = isArray ? res : (res.content || []);
+      } catch (err) {
+        console.error('❌ [Sales] Error fetching sales from backend:', err);
+        this.fullFilteredSales = [];
+      }
+    }
+
+    const allContent = this.fullFilteredSales || [];
+    const totalItems = allContent.length;
+    const totalPagesCount = Math.ceil(totalItems / size) || 1;
+    
+    // Excluir ventas anuladas para el cálculo de ingresos y volumen
+    const validContent = allContent.filter((raw: any) => raw.status !== 'cancelled' && raw.status !== 'anulada');
+    const validItemsCount = validContent.length;
+    const totalRevenue = validContent.reduce((sum: number, raw: any) => sum + (raw.total ?? 0), 0);
+    
+    // Local pagination
+    const pagedContent = allContent.slice(page * size, (page + 1) * size);
+
+    // Mapear los items al formato "Sale" que usaba Frontend
+    const mappedSales: Sale[] = pagedContent.map((raw: any) => {
+      return {
+        id: raw.id,
+        saleNumber: raw.saleNumber,
+        date: raw.createdAt || new Date().toISOString(),
+        total: raw.total ?? 0,
+        subtotal: raw.subtotal ?? 0,
+        discount: raw.discount ?? 0,
+        tax: raw.tax ?? 0,
+        paymentMethod: raw.paymentMethod || 'Efectivo',
+        items: (raw.items || []).map((i: any) => ({
+          productId: i.productId,
+          productName: i.productName,
+          quantity: i.quantity,
+          unitPrice: i.unitPrice ?? 0,
+          subtotal: i.subtotal ?? 0,
+          size: i.size,
+          color: i.color
+        })),
+        customerId: raw.customerId,
+        customer: (raw.customerId ? this.clientService.getClientById(raw.customerId) || { name: 'Cliente Registrado', phone: '' } : undefined) as any,
+        vendedorId: raw.vendedorId,
+        createdBy: raw.createdBy || 'Sistema',
+        status: raw.status || 'completed',
+        saleType: raw.saleType || 'tienda',
+        notes: raw.notes || ''
+      };
+    });
+
+    this.salesSignal.set(mappedSales);
+    this.currentPage.set(page);
+    this.totalElements.set(totalItems);
+    this.validElements.set(validItemsCount);
+    this.totalFilteredRevenue.set(totalRevenue);
+    this.totalPages.set(totalPagesCount);
+
+    this.isLoading.set(false);
   }
 
   /**

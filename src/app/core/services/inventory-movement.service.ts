@@ -64,9 +64,15 @@ export class InventoryMovementService {
 
     try {
       const response = await firstValueFrom(this.http.get<any>(this.API_URL, { params }));
-      this.movementsSignal.set(response.content || []);
-      this.totalElements.set(response.totalElements || 0);
-      this.totalPages.set(response.totalPages || 0);
+      const isArray = Array.isArray(response);
+      
+      const items = isArray ? response : (response.content || []);
+      this.movementsSignal.set(items);
+      
+      const totalCount = Math.max(response.totalElements || 0, items.length);
+      this.totalElements.set(totalCount);
+      
+      this.totalPages.set(response.totalPages || (isArray ? 1 : 0));
       this.currentPage.set(response.number || 0);
       this.pageSize.set(response.size || 20);
     } catch (error) {
@@ -88,18 +94,20 @@ export class InventoryMovementService {
    * 📥 Registrar entrada de inventario vía API
    */
   async registerEntrada(
-    entrada: Omit<InventoryMovement, 'id' | 'movementNumber' | 'date' | 'type'>
+    entrada: Omit<InventoryMovement, 'id' | 'movementNumber' | 'date' | 'type'>,
+    skipStockUpdate: boolean = false
   ): Promise<InventoryMovement | null> {
-    return this.createMovement('entrada', entrada);
+    return this.createMovement('entrada', entrada, skipStockUpdate);
   }
 
   /**
    * 🔧 Registrar ajuste de inventario vía API
    */
   async registerAjuste(
-    ajuste: Omit<InventoryMovement, 'id' | 'movementNumber' | 'date' | 'type'>
+    ajuste: Omit<InventoryMovement, 'id' | 'movementNumber' | 'date' | 'type'>,
+    skipStockUpdate: boolean = false
   ): Promise<InventoryMovement | null> {
-    return this.createMovement('ajuste', ajuste);
+    return this.createMovement('ajuste', ajuste, skipStockUpdate);
   }
 
   /**
@@ -107,7 +115,8 @@ export class InventoryMovementService {
    */
   private async createMovement(
     type: string,
-    data: Omit<InventoryMovement, 'id' | 'movementNumber' | 'date' | 'type'>
+    data: Omit<InventoryMovement, 'id' | 'movementNumber' | 'date' | 'type'>,
+    skipStockUpdate: boolean = false
   ): Promise<InventoryMovement | null> {
     try {
       this.isLoading.set(true);
@@ -123,15 +132,20 @@ export class InventoryMovementService {
       );
 
       // Actualizar la grilla trayendo la página 0 (para ver el nuevo)
-      await this.fetchPaginatedMovements(0, this.pageSize(), this.currentTypeFilter() || undefined);
+      // Solo actualizamos la grilla si no estamos omitiendo el stock (para evitar spam de fetches en un batch)
+      if (!skipStockUpdate) {
+        await this.fetchPaginatedMovements(0, this.pageSize(), this.currentTypeFilter() || undefined);
+      }
       
       // Sincronizar el catálogo local de productos con la DB
-      if (type === 'entrada') {
-          this.productService.addStock(data.productId, data.quantity, data.variantId);
-      } else if (type === 'ajuste' && data.quantity > 0) {
-          this.productService.addStock(data.productId, data.quantity, data.variantId);
-      } else if (type === 'ajuste' && data.quantity < 0) {
-          this.productService.reduceStock(data.productId, Math.abs(data.quantity), data.variantId);
+      if (!skipStockUpdate) {
+        if (type === 'entrada') {
+            this.productService.addStock(data.productId, data.quantity, data.variantId);
+        } else if (type === 'ajuste' && data.quantity > 0) {
+            this.productService.addStock(data.productId, data.quantity, data.variantId);
+        } else if (type === 'ajuste' && data.quantity < 0) {
+            this.productService.reduceStock(data.productId, Math.abs(data.quantity), data.variantId);
+        }
       }
 
       return result;

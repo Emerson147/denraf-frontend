@@ -30,12 +30,34 @@ export class InventoryMovementsComponent {
   // Formulario de nuevo movimiento
   movementType = signal<'entrada' | 'ajuste'>('entrada');
   selectedProductId = signal<string>('');
+  variantQuantities = signal<{ [variantId: string]: number | null }>({}); // Nuevo: Multi-variantes
   quantity = signal<number>(1);
   reason = signal<string>('');
   supplier = signal<string>('');
   invoice = signal<string>('');
   cost = signal<number>(0);
   notes = signal<string>('');
+
+  // Computados de selección
+  selectedProduct = computed(() => {
+    return this.products().find((p) => p.id === this.selectedProductId());
+  });
+
+  productVariants = computed(() => {
+    return this.selectedProduct()?.variants || [];
+  });
+
+  totalQuantity = computed(() => {
+    if (this.productVariants().length > 0) {
+      const q = this.variantQuantities();
+      let sum = 0;
+      for (const key in q) {
+        if (q[key]) sum += q[key]!;
+      }
+      return sum;
+    }
+    return this.quantity();
+  });
 
   // Data
   products = this.productService.products;
@@ -56,9 +78,24 @@ export class InventoryMovementsComponent {
     return movements;
   });
 
-  // Stats (Dummy data hasta tener endpoints de stats)
-  todayEntradas = signal<number>(0);
-  todayAjustes = signal<number>(0);
+  // Stats reales extraídas de la lista filtrando por fecha de hoy
+  todayEntradas = computed(() => {
+    const startOfToday = new Date();
+    startOfToday.setHours(0, 0, 0, 0);
+    return this.movementService.movements().filter(m => {
+      const d = m.createdAt ? new Date(m.createdAt) : new Date(m.date);
+      return m.type === 'entrada' && d >= startOfToday;
+    }).length;
+  });
+
+  todayAjustes = computed(() => {
+    const startOfToday = new Date();
+    startOfToday.setHours(0, 0, 0, 0);
+    return this.movementService.movements().filter(m => {
+      const d = m.createdAt ? new Date(m.createdAt) : new Date(m.date);
+      return m.type === 'ajuste' && d >= startOfToday;
+    }).length;
+  });
 
   ngOnInit() {
     this.movementService.fetchPaginatedMovements(0, this.movementService.pageSize());
@@ -86,7 +123,7 @@ export class InventoryMovementsComponent {
   }
 
   // --- FILTROS TAB ---
-  setTab(tab: 'all' | 'entradas' | 'ajustes') {
+  setTab(tab: 'all' | 'entrada' | 'ajuste') {
     if (tab === 'all') {
       this.movementService.fetchPaginatedMovements(0, this.movementService.pageSize(), undefined);
     } else {
@@ -114,17 +151,73 @@ export class InventoryMovementsComponent {
    * Registrar nuevo movimiento
    */
   async submitMovement() {
-    const productId = this.selectedProductId();
-    const product = this.products().find((p) => p.id === productId);
+    const product = this.selectedProduct();
 
     if (!product) {
       this.toastService.error('Selecciona un producto válido');
       return;
     }
 
-    if (this.quantity() <= 0) {
-      this.toastService.error('La cantidad debe ser mayor a 0');
-      return;
+    // Lógica para procesar una o múltiples variantes
+    const variants = this.productVariants();
+    let movementsToCreate: any[] = [];
+    
+    if (variants.length > 0) {
+      const vQuantities = this.variantQuantities();
+      let hasAny = false;
+      
+      for (const variant of variants) {
+        const inputVal = vQuantities[variant.id];
+        if (inputVal === undefined || inputVal === null) continue;
+        
+        let finalQty = inputVal;
+        if (this.movementType() === 'ajuste') {
+          finalQty = inputVal - variant.stock;
+          if (finalQty === 0) continue; // Sin cambios para esta variante
+        } else {
+          if (inputVal <= 0) continue; // Entrada debe ser mayor a 0
+        }
+        
+        hasAny = true;
+        movementsToCreate.push({
+          productId: product.id,
+          productName: product.name,
+          variantId: variant.id,
+          size: variant.size,
+          color: variant.color,
+          quantity: finalQty,
+        });
+      }
+      
+      if (!hasAny) {
+        this.toastService.error('Ingresa una cantidad válida para al menos una variante');
+        return;
+      }
+    } else {
+      // Producto sin variantes
+      let finalQty = this.quantity();
+      if (this.movementType() === 'ajuste') {
+        finalQty = this.quantity() - product.stock;
+        if (finalQty === 0) {
+          this.toastService.error('El nuevo stock físico es igual al actual. No hay ajuste que realizar.');
+          return;
+        }
+        if (this.quantity() < 0) {
+          this.toastService.error('El stock físico no puede ser negativo');
+          return;
+        }
+      } else {
+        if (this.quantity() <= 0) {
+          this.toastService.error('La cantidad recibida debe ser mayor a 0');
+          return;
+        }
+      }
+      
+      movementsToCreate.push({
+        productId: product.id,
+        productName: product.name,
+        quantity: finalQty,
+      });
     }
 
     if (!this.reason().trim()) {
@@ -132,43 +225,100 @@ export class InventoryMovementsComponent {
       return;
     }
 
-    const movement: any = {
-      productId: product.id,
-      productName: product.name,
-      quantity: this.quantity(),
+    const baseMovement: any = {
       reason: this.reason(),
       createdBy: this.authService.currentUser()?.nombre || 'Usuario',
       notes: this.notes() || undefined,
     };
 
-    // Datos específicos según el tipo
+    // ====== BATCH STOCK Y COSTO ======
+    // Calculamos el estado final del producto para enviar 1 sola actualización al servidor
+    // y evitar errores 500 de "ConcurrentModification" o Optimistic Locking
+    let productHasChanges = false;
+    let updatedProductData: any = {};
+
     if (this.movementType() === 'entrada') {
-      movement.supplier = this.supplier() || undefined;
-      movement.invoice = this.invoice() || undefined;
-      movement.cost = this.cost() || product.cost;
-      movement.totalCost = movement.cost * this.quantity();
+      baseMovement.supplier = this.supplier() || undefined;
+      baseMovement.invoice = this.invoice() || undefined;
+      baseMovement.cost = this.cost() || product.cost;
+      
+      if (baseMovement.cost !== product.cost && baseMovement.cost > 0) {
+        updatedProductData.cost = baseMovement.cost;
+        productHasChanges = true;
+      }
     }
 
-    let result: InventoryMovement | null = null;
+    // Calcular el nuevo stock de variantes
+    if (variants.length > 0) {
+      const newVariants = variants.map(v => {
+        const inputVal = this.variantQuantities()[v.id];
+        if (inputVal === undefined || inputVal === null) return v;
+        
+        let delta = 0;
+        if (this.movementType() === 'ajuste') {
+          delta = inputVal - v.stock;
+        } else {
+          delta = inputVal > 0 ? inputVal : 0;
+        }
+
+        if (delta !== 0) {
+          productHasChanges = true;
+          return { ...v, stock: v.stock + delta };
+        }
+        return v;
+      });
+      
+      if (productHasChanges) {
+        updatedProductData.variants = newVariants;
+        // Calcular nuevo stock total sumando variantes
+        updatedProductData.stock = newVariants.reduce((sum, v) => sum + v.stock, 0);
+      }
+    } else {
+       // Si no hay variantes, sumamos el stock total
+       let delta = 0;
+       const finalQty = movementsToCreate[0].quantity;
+       if (this.movementType() === 'ajuste') {
+         delta = finalQty; // Para ajuste, movementsToCreate ya tiene la diferencia
+       } else {
+         delta = finalQty;
+       }
+       if (delta !== 0) {
+         productHasChanges = true;
+         updatedProductData.stock = product.stock + delta;
+       }
+    }
+
+    // Guardaremos productHasChanges y updatedProductData para ejecutarlos AL FINAL
 
     try {
-      switch (this.movementType()) {
-        case 'entrada':
-          result = await this.movementService.registerEntrada(movement);
-          break;
-        case 'ajuste':
-          // Para ajustes, la cantidad puede ser negativa o positiva via backend, pero el input ya es el absoluto en el modal.
-          movement.quantity = this.quantity();
-          result = await this.movementService.registerAjuste(movement);
-          break;
+      for (const mov of movementsToCreate) {
+        const payload = { ...mov, ...baseMovement };
+        
+        if (this.movementType() === 'entrada') {
+          payload.totalCost = payload.cost * Math.abs(payload.quantity);
+          await this.movementService.registerEntrada(payload, true); // true = skipStockUpdate individual
+        } else {
+          await this.movementService.registerAjuste(payload, true); // true = skipStockUpdate individual
+        }
       }
 
-      if (result) {
-        this.toastService.success(`Movimiento registrado: ${result.movementNumber}`);
-        this.closeDialog();
+      // Ejecutar UNA sola actualización del producto AL FINAL (Evita conflictos de transacciones en la DB)
+      if (productHasChanges) {
+        this.productService.updateProduct(product.id, updatedProductData);
       }
+      
+      this.toastService.success('Movimiento(s) registrado(s) correctamente');
+      this.closeDialog();
+      
+      // Refrescar la tabla para mostrar el nuevo registro
+      this.movementService.fetchPaginatedMovements(
+        this.movementService.currentPage(),
+        this.movementService.pageSize(),
+        this.movementService.currentTypeFilter() || undefined
+      );
     } catch(e) {
-       console.error("Error al registrar movimiento:", e);
+      console.error('Error registering movements:', e);
+      this.toastService.error('Ocurrió un error al registrar el movimiento');
     }
   }
 
@@ -177,12 +327,32 @@ export class InventoryMovementsComponent {
    */
   private resetForm() {
     this.selectedProductId.set('');
+    this.variantQuantities.set({});
     this.quantity.set(1);
     this.reason.set('');
     this.supplier.set('');
     this.invoice.set('');
     this.cost.set(0);
     this.notes.set('');
+  }
+
+  /**
+   * Evento al cambiar de producto
+   */
+  onProductChange() {
+    this.variantQuantities.set({}); // Resetear variantes al cambiar producto
+    const product = this.selectedProduct();
+    if (product) {
+      this.cost.set(product.cost || 0); // Pre-cargar el costo
+    }
+  }
+
+  // Set quantity for a specific variant
+  setVariantQuantity(variantId: string, qty: number | null) {
+    this.variantQuantities.update(prev => ({
+      ...prev,
+      [variantId]: qty
+    }));
   }
 
   /**

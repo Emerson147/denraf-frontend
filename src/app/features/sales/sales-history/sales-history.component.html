@@ -8,93 +8,65 @@
       subtitle="Todas las transacciones de Tu Tienda. Busca, filtra y audita facturas."
       materialIcon="receipt_long"
     >
-      <div class="flex gap-2">
-        <app-ui-export-menu
-          [data]="exportData()"
-          type="sales"
-          (pdfExport)="exportToZenPDF()"
-        ></app-ui-export-menu>
-      </div>
     </app-ui-page-header>
 
-    <!-- Resumen Bento Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+    <!-- Resumen Bento Grid (Compacto) -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
       <!-- Card: Volumen -->
       <div
-        class="relative overflow-hidden bg-white dark:bg-stone-900/40 p-6 rounded-[2rem] border border-stone-200/60 dark:border-stone-800 shadow-sm hover:shadow-md transition-all duration-500 group"
+        class="bg-white/80 dark:bg-stone-900/80 backdrop-blur-xl rounded-[1.5rem] p-5 border border-stone-200/60 dark:border-stone-800 shadow-sm hover:shadow-md transition-colors flex items-center justify-between group hover:border-stone-300 dark:hover:border-stone-700"
       >
-        <div
-          class="absolute -right-4 -top-4 w-24 h-24 bg-stone-100 dark:bg-stone-800/40 rounded-full blur-2xl group-hover:bg-stone-200/50 transition-colors duration-500"
-        ></div>
-        <p
-          class="text-[10px] font-bold text-stone-400 dark:text-stone-500 uppercase tracking-[0.2em] mb-4"
-        >
-          Volumen de Transacciones
-        </p>
-        <div class="flex items-center justify-between">
-          <h3 class="text-4xl font-bold tracking-tight text-stone-900 dark:text-stone-100">
-            {{ salesService.totalElements() }}
-          </h3>
-          <div
-            class="h-10 w-10 rounded-2xl bg-stone-100 dark:bg-stone-800 flex items-center justify-center text-stone-400 group-hover:text-stone-900 dark:group-hover:text-stone-100 transition-colors"
-          >
-            <span class="material-symbols-outlined">analytics</span>
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 rounded-xl bg-stone-100 dark:bg-stone-800 flex items-center justify-center group-hover:scale-105 transition-transform">
+            <span class="material-symbols-outlined text-stone-900 dark:text-white text-xl">analytics</span>
+          </div>
+          <div>
+            <p class="text-[9px] text-stone-500 dark:text-stone-400 uppercase tracking-widest font-black">Volumen</p>
+            <h3 class="text-2xl font-black text-stone-900 dark:text-stone-100 mt-0.5 tracking-tight">
+              {{ salesService.totalElements() }}
+            </h3>
           </div>
         </div>
       </div>
 
       <!-- Card: Ingresos -->
       <div
-        class="relative overflow-hidden bg-white dark:bg-stone-900/40 p-6 rounded-[2rem] border border-stone-200/60 dark:border-stone-800 shadow-sm hover:shadow-md transition-all duration-500 group"
+        class="bg-white/80 dark:bg-stone-900/80 backdrop-blur-xl rounded-[1.5rem] p-5 border border-stone-200/60 dark:border-stone-800 shadow-sm hover:shadow-md transition-colors flex items-center justify-between group hover:border-stone-300 dark:hover:border-stone-700"
       >
-        <div
-          class="absolute -right-4 -top-4 w-24 h-24 bg-emerald-50 dark:bg-emerald-900/10 rounded-full blur-2xl group-hover:bg-emerald-100/30 transition-colors duration-500"
-        ></div>
-        <p
-          class="text-[10px] font-bold text-stone-400 dark:text-stone-500 uppercase tracking-[0.2em] mb-4 text-emerald-600/80 dark:text-emerald-400/80"
-        >
-          Ingresos Totales
-        </p>
-        <div class="flex items-center justify-between">
-          <h3 class="text-4xl font-bold tracking-tight text-stone-900 dark:text-stone-100">
-            S/ {{ summary().total | number: '1.2-2' }}
-          </h3>
-          <div
-            class="h-10 w-10 rounded-2xl bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400 transition-colors"
-          >
-            <span class="material-symbols-outlined">payments</span>
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 rounded-xl bg-stone-100 dark:bg-stone-800 flex items-center justify-center group-hover:scale-105 transition-transform">
+            <span class="material-symbols-outlined text-stone-900 dark:text-white text-xl">payments</span>
+          </div>
+          <div>
+            <p class="text-[9px] text-stone-500 dark:text-stone-400 uppercase tracking-widest font-black">Ingresos Totales</p>
+            <h3 class="text-2xl font-black text-stone-900 dark:text-stone-100 mt-0.5 tracking-tight">
+              S/ {{ summary().total | number: '1.2-2' }}
+            </h3>
           </div>
         </div>
       </div>
 
       <!-- Card: Ticket Promedio -->
       <div
-        class="relative overflow-hidden bg-white dark:bg-stone-900/40 p-6 rounded-[2rem] border border-stone-200/60 dark:border-stone-800 shadow-sm hover:shadow-md transition-all duration-500 group"
+        class="bg-white/80 dark:bg-stone-900/80 backdrop-blur-xl rounded-[1.5rem] p-5 border border-stone-200/60 dark:border-stone-800 shadow-sm hover:shadow-md transition-colors flex items-center justify-between group hover:border-stone-300 dark:hover:border-stone-700"
       >
-        <div
-          class="absolute -right-4 -top-4 w-24 h-24 bg-amber-50 dark:bg-amber-900/10 rounded-full blur-2xl group-hover:bg-amber-100/30 transition-colors duration-500"
-        ></div>
-        <p
-          class="text-[10px] font-bold text-stone-400 dark:text-stone-500 uppercase tracking-[0.2em] mb-4 text-amber-600/80 dark:text-amber-400/80"
-        >
-          Ticket Promedio
-        </p>
-        <div class="flex items-center justify-between">
-          <h3 class="text-4xl font-bold tracking-tight text-stone-900 dark:text-zinc-100">
-            S/ {{ summary().average | number: '1.2-2' }}
-          </h3>
-          <div
-            class="h-10 w-10 rounded-2xl bg-amber-50 dark:bg-amber-900/20 flex items-center justify-center text-amber-600 dark:text-amber-400 transition-colors"
-          >
-            <span class="material-symbols-outlined">shopping_cart</span>
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 rounded-xl bg-stone-100 dark:bg-stone-800 flex items-center justify-center group-hover:scale-105 transition-transform">
+            <span class="material-symbols-outlined text-stone-900 dark:text-white text-xl">shopping_cart</span>
+          </div>
+          <div>
+            <p class="text-[9px] text-stone-500 dark:text-stone-400 uppercase tracking-widest font-black">Ticket Promedio</p>
+            <h3 class="text-2xl font-black text-stone-900 dark:text-stone-100 mt-0.5 tracking-tight">
+              S/ {{ summary().average | number: '1.2-2' }}
+            </h3>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Controles Minimalistas -->
+    <!-- Controles Minimalistas (NO STICKY) -->
     <div
-      class="flex flex-col sm:flex-row gap-6 justify-between items-center z-20 sticky top-4 pt-2 pb-4 bg-gradient-to-b from-[#f8fafc] dark:from-[#09090b] to-transparent"
+      class="flex flex-col sm:flex-row gap-6 justify-between items-center pt-2 pb-4"
     >
       <!-- Búsqueda Soft Pill -->
       <div class="relative w-full sm:w-72 group">
@@ -113,29 +85,39 @@
         />
       </div>
 
-      <!-- Filtros Flotantes Zen -->
-      <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar px-1">
-        @for (period of ['today', 'week', 'month', 'all']; track period) {
-          <button
-            (click)="selectedPeriod.set($any(period))"
-            class="px-4 py-1.5 rounded-full text-[13px] font-medium transition-all duration-300 cursor-pointer whitespace-nowrap"
-            [ngClass]="
-              selectedPeriod() === period
-                ? 'bg-stone-900 text-white dark:bg-stone-100 dark:text-stone-900 shadow-sm'
-                : 'bg-transparent text-stone-500 dark:text-stone-400 hover:bg-stone-200/50 dark:hover:bg-stone-800/50'
-            "
-          >
-            {{
-              period === 'today'
-                ? 'Hoy'
-                : period === 'week'
-                  ? 'Semana'
-                  : period === 'month'
-                    ? 'Mes'
-                    : 'Todas'
-            }}
-          </button>
-        }
+      <!-- Filtros Flotantes Zen y Export -->
+      <div class="flex items-center gap-3 w-full sm:w-auto">
+        <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar px-1">
+          @for (period of ['today', 'week', 'month', 'all']; track period) {
+            <button
+              (click)="selectedPeriod.set($any(period))"
+              class="px-4 py-1.5 rounded-full text-[13px] font-medium transition-all duration-300 cursor-pointer whitespace-nowrap"
+              [ngClass]="
+                selectedPeriod() === period
+                  ? 'bg-stone-900 text-white dark:bg-white dark:text-stone-900 shadow-sm'
+                  : 'bg-transparent text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-300'
+              "
+            >
+              {{
+                period === 'today'
+                  ? 'Hoy'
+                  : period === 'week'
+                    ? 'Semana'
+                    : period === 'month'
+                      ? 'Mes'
+                      : 'Todas'
+              }}
+            </button>
+          }
+        </div>
+
+        <div class="hidden sm:block w-px h-6 bg-stone-200 dark:bg-stone-800"></div>
+
+        <app-ui-export-menu
+          [data]="exportData()"
+          type="sales"
+          (pdfExport)="exportToZenPDF()"
+        ></app-ui-export-menu>
       </div>
     </div>
 
@@ -159,7 +141,8 @@
           </p>
         </div>
       } @else {
-        <div class="overflow-x-auto no-scrollbar">
+        <!-- Vista Desktop / Tablet -->
+        <div class="hidden lg:block overflow-x-auto no-scrollbar">
           <table class="w-full text-left border-collapse text-sm">
             <thead>
               <tr
@@ -256,23 +239,16 @@
                   </td>
                   <td class="px-8 py-5 text-center">
                     <div
-                      class="px-3 py-1.5 rounded-full inline-flex items-center gap-2 text-[9px] font-black tracking-[0.1em] uppercase transition-all duration-500"
-                      [ngClass]="
-                        sale.status === 'completed'
-                          ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 border border-emerald-100/50 dark:border-emerald-800/30'
-                          : sale.status === 'pending'
-                            ? 'bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 border border-amber-100/50 dark:border-amber-800/30'
-                            : 'bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border border-red-100/50 dark:border-red-800/30'
-                      "
+                      class="px-2.5 py-1 rounded-full inline-flex items-center gap-1.5 text-[9px] font-black tracking-[0.1em] uppercase transition-all duration-500 bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 border border-transparent"
                     >
                       <span
-                        class="w-1.5 h-1.5 rounded-full animate-pulse"
+                        class="w-1.5 h-1.5 rounded-full animate-pulse shadow-[0_0_8px_currentColor]"
                         [ngClass]="
                           sale.status === 'completed'
-                            ? 'bg-emerald-500'
+                            ? 'bg-emerald-500 text-emerald-500'
                             : sale.status === 'pending'
-                              ? 'bg-amber-500'
-                              : 'bg-red-500'
+                              ? 'bg-amber-500 text-amber-500'
+                              : 'bg-red-500 text-red-500'
                         "
                       ></span>
                       {{ getStatusBadge(sale.status).label }}
@@ -282,46 +258,131 @@
                     class="px-8 py-5 text-right whitespace-nowrap sticky right-0 bg-white/95 dark:bg-stone-900/95 group-hover:bg-stone-50/95 dark:group-hover:bg-stone-800/95 transition-all duration-300"
                   >
                     <div
-                      class="flex items-center justify-end gap-2 translate-x-2 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all duration-500"
+                      class="flex items-center justify-end translate-x-4 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all duration-300"
                     >
-                      <button
-                        (click)="viewDetails(sale); $event.stopPropagation()"
-                        class="h-9 w-9 rounded-xl bg-white dark:bg-stone-800 shadow-sm border border-stone-200 dark:border-stone-700 text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 hover:border-stone-300 transition-all flex items-center justify-center cursor-pointer group/btn"
-                        title="Ver Detalles"
-                      >
-                        <span
-                          class="material-symbols-outlined text-[18px] group-hover/btn:scale-110 transition-transform"
-                          >visibility</span
-                        >
-                      </button>
-                      <button
-                        (click)="printTicket(sale); $event.stopPropagation()"
-                        class="h-9 w-9 rounded-xl bg-white dark:bg-stone-800 shadow-sm border border-stone-200 dark:border-stone-700 text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 hover:border-stone-300 transition-all flex items-center justify-center cursor-pointer group/btn"
-                        title="Imprimir Ticket"
-                      >
-                        <span
-                          class="material-symbols-outlined text-[18px] group-hover/btn:scale-110 transition-transform"
-                          >receipt</span
-                        >
-                      </button>
-                      @if (sale.status === 'completed') {
+                      <div class="flex items-center gap-1 p-1 bg-white/60 dark:bg-stone-800/60 backdrop-blur-md border border-stone-200/80 dark:border-stone-700/50 rounded-2xl shadow-sm">
                         <button
-                          (click)="openCancelModal(sale); $event.stopPropagation()"
-                          class="h-9 w-9 rounded-xl bg-red-50/50 dark:bg-red-900/20 shadow-sm border border-red-100 dark:border-red-900/30 text-red-400 hover:text-red-600 dark:hover:text-red-400 hover:border-red-200 transition-all flex items-center justify-center cursor-pointer group/btn"
-                          title="Anular Venta"
+                          (click)="viewDetails(sale); $event.stopPropagation()"
+                          class="h-8 w-8 rounded-xl bg-transparent text-stone-500 hover:bg-stone-100 dark:hover:bg-stone-700 hover:text-stone-900 dark:hover:text-stone-100 transition-all flex items-center justify-center cursor-pointer group/btn"
+                          title="Ver Detalles"
                         >
                           <span
                             class="material-symbols-outlined text-[18px] group-hover/btn:scale-110 transition-transform"
-                            >block</span
+                            >visibility</span
                           >
                         </button>
-                      }
+                        <button
+                          (click)="printTicket(sale); $event.stopPropagation()"
+                          class="h-8 w-8 rounded-xl bg-transparent text-stone-500 hover:bg-stone-100 dark:hover:bg-stone-700 hover:text-stone-900 dark:hover:text-stone-100 transition-all flex items-center justify-center cursor-pointer group/btn"
+                          title="Imprimir Ticket"
+                        >
+                          <span
+                            class="material-symbols-outlined text-[18px] group-hover/btn:scale-110 transition-transform"
+                            >receipt</span
+                          >
+                        </button>
+                        @if (sale.status === 'completed') {
+                          <div class="w-px h-4 bg-stone-200 dark:bg-stone-700 mx-1"></div>
+                          <button
+                            (click)="openCancelModal(sale); $event.stopPropagation()"
+                            class="h-8 w-8 rounded-xl bg-transparent text-stone-400 hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-600 dark:hover:text-red-400 transition-all flex items-center justify-center cursor-pointer group/btn"
+                            title="Anular Venta"
+                          >
+                            <span
+                              class="material-symbols-outlined text-[18px] group-hover/btn:scale-110 transition-transform"
+                              >block</span
+                            >
+                          </button>
+                        }
+                      </div>
                     </div>
                   </td>
                 </tr>
               }
             </tbody>
           </table>
+        </div>
+
+        <!-- Vista Móvil (Cards) -->
+        <div class="block lg:hidden divide-y divide-stone-100 dark:divide-stone-800/50">
+          @for (sale of filteredSales(); track sale.id; let idx = $index) {
+            <div
+              class="p-5 hover:bg-stone-50/50 dark:hover:bg-stone-800/30 transition-all duration-300 animate-in fade-in slide-in-from-bottom-4 fill-mode-both"
+              [style.animation-delay]="idx * 30 + 'ms'"
+            >
+              <div class="flex justify-between items-start mb-3">
+                <div class="flex items-center gap-3">
+                  <div
+                    class="h-10 w-10 rounded-2xl bg-stone-100 dark:bg-stone-800 flex items-center justify-center text-stone-400 font-bold text-sm"
+                  >
+                    {{ (sale.customer?.name || 'C')[0] }}
+                  </div>
+                  <div>
+                    <span class="font-bold text-stone-900 dark:text-stone-100 block leading-tight">{{
+                      sale.customer?.name || 'Cliente Casual'
+                    }}</span>
+                    <span class="font-mono text-[11px] text-stone-500 font-bold mt-0.5 block">
+                      {{ sale.saleNumber }}
+                    </span>
+                  </div>
+                </div>
+                <div class="text-right">
+                  <span class="font-black text-[16px] text-stone-900 dark:text-white tracking-tight block">
+                    S/ {{ sale.total | number: '1.2-2' }}
+                  </span>
+                  <span class="text-[9px] font-bold text-stone-400 uppercase tracking-widest">
+                    {{ getPaymentMethodLabel(sale.paymentMethod) }}
+                  </span>
+                </div>
+              </div>
+
+              <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-2">
+                  <span class="material-symbols-outlined text-[14px] text-stone-400">schedule</span>
+                  <span class="text-[11px] text-stone-500 font-semibold">{{ sale.date | date: 'dd MMM, yyyy · h:mm a' }}</span>
+                </div>
+                <div
+                  class="px-2 py-0.5 rounded-full inline-flex items-center gap-1.5 text-[8px] font-black tracking-[0.1em] uppercase bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300"
+                >
+                  <span
+                    class="w-1.5 h-1.5 rounded-full shadow-[0_0_8px_currentColor]"
+                    [ngClass]="
+                      sale.status === 'completed'
+                        ? 'bg-emerald-500 text-emerald-500'
+                        : sale.status === 'pending'
+                          ? 'bg-amber-500 text-amber-500'
+                          : 'bg-red-500 text-red-500'
+                    "
+                  ></span>
+                  {{ getStatusBadge(sale.status).label }}
+                </div>
+              </div>
+
+              <!-- Acciones Móvil -->
+              <div class="flex gap-2 pt-3 border-t border-stone-100 dark:border-stone-800/50">
+                <button
+                  (click)="viewDetails(sale)"
+                  class="flex-1 py-2 rounded-xl bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 text-[11px] font-bold uppercase tracking-wider flex items-center justify-center gap-1 hover:bg-stone-200 transition-colors"
+                >
+                  <span class="material-symbols-outlined text-[14px]">visibility</span> Ver
+                </button>
+                <button
+                  (click)="printTicket(sale)"
+                  class="flex-1 py-2 rounded-xl bg-stone-900 text-white dark:bg-white dark:text-stone-900 text-[11px] font-bold uppercase tracking-wider flex items-center justify-center gap-1 shadow-md hover:scale-[1.02] transition-transform"
+                >
+                  <span class="material-symbols-outlined text-[14px]">receipt</span> Ticket
+                </button>
+                @if (sale.status === 'completed') {
+                  <button
+                    (click)="openCancelModal(sale)"
+                    class="w-10 rounded-xl bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 flex items-center justify-center transition-colors hover:bg-red-100 dark:hover:bg-red-900/40"
+                  >
+                    <span class="material-symbols-outlined text-[14px]">block</span>
+                  </button>
+                }
+              </div>
+            </div>
+          }
         </div>
 
         <!-- Pagination Bar (Spring Boot) -->
@@ -613,9 +674,9 @@
           (click)="$event.stopPropagation()"
         >
           <div
-            class="h-14 w-14 rounded-full bg-red-100 dark:bg-red-900/30 mx-auto flex items-center justify-center mb-4 text-red-600 dark:text-red-400"
+            class="h-14 w-14 rounded-2xl bg-stone-100 dark:bg-stone-800 mx-auto flex items-center justify-center mb-5 text-stone-900 dark:text-white"
           >
-            <span class="material-symbols-outlined text-2xl">undo</span>
+            <span class="material-symbols-outlined text-2xl">block</span>
           </div>
           <h3 class="text-xl font-bold mb-2 tracking-tight text-stone-900 dark:text-white">
             Anular esta Venta
@@ -652,7 +713,7 @@
             </button>
             <button
               (click)="confirmCancelSale()"
-              class="flex-1 py-3 bg-red-600 text-white font-semibold rounded-xl hover:bg-red-700 shadow-md shadow-red-600/20 transition-all active:scale-95"
+              class="flex-1 py-3 bg-stone-900 dark:bg-white text-white dark:text-stone-900 font-bold rounded-xl hover:bg-red-600 hover:text-white dark:hover:bg-red-600 dark:hover:text-white shadow-md hover:shadow-red-600/20 transition-all active:scale-95 group"
             >
               Anular Ahora
             </button>

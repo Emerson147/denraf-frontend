@@ -28,7 +28,7 @@ import { UiPageHeaderComponent } from '../../shared/ui/ui-page-header/ui-page-he
             <div class="flex items-center gap-1"
               [class.text-orange-500]="gamification.stats().currentStreak > 0"
               [class.text-stone-400]="gamification.stats().currentStreak === 0">
-              <span class="material-icons-outlined text-sm">local_fire_department</span>
+              <span class="material-symbols-outlined text-sm">local_fire_department</span>
               <span class="font-bold text-sm">{{ gamification.stats().currentStreak }} días</span>
             </div>
           </div>
@@ -43,7 +43,7 @@ import { UiPageHeaderComponent } from '../../shared/ui/ui-page-header/ui-page-he
           <!-- Nivel actual -->
           <div class="bg-white dark:bg-stone-900 border border-stone-200/60 dark:border-stone-800 rounded-3xl p-4 flex items-center gap-4 hover:border-stone-300 dark:hover:border-stone-700 transition-colors">
             <div class="w-10 h-10 rounded-full bg-stone-100 dark:bg-stone-800 flex items-center justify-center text-stone-600 dark:text-stone-400">
-              <span class="material-icons-outlined text-lg">military_tech</span>
+              <span class="material-symbols-outlined text-lg">military_tech</span>
             </div>
             <div class="flex-1">
               <p class="text-xs text-stone-500 font-medium">Nivel actual</p>
@@ -58,7 +58,7 @@ import { UiPageHeaderComponent } from '../../shared/ui/ui-page-header/ui-page-he
           <!-- Puntos totales -->
           <div class="bg-white dark:bg-stone-900 border border-stone-200/60 dark:border-stone-800 rounded-3xl p-4 flex items-center gap-4 hover:border-stone-300 dark:hover:border-stone-700 transition-colors">
             <div class="w-10 h-10 rounded-full bg-stone-100 dark:bg-stone-800 flex items-center justify-center text-stone-600 dark:text-stone-400">
-              <span class="material-icons-outlined text-lg">stars</span>
+              <span class="material-symbols-outlined text-lg">stars</span>
             </div>
             <div class="flex-1">
               <p class="text-xs text-stone-500 font-medium">Puntos totales</p>
@@ -82,7 +82,7 @@ import { UiPageHeaderComponent } from '../../shared/ui/ui-page-header/ui-page-he
               [class.bg-stone-100]="gamification.stats().currentStreak === 0"
               [class.dark:bg-stone-800]="gamification.stats().currentStreak === 0"
               [class.text-stone-400]="gamification.stats().currentStreak === 0">
-              <span class="material-icons-outlined text-lg">local_fire_department</span>
+              <span class="material-symbols-outlined text-lg">local_fire_department</span>
             </div>
             <div>
               <p class="text-xs font-medium"
@@ -105,7 +105,7 @@ import { UiPageHeaderComponent } from '../../shared/ui/ui-page-header/ui-page-he
           <!-- Galardones -->
           <div class="bg-white dark:bg-stone-900 border border-stone-200/60 dark:border-stone-800 rounded-3xl p-4 flex items-center gap-4 hover:border-stone-300 dark:hover:border-stone-700 transition-colors">
             <div class="w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center text-amber-600 dark:text-amber-400">
-              <span class="material-icons-outlined text-lg">emoji_events</span>
+              <span class="material-symbols-outlined text-lg">emoji_events</span>
             </div>
             <div>
               <p class="text-xs text-amber-600/80 dark:text-amber-500 font-medium">Galardones</p>
@@ -126,11 +126,11 @@ import { UiPageHeaderComponent } from '../../shared/ui/ui-page-header/ui-page-he
           <!-- HERO DARK: Nivel y progreso -->
           <div class="lg:col-span-4 bg-stone-900 rounded-3xl p-6 lg:p-8 flex flex-col justify-between relative overflow-hidden group">
             <div class="absolute -right-10 -bottom-10 opacity-10 group-hover:scale-110 transition-transform duration-700">
-              <span class="material-icons-outlined text-[150px] text-white">military_tech</span>
+              <span class="material-symbols-outlined text-[150px] text-white">military_tech</span>
             </div>
             <div class="relative z-10">
               <div class="flex items-center gap-2 text-stone-400 mb-2">
-                <span class="material-icons-outlined text-sm">stars</span>
+                <span class="material-symbols-outlined text-sm">stars</span>
                 <span class="text-xs uppercase tracking-widest font-semibold">
                   Nivel {{ gamification.currentLevel() }}
                 </span>
@@ -168,7 +168,7 @@ import { UiPageHeaderComponent } from '../../shared/ui/ui-page-header/ui-page-he
               <div class="flex items-center gap-3">
                 @if (isAdmin) {
                   <button (click)="openGoalModal()" class="px-3 py-1.5 flex items-center gap-1.5 bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 text-[11px] font-bold rounded-lg hover:scale-105 transition-transform shadow-sm">
-                    <span class="material-icons-outlined text-[14px]">add</span>
+                    <span class="material-symbols-outlined text-[14px]">add</span>
                     Nueva Meta
                   </button>
                 }
@@ -225,7 +225,7 @@ import { UiPageHeaderComponent } from '../../shared/ui/ui-page-header/ui-page-he
               } @empty {
                 <div class="p-12 flex flex-col items-center justify-center text-center">
                   <div class="w-16 h-16 rounded-full bg-stone-50 dark:bg-stone-800 flex items-center justify-center mb-4">
-                    <span class="material-icons-outlined text-3xl text-stone-300 dark:text-stone-600">flag</span>
+                    <span class="material-symbols-outlined text-3xl text-stone-300 dark:text-stone-600">flag</span>
                   </div>
                   <h3 class="text-sm font-bold text-stone-900 dark:text-stone-100">Sin metas activas</h3>
                   <p class="text-xs text-stone-500 mt-1 max-w-[200px]">Tu historial de metas anteriores y próximas aparecerá aquí.</p>
@@ -266,7 +266,7 @@ import { UiPageHeaderComponent } from '../../shared/ui/ui-page-header/ui-page-he
                     [class.bg-stone-100]="!achievement.unlocked"
                     [class.dark:bg-stone-800]="!achievement.unlocked"
                     [class.text-stone-300]="!achievement.unlocked">
-                    <span class="material-icons-outlined text-[20px]">{{ achievement.icon }}</span>
+                    <span class="material-symbols-outlined text-[20px]">{{ achievement.icon }}</span>
                   </div>
                   <div class="flex-1 min-w-0">
                     <div class="flex items-center justify-between mb-0.5">
@@ -297,13 +297,13 @@ import { UiPageHeaderComponent } from '../../shared/ui/ui-page-header/ui-page-he
           <!-- RANKING DARK — mismo lenguaje que "Ferias vs Tienda" -->
           <div class="lg:col-span-5 bg-stone-900 rounded-3xl p-6 lg:p-8 relative overflow-hidden group flex flex-col">
             <div class="absolute -right-8 -bottom-8 opacity-10 group-hover:scale-110 transition-transform duration-700">
-              <span class="material-icons-outlined text-[140px] text-white">leaderboard</span>
+              <span class="material-symbols-outlined text-[140px] text-white">leaderboard</span>
             </div>
 
             <!-- Header ranking -->
             <div class="relative z-10 flex items-center gap-3 mb-6">
               <div class="w-10 h-10 rounded-xl bg-amber-500/20 flex items-center justify-center">
-                <span class="material-icons-outlined text-amber-400">leaderboard</span>
+                <span class="material-symbols-outlined text-amber-400">leaderboard</span>
               </div>
               <div>
                 <h3 class="text-lg font-bold text-white">Clasificación</h3>
@@ -346,7 +346,7 @@ import { UiPageHeaderComponent } from '../../shared/ui/ui-page-header/ui-page-he
                     <div class="flex items-center gap-1.5">
                       <p class="text-[13px] font-semibold text-white truncate">{{ entry.userName }}</p>
                       @if (entry.streak > 2) {
-                        <span class="material-icons-outlined text-orange-400 text-sm">local_fire_department</span>
+                        <span class="material-symbols-outlined text-orange-400 text-sm">local_fire_department</span>
                       }
                     </div>
                     <p class="text-[11px] text-stone-400">{{ entry.totalSales }} ventas</p>
@@ -395,7 +395,7 @@ import { UiPageHeaderComponent } from '../../shared/ui/ui-page-header/ui-page-he
           <!-- Modal Panel Premium Solid -->
           <div class="relative bg-white dark:bg-stone-900 border border-stone-200/60 dark:border-stone-800 rounded-3xl p-8 w-full max-w-md shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)] dark:shadow-[0_20px_50px_-12px_rgba(0,0,0,0.5)] animate-scale-in">
             <h2 class="text-xl font-bold text-stone-900 dark:text-stone-100 mb-6 flex items-center gap-2">
-              <span class="material-icons-outlined text-emerald-500">campaign</span>
+              <span class="material-symbols-outlined text-emerald-500">campaign</span>
               Asignar Meta
             </h2>
 

@@ -40,7 +40,7 @@
                   'text-rose-600 dark:text-rose-400': (dashboardData()?.crecimientoSemanal || 0) < 0,
                   'text-stone-600 dark:text-stone-400': (dashboardData()?.crecimientoSemanal || 0) === 0
                 }">
-                <span class="material-icons-outlined text-sm">{{ (dashboardData()?.crecimientoSemanal || 0) >= 0 ? 'trending_up' : 'trending_down' }}</span>
+                <span class="material-symbols-outlined text-sm">{{ (dashboardData()?.crecimientoSemanal || 0) >= 0 ? 'trending_up' : 'trending_down' }}</span>
                 <span class="font-bold text-sm">{{ (dashboardData()?.crecimientoSemanal || 0) > 0 ? '+' : ''}}{{ (dashboardData()?.crecimientoSemanal || 0) | number : '1.1-1' }}%</span>
               </div>
             </div>
@@ -68,11 +68,11 @@
         <!-- Ingresos Totales Hero Box -->
         <div class="flex-1 bg-stone-900 rounded-3xl p-6 lg:p-8 flex flex-col justify-between relative overflow-hidden group">
           <div class="absolute -right-10 -bottom-10 opacity-10 group-hover:scale-110 transition-transform duration-700">
-            <span class="material-icons-outlined text-[150px] text-white">account_balance_wallet</span>
+            <span class="material-symbols-outlined text-[150px] text-white">account_balance_wallet</span>
           </div>
           <div class="relative z-10">
             <div class="flex items-center gap-2 text-stone-400 mb-2">
-              <span class="material-icons-outlined text-sm">attach_money</span>
+              <span class="material-symbols-outlined text-sm">attach_money</span>
               <span class="text-xs uppercase tracking-widest font-semibold">Total Ingresos</span>
             </div>
             <p class="text-4xl lg:text-5xl font-bold text-white tracking-tight">S/ {{ (dashboardData()?.ingresosSemana || 0) | number : '1.0-0' }}</p>
@@ -87,7 +87,7 @@
           <div>
             <div class="flex items-center justify-between mb-2">
               <div class="flex items-center gap-2 text-stone-500 dark:text-stone-400">
-                <span class="material-icons-outlined text-sm">trending_up</span>
+                <span class="material-symbols-outlined text-sm">trending_up</span>
                 <span class="text-xs uppercase tracking-widest font-semibold">Ganancia Neta</span>
               </div>
             </div>
@@ -107,7 +107,7 @@
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
       <div class="bg-white dark:bg-stone-900 border border-stone-200/60 dark:border-stone-800 rounded-2xl p-4 flex items-center gap-4 hover:border-stone-300 dark:hover:border-stone-700 transition-colors">
         <div class="w-10 h-10 rounded-full bg-stone-100 dark:bg-stone-800 flex items-center justify-center text-stone-600 dark:text-stone-400">
-          <span class="material-icons-outlined text-lg">pie_chart</span>
+          <span class="material-symbols-outlined text-lg">pie_chart</span>
         </div>
         <div>
           <p class="text-xs text-stone-500 font-medium">Margen Global</p>
@@ -117,7 +117,7 @@
 
       <div class="bg-white dark:bg-stone-900 border border-stone-200/60 dark:border-stone-800 rounded-2xl p-4 flex items-center gap-4 hover:border-stone-300 dark:hover:border-stone-700 transition-colors">
         <div class="w-10 h-10 rounded-full bg-stone-100 dark:bg-stone-800 flex items-center justify-center text-stone-600 dark:text-stone-400">
-          <span class="material-icons-outlined text-lg">rocket_launch</span>
+          <span class="material-symbols-outlined text-lg">rocket_launch</span>
         </div>
         <div>
           <p class="text-xs text-stone-500 font-medium">ROI Estimado</p>
@@ -127,7 +127,7 @@
 
       <div class="bg-white dark:bg-stone-900 border border-stone-200/60 dark:border-stone-800 rounded-2xl p-4 flex items-center gap-4 hover:border-stone-300 dark:hover:border-stone-700 transition-colors">
         <div class="w-10 h-10 rounded-full bg-stone-100 dark:bg-stone-800 flex items-center justify-center text-stone-600 dark:text-stone-400">
-          <span class="material-icons-outlined text-lg">receipt</span>
+          <span class="material-symbols-outlined text-lg">receipt</span>
         </div>
         <div>
           <p class="text-xs text-stone-500 font-medium">Ticket Promedio</p>
@@ -137,7 +137,7 @@
 
       <div class="bg-white dark:bg-stone-900 border border-stone-200/60 dark:border-stone-800 rounded-2xl p-4 flex items-center gap-4 hover:border-stone-300 dark:hover:border-stone-700 transition-colors">
         <div class="w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center text-amber-600 dark:text-amber-400">
-          <span class="material-icons-outlined text-lg">star</span>
+          <span class="material-symbols-outlined text-lg">star</span>
         </div>
         <div>
           <p class="text-xs text-amber-600/80 dark:text-amber-500 font-medium">Mejor Día</p>
@@ -160,7 +160,7 @@
           <div class="flex items-center gap-4 p-4 hover:bg-stone-50 dark:hover:bg-stone-800/50 rounded-2xl transition-colors group cursor-default">
             <!-- Icono Venta -->
             <div class="w-12 h-12 rounded-xl bg-stone-100 dark:bg-stone-800 flex items-center justify-center text-stone-500 shrink-0">
-              <span class="material-icons-outlined">sell</span>
+              <span class="material-symbols-outlined">sell</span>
             </div>
             
             <div class="flex-1 min-w-0">
@@ -184,7 +184,7 @@
           </div>
           } @empty {
             <div class="h-full flex flex-col items-center justify-center text-stone-400 p-8">
-              <span class="material-icons-outlined text-5xl mb-4 opacity-20">receipt_long</span>
+              <span class="material-symbols-outlined text-5xl mb-4 opacity-20">receipt_long</span>
               <p>No hay actividad registrada en este período</p>
             </div>
           }
@@ -237,7 +237,7 @@
                 </div>
               } @empty {
                 <div class="text-center mt-10">
-                  <span class="material-icons-outlined text-4xl text-emerald-400 mb-2">check_circle</span>
+                  <span class="material-symbols-outlined text-4xl text-emerald-400 mb-2">check_circle</span>
                   <p class="text-sm text-stone-500">Inventario saludable. Ningún stock bajo.</p>
                 </div>
               }
@@ -248,7 +248,7 @@
           @if(activeDashboardTab() === 'proyeccion') {
             <div class="flex flex-col h-full animate-in fade-in slide-in-from-bottom-2 duration-300">
               <div class="text-center mb-8 mt-4">
-                <span class="material-icons-outlined text-4xl text-stone-300 dark:text-stone-600 mb-2">auto_graph</span>
+                <span class="material-symbols-outlined text-4xl text-stone-300 dark:text-stone-600 mb-2">auto_graph</span>
                 <h3 class="text-lg font-bold text-stone-900 dark:text-stone-100">Próxima Semana</h3>
                 <p class="text-xs text-stone-500">Cálculo basado en histórico transaccional.</p>
               </div>

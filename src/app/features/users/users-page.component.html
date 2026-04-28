@@ -5,7 +5,7 @@
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
       <div class="flex items-center gap-3">
         <div class="w-12 h-12 rounded-xl bg-stone-200/50 dark:bg-stone-800/50 flex items-center justify-center transition-colors duration-300">
-          <span class="material-icons-outlined text-2xl text-stone-600 dark:text-stone-300">admin_panel_settings</span>
+          <span class="material-symbols-outlined text-2xl text-stone-600 dark:text-stone-300">admin_panel_settings</span>
         </div>
         <div>
           <h1 class="text-2xl sm:text-3xl font-bold text-stone-900 dark:text-stone-100 tracking-tight">Gestión de Usuarios</h1>
@@ -18,7 +18,7 @@
         class="bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 rounded-xl shadow-lg"
       >
         <span class="flex items-center gap-2">
-          <span class="material-icons-outlined text-sm">person_add</span>
+          <span class="material-symbols-outlined text-sm">person_add</span>
           Nuevo Usuario
         </span>
       </app-ui-button>
@@ -47,7 +47,7 @@
         } @else {
            @if (users().length === 0) {
               <div class="flex flex-col items-center justify-center h-64 text-center">
-                 <span class="material-icons-outlined text-4xl text-stone-300 dark:text-stone-600 mb-2">people_outline</span>
+                 <span class="material-symbols-outlined text-4xl text-stone-300 dark:text-stone-600 mb-2">people_outline</span>
                  <p class="text-stone-500 font-medium">Aún no hay usuarios creados.</p>
               </div>
            } @else {
@@ -78,7 +78,7 @@
                        
                        <div class="space-y-1 mb-4">
                           <div class="flex items-center gap-2 text-stone-600 dark:text-stone-400">
-                             <span class="material-icons-outlined text-[14px]">email</span>
+                             <span class="material-symbols-outlined text-[14px]">email</span>
                              <span class="text-xs font-mono">{{ user.email }}</span>
                           </div>
                        </div>
@@ -86,11 +86,11 @@
                        <!-- ACCIONES HORIZONTALES OCULTAS -->
                        <div class="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                           <button (click)="openEditModal(user)" class="flex-1 py-1.5 flex items-center justify-center gap-1.5 bg-stone-100 dark:bg-stone-800 hover:bg-stone-200 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-300 rounded-lg text-xs font-bold transition-colors">
-                             <span class="material-icons-outlined text-[14px]">edit</span>
+                             <span class="material-symbols-outlined text-[14px]">edit</span>
                              Editar
                           </button>
                           <button (click)="deleteUser(user.id)" class="py-1.5 px-3 flex items-center justify-center bg-rose-50 dark:bg-rose-900/20 hover:bg-rose-100 dark:hover:bg-rose-900/40 text-rose-600 dark:text-rose-400 rounded-lg transition-colors">
-                             <span class="material-icons-outlined text-[14px]">person_off</span>
+                             <span class="material-symbols-outlined text-[14px]">person_off</span>
                           </button>
                        </div>
 
@@ -111,7 +111,7 @@
         <p class="text-xs text-stone-400 font-medium tracking-wide uppercase">{{ isEditing() ? 'Actualizar credenciales' : 'Registrar nueva cuenta' }}</p>
       </div>
       <div class="h-10 w-10 rounded-xl bg-stone-100 dark:bg-stone-800 flex items-center justify-center text-stone-600 dark:text-stone-300">
-        <span class="material-icons-outlined text-lg">{{ isEditing() ? 'edit' : 'person_add' }}</span>
+        <span class="material-symbols-outlined text-lg">{{ isEditing() ? 'edit' : 'person_add' }}</span>
       </div>
     </div>
 
@@ -159,7 +159,7 @@
       <!-- ERROR ALERT -->
       @if (formError()) {
          <div class="p-3 bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800 rounded-lg flex items-center gap-2">
-            <span class="material-icons-outlined text-sm text-rose-600 dark:text-rose-400">error</span>
+            <span class="material-symbols-outlined text-sm text-rose-600 dark:text-rose-400">error</span>
             <span class="text-sm text-rose-600 dark:text-rose-400">{{ formError() }}</span>
          </div>
       }
@@ -180,7 +180,7 @@
         >
           <span class="flex items-center justify-center gap-2">
             @if (isSaving()) {
-              <span class="material-icons-outlined text-sm animate-spin">refresh</span>
+              <span class="material-symbols-outlined text-sm animate-spin">refresh</span>
             }
             {{ isEditing() ? 'Guardar Cambios' : 'Crear Usuario' }}
           </span>

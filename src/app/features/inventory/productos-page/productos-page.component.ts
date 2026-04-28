@@ -28,7 +28,7 @@ import { ImageFallbackDirective } from '../../../shared/directives/image-fallbac
   standalone: true,
   imports: [
     CommonModule,
-    ScrollingModule, // 🚀 Virtual Scrolling
+    ScrollingModule, //  Virtual Scrolling
     UiInputComponent,
     UiButtonComponent,
     UiAnimatedDialogComponent,
@@ -38,38 +38,39 @@ import { ImageFallbackDirective } from '../../../shared/directives/image-fallbac
   ],
   templateUrl: './productos-page.component.html',
   styleUrls: ['./productos-page.component.css'],
-  changeDetection: ChangeDetectionStrategy.OnPush, // 🚀 Optimización de Change Detection
+  changeDetection: ChangeDetectionStrategy.OnPush, //  Optimización de Change Detection
 })
 export class ProductosPageComponent {
   private productService = inject(ProductService);
   private cloudinary = inject(CloudinaryService);
   private destroyRef = inject(DestroyRef);
 
-  // 🚀 Debounce para búsqueda (Fase 2)
+  // Debounce para búsqueda (Fase 2)
   private searchSubject = new Subject<string>();
   private debouncedSearch = signal('');
 
   constructor() {
-    // 🚀 Configurar debounce de 300ms para la búsqueda
+    // Configurar debounce de 300ms para la búsqueda
     const subscription = this.searchSubject
       .pipe(debounceTime(300), distinctUntilChanged())
       .subscribe((value) => {
         this.debouncedSearch.set(value);
       });
 
-    // 🧹 Cleanup automático
+    //  Cleanup automático
     this.destroyRef.onDestroy(() => subscription.unsubscribe());
   }
 
-  // 🖼️ Estado de upload de imagen
+  //  Estado de upload de imagen
   isUploadingImage = signal(false);
   uploadProgress = signal(0);
   selectedFile = signal<File | null>(null);
-  isDragging = signal(false); // 🆕 Estado para drag & drop
+  isDragging = signal(false); // Estado para drag & drop
 
-  // 🆕 Estados para UI Avanzada
+  //  Estados para UI Avanzada
   viewMode = signal<'list' | 'grid'>('list');
   selectedProducts = signal<string[]>([]);
+  showStats = signal<boolean>(true);
   activeDropdownId = signal<string | null>(null);
 
   // Productos desde el servicio central
@@ -78,7 +79,7 @@ export class ProductosPageComponent {
   // Señales para búsqueda y modal
   searchQuery = signal('');
 
-  // 🆕 Sistema de filtros inicial
+  //  Sistema de filtros inicial
   selectedCategory = signal<string | null>(null);
   selectedGender = signal<string | null>(null);
 
@@ -91,7 +92,7 @@ export class ProductosPageComponent {
   // Método para manejar cambios en input de búsqueda
   onSearchChange(value: string): void {
     this.searchQuery.set(value);
-    this.searchSubject.next(value); // 🚀 Trigger debounce
+    this.searchSubject.next(value); // Trigger debounce
     this.currentPage.set(1);
   }
 
@@ -112,7 +113,7 @@ export class ProductosPageComponent {
   variants = signal<ProductVariant[]>([]); // Variantes del producto
   expandedProductId = signal<string | null>(null); // Para expandir/contraer variantes en cards
 
-  // 🆕 Paginación y Modales
+  //  Paginación y Modales
   currentPage = signal(1);
   pageSize = signal(10);
   activeModalTab = signal<'INFO' | 'VARIANTS' | 'FINANCE'>('INFO');
@@ -141,6 +142,15 @@ export class ProductosPageComponent {
   margin = computed(() => {
     if (this.salePrice() === 0) return 0;
     return ((this.profit() / this.salePrice()) * 100).toFixed(1);
+  });
+
+  // 🆕 Estadísticas Globales para Bento Grid
+  statsCriticalStock = computed(() => {
+    return this.products().filter((p) => p.stock <= (p.minStock || 5)).length;
+  });
+
+  statsTotalValue = computed(() => {
+    return this.products().reduce((acc, p) => acc + p.stock * p.cost, 0);
   });
 
   // Computed: Validación del formulario
@@ -177,7 +187,7 @@ export class ProductosPageComponent {
       filtered = filtered.filter(
         (p) =>
           p.name.toLowerCase().includes(gender.toLowerCase()) ||
-          p.category.toLowerCase().includes(gender.toLowerCase())
+          p.category.toLowerCase().includes(gender.toLowerCase()),
       );
     }
 
@@ -185,7 +195,7 @@ export class ProductosPageComponent {
     const query = this.debouncedSearch().toLowerCase();
     if (query) {
       filtered = filtered.filter(
-        (p) => p.name.toLowerCase().includes(query) || p.category.toLowerCase().includes(query)
+        (p) => p.name.toLowerCase().includes(query) || p.category.toLowerCase().includes(query),
       );
     }
 
@@ -207,14 +217,20 @@ export class ProductosPageComponent {
 
   nextPage() {
     if (this.currentPage() < this.totalPages()) {
-      this.currentPage.update(p => p + 1);
+      this.currentPage.update((p) => p + 1);
     }
   }
 
   prevPage() {
     if (this.currentPage() > 1) {
-      this.currentPage.update(p => p - 1);
+      this.currentPage.update((p) => p - 1);
     }
+  }
+
+  onPageSizeChange(event: Event) {
+    const size = parseInt((event.target as HTMLSelectElement).value, 10);
+    this.pageSize.set(size);
+    this.currentPage.set(1);
   }
 
   generateBarcode() {
@@ -222,7 +238,7 @@ export class ProductosPageComponent {
   }
 
   // 🆕 MÉTODOS DE UI AVANZADA (Selección, Vista, Dropdown)
-  
+
   toggleViewMode(mode: 'list' | 'grid') {
     this.viewMode.set(mode);
   }
@@ -230,19 +246,19 @@ export class ProductosPageComponent {
   toggleSelection(productId: string) {
     const current = this.selectedProducts();
     if (current.includes(productId)) {
-      this.selectedProducts.set(current.filter(id => id !== productId));
+      this.selectedProducts.set(current.filter((id) => id !== productId));
     } else {
       this.selectedProducts.set([...current, productId]);
     }
   }
 
   toggleAllSelection() {
-    const currentPaginated = this.paginatedProducts().map(p => p.id);
+    const currentPaginated = this.paginatedProducts().map((p) => p.id);
     const selected = this.selectedProducts();
-    const allVisibleSelected = currentPaginated.every(id => selected.includes(id));
-    
+    const allVisibleSelected = currentPaginated.every((id) => selected.includes(id));
+
     if (allVisibleSelected) {
-      this.selectedProducts.set(selected.filter(id => !currentPaginated.includes(id)));
+      this.selectedProducts.set(selected.filter((id) => !currentPaginated.includes(id)));
     } else {
       const newSelection = Array.from(new Set([...selected, ...currentPaginated]));
       this.selectedProducts.set(newSelection);
@@ -252,7 +268,7 @@ export class ProductosPageComponent {
   isAllSelected(): boolean {
     const currentPaginated = this.paginatedProducts();
     if (currentPaginated.length === 0) return false;
-    return currentPaginated.every(p => this.selectedProducts().includes(p.id));
+    return currentPaginated.every((p) => this.selectedProducts().includes(p.id));
   }
 
   clearSelection() {
@@ -285,7 +301,7 @@ export class ProductosPageComponent {
     event.preventDefault();
     event.stopPropagation();
     this.isDragging.set(false);
-    
+
     const files = event.dataTransfer?.files;
     if (files && files.length > 0) {
       const file = files[0];
@@ -518,7 +534,7 @@ export class ProductosPageComponent {
    */
   updateVariantStock(variantId: string, stock: number) {
     const updated = this.variants().map((v) =>
-      v.id === variantId ? { ...v, stock: Math.max(0, stock) } : v
+      v.id === variantId ? { ...v, stock: Math.max(0, stock) } : v,
     );
     this.variants.set(updated);
   }
@@ -578,7 +594,7 @@ export class ProductosPageComponent {
 
         const publicId = editingId || `producto-${Date.now()}`;
         const result = await this.cloudinary.uploadImage(file, publicId, (progress) =>
-          this.uploadProgress.set(progress.percentage)
+          this.uploadProgress.set(progress.percentage),
         );
 
         imageUrl = result.url;
@@ -641,7 +657,7 @@ export class ProductosPageComponent {
     if (action === 'delete') {
       if (
         confirm(
-          '¿Archivar este producto? No se eliminará si tiene ventas asociadas, solo se ocultará del inventario.'
+          '¿Archivar este producto? No se eliminará si tiene ventas asociadas, solo se ocultará del inventario.',
         )
       ) {
         const success = await this.productService.deleteProduct(id);
@@ -701,10 +717,8 @@ export class ProductosPageComponent {
       Polos: 'dry_cleaning',
       Jeans: 'style',
       Accesorios: 'diamond',
-      Calzado: 'steps'
+      Calzado: 'steps',
     };
     return icons[category] || 'category';
   }
-
- 
 }

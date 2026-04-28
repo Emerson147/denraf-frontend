@@ -1,235 +1,500 @@
 <div
-  class="min-h-screen bg-stone-50 dark:bg-stone-950 p-4 sm:p-6 lg:p-8 transition-colors duration-300 ease-out"
+  class="min-h-screen bg-[#f8fafc] dark:bg-[#09090b] p-4 sm:p-8 transition-colors duration-300 font-sans tracking-tight"
   (click)="closeDropdowns()"
 >
   <div class="w-full space-y-6 relative">
-    <!-- Header Estandarizado -->
-    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-      <app-ui-page-header
-        title="Catálogo de Productos"
-        subtitle="DenRaf · Gestión operativa del inventario"
-        materialIcon="inventory_2"
-      >
-        <div class="hidden sm:block">
-          <p class="text-xs text-stone-500 dark:text-stone-400 uppercase tracking-widest font-bold">Total SKUs</p>
-          <p class="text-xl font-bold leading-none mt-1 text-stone-800 dark:text-stone-100">{{ products().length }}</p>
-        </div>
-      </app-ui-page-header>
-      
-      <!-- Buscador y Acciones Principales -->
-      <div class="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto mt-2 sm:mt-0">
-        <div class="relative w-full sm:w-64 group">
-          <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-stone-400 group-focus-within:text-stone-900 dark:group-focus-within:text-stone-100 transition-colors">
-            <span class="material-icons-outlined text-[18px]">search</span>
-          </div>
-          <input
-            type="text"
-            [value]="searchQuery()"
-            (input)="onSearchChange($any($event.target).value)"
-            placeholder="Buscar..."
-            class="w-full h-10 pl-11 pr-4 bg-stone-200/50 dark:bg-stone-800/50 hover:bg-stone-200/80 dark:hover:bg-stone-800/80 rounded-full text-[13px] font-medium focus:outline-hidden focus:ring-2 focus:ring-stone-900 dark:focus:ring-stone-100 transition-all placeholder:text-stone-400 dark:placeholder:text-stone-500 text-stone-900 dark:text-stone-100 border-none"
-          />
-        </div>
-        
-        <div class="flex items-center gap-2 w-full sm:w-auto bg-white dark:bg-stone-900 border border-stone-200/60 dark:border-stone-800 p-1 rounded-xl shadow-sm">
-          <button (click)="toggleViewMode('list')" [ngClass]="viewMode() === 'list' ? 'bg-stone-100 dark:bg-stone-800 text-stone-900 dark:text-stone-100' : 'text-stone-400 hover:text-stone-600 dark:hover:text-stone-300'" class="p-1.5 rounded-lg transition-colors flex items-center justify-center cursor-pointer" title="Vista de lista">
-            <span class="material-icons-outlined text-[18px]">table_rows</span>
-          </button>
-          <button (click)="toggleViewMode('grid')" [ngClass]="viewMode() === 'grid' ? 'bg-stone-100 dark:bg-stone-800 text-stone-900 dark:text-stone-100' : 'text-stone-400 hover:text-stone-600 dark:hover:text-stone-300'" class="p-1.5 rounded-lg transition-colors flex items-center justify-center cursor-pointer" title="Vista de cuadrícula">
-            <span class="material-icons-outlined text-[18px]">grid_view</span>
-          </button>
-        </div>
+    <!-- Header Premium -->
+    <app-ui-page-header
+      title="Catálogo de Productos"
+      subtitle="DenRaf · Gestión operativa y control de existencias."
+      materialIcon="inventory_2"
+    >
+      <div class="flex gap-2">
+        <!-- Toggle Estadísticas -->
+        <button
+          (click)="showStats.set(!showStats())"
+          class="h-10 w-10 flex items-center justify-center rounded-full border border-stone-200 dark:border-stone-800 text-stone-500 hover:text-stone-900 dark:hover:text-stone-100 transition-all active:scale-95 cursor-pointer bg-white/50 dark:bg-stone-900/50 backdrop-blur"
+          [title]="showStats() ? 'Ocultar estadísticas' : 'Mostrar estadísticas'"
+        >
+          <span
+            class="material-symbols-outlined text-[20px] transition-transform duration-300"
+            [class.rotate-180]="!showStats()"
+            >analytics</span
+          >
+        </button>
 
-        <button (click)="openCreate()" class="w-full sm:w-auto bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 rounded-xl px-5 py-2.5 font-medium shadow-sm hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 text-sm whitespace-nowrap">
-          <span class="material-icons-outlined text-sm">add</span>
-          Nuevo Producto
+        <button
+          (click)="openCreate()"
+          class="bg-stone-900 hover:bg-black dark:bg-stone-100 dark:hover:bg-white text-white dark:text-stone-900 rounded-full px-6 py-2.5 font-bold shadow-sm active:scale-[0.98] transition-all flex items-center justify-center gap-2 text-sm whitespace-nowrap"
+        >
+          <span class="material-symbols-outlined text-sm">add</span>
+          Nuevo SKU
         </button>
       </div>
-    </div>
+    </app-ui-page-header>
+
+    <!-- Resumen Bento Grid (Estadísticas Zen Compactas) -->
+    @if (showStats()) {
+      <div
+        class="grid grid-cols-1 md:grid-cols-3 gap-4 animate-in slide-in-from-top-4 fade-in duration-500"
+      >
+        <!-- Card: Total SKUs -->
+        <div
+          class="relative overflow-hidden bg-white/80 dark:bg-stone-900/40 p-4 rounded-3xl border border-stone-200/60 dark:border-stone-800 shadow-sm transition-all duration-300 group"
+        >
+          <div class="flex items-center gap-4">
+            <div
+              class="h-10 w-10 rounded-2xl bg-stone-100 dark:bg-stone-800 flex items-center justify-center text-stone-500 group-hover:bg-stone-900 group-hover:text-white dark:group-hover:bg-stone-100 dark:group-hover:text-stone-900 transition-all duration-300"
+            >
+              <span class="material-symbols-outlined text-[20px]">category</span>
+            </div>
+            <div>
+              <p
+                class="text-[10px] font-bold text-stone-400 dark:text-stone-500 uppercase tracking-widest"
+              >
+                Productos
+              </p>
+              <h3 class="text-xl font-bold tracking-tight text-stone-900 dark:text-stone-100">
+                {{ products().length }}
+              </h3>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card: Stock Crítico -->
+        <div
+          class="relative overflow-hidden bg-white/80 dark:bg-stone-900/40 p-4 rounded-3xl border border-stone-200/60 dark:border-stone-800 shadow-sm transition-all duration-300 group"
+        >
+          <div class="flex items-center gap-4">
+            <div
+              class="h-10 w-10 rounded-2xl flex items-center justify-center transition-all duration-300"
+              [ngClass]="
+                statsCriticalStock() > 0
+                  ? 'bg-red-50 text-red-500 animate-pulse'
+                  : 'bg-stone-100 dark:bg-stone-800 text-stone-500'
+              "
+            >
+              <span class="material-symbols-outlined text-[20px]">notification_important</span>
+            </div>
+            <div>
+              <p
+                class="text-[10px] font-bold uppercase tracking-widest"
+                [ngClass]="
+                  statsCriticalStock() > 0 ? 'text-red-500' : 'text-stone-400 dark:text-stone-500'
+                "
+              >
+                Alertas
+              </p>
+              <h3 class="text-xl font-bold tracking-tight text-stone-900 dark:text-stone-100">
+                {{ statsCriticalStock() }}
+              </h3>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card: Valor Total -->
+        <div
+          class="relative overflow-hidden bg-white/80 dark:bg-stone-900/40 p-4 rounded-3xl border border-stone-200/60 dark:border-stone-800 shadow-sm transition-all duration-300 group"
+        >
+          <div class="flex items-center gap-4">
+            <div
+              class="h-10 w-10 rounded-2xl bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400 transition-all duration-300"
+            >
+              <span class="material-symbols-outlined text-[20px]">account_balance_wallet</span>
+            </div>
+            <div>
+              <p
+                class="text-[10px] font-bold text-emerald-600/80 dark:text-emerald-400/80 uppercase tracking-widest"
+              >
+                Valor Total
+              </p>
+              <h3 class="text-xl font-bold tracking-tight text-stone-900 dark:text-stone-100">
+                S/ {{ statsTotalValue() | number: '1.0-0' }}
+              </h3>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
 
     <!-- Barra de Acciones en Lote Flotante -->
     @if (selectedProducts().length > 0) {
-      <div class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 px-6 py-3 rounded-full shadow-2xl flex items-center gap-6 animate-in slide-in-from-bottom-8 fade-in duration-300">
+      <div
+        class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 px-4 sm:px-6 py-2.5 sm:py-3 rounded-full shadow-2xl flex items-center gap-3 sm:gap-6 animate-in slide-in-from-bottom-8 fade-in duration-300 max-w-[calc(100vw-2rem)] overflow-x-auto no-scrollbar"
+      >
         <span class="text-sm font-bold flex items-center gap-2">
-          <span class="flex h-6 w-6 rounded-full bg-stone-800 dark:bg-stone-200 items-center justify-center text-xs">{{ selectedProducts().length }}</span>
+          <span
+            class="flex h-6 w-6 rounded-full bg-stone-800 dark:bg-stone-200 items-center justify-center text-xs"
+            >{{ selectedProducts().length }}</span
+          >
           seleccionados
         </span>
         <div class="h-4 w-px bg-stone-700 dark:bg-stone-300"></div>
         <div class="flex items-center gap-2">
-          <button class="px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-stone-800 dark:hover:bg-stone-200 transition-colors flex items-center gap-1.5">
-            <span class="material-icons-outlined text-[16px]">label</span>
+          <button
+            class="px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-stone-800 dark:hover:bg-stone-200 transition-colors flex items-center gap-1.5"
+          >
+            <span class="material-symbols-outlined text-[16px]">label</span>
             Categorizar
           </button>
-          <button class="px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-stone-800 dark:hover:bg-stone-200 transition-colors flex items-center gap-1.5">
-            <span class="material-icons-outlined text-[16px]">sell</span>
+          <button
+            class="px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-stone-800 dark:hover:bg-stone-200 transition-colors flex items-center gap-1.5"
+          >
+            <span class="material-symbols-outlined text-[16px]">sell</span>
             Precios
           </button>
-          <button class="px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-stone-800 dark:hover:bg-stone-200 transition-colors flex items-center gap-1.5">
-            <span class="material-icons-outlined text-[16px]">download</span>
+          <button
+            class="px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-stone-800 dark:hover:bg-stone-200 transition-colors flex items-center gap-1.5"
+          >
+            <span class="material-symbols-outlined text-[16px]">download</span>
             Exportar
           </button>
-          
+
           <div class="w-px h-4 bg-stone-700 dark:bg-stone-300 mx-1"></div>
-          
-          <button class="px-3 py-1.5 rounded-lg text-sm font-medium text-red-400 hover:text-red-300 hover:bg-red-900/20 dark:text-red-600 dark:hover:text-red-700 dark:hover:bg-red-100 transition-colors flex items-center gap-1.5">
-            <span class="material-icons-outlined text-[16px]">delete</span>
+
+          <button
+            class="px-3 py-1.5 rounded-lg text-sm font-medium text-red-400 hover:text-red-300 hover:bg-red-900/20 dark:text-red-600 dark:hover:text-red-700 dark:hover:bg-red-100 transition-colors flex items-center gap-1.5"
+          >
+            <span class="material-symbols-outlined text-[16px]">delete</span>
             Archivar
           </button>
-          
-          <button (click)="clearSelection()" class="px-3 py-1.5 rounded-lg text-sm font-medium text-stone-400 hover:text-white dark:hover:text-stone-900 transition-colors ml-1">
+
+          <button
+            (click)="clearSelection()"
+            class="px-3 py-1.5 rounded-lg text-sm font-medium text-stone-400 hover:text-white dark:hover:text-stone-900 transition-colors ml-1"
+          >
             Cancelar
           </button>
         </div>
       </div>
     }
 
-    <!-- Barra de Filtros Minimalista -->
-    <div class="flex items-center gap-1.5 mb-8 overflow-x-auto no-scrollbar px-1">
-      <button 
-        (click)="clearFilters()" 
-        class="px-4 py-1.5 rounded-full text-[13px] font-medium transition-all duration-300 cursor-pointer whitespace-nowrap"
-        [ngClass]="!selectedCategory() && !searchQuery() ? 'bg-stone-900 text-white dark:bg-stone-100 dark:text-stone-900 shadow-sm' : 'bg-transparent text-stone-500 dark:text-stone-400 hover:bg-stone-200/50 dark:hover:bg-stone-800/50'"
-      >
-        Todos
-      </button>
-      
-      @for (cat of ['Casacas', 'Pantalones', 'Polos', 'Jeans', 'Accesorios', 'Calzado']; track cat) {
-      <button 
-        (click)="applyCategory(cat)" 
-        class="flex items-center gap-1.5 px-4 py-1.5 rounded-full text-[13px] font-medium transition-all duration-300 cursor-pointer whitespace-nowrap"
-        [ngClass]="selectedCategory() === cat ? 'bg-stone-900 text-white dark:bg-stone-100 dark:text-stone-900 shadow-sm' : 'bg-transparent text-stone-500 dark:text-stone-400 hover:bg-stone-200/50 dark:hover:bg-stone-800/50'"
-      >
-        <span class="material-icons-outlined text-[16px]" [class.opacity-50]="selectedCategory() !== cat">{{ getCategoryIcon(cat) }}</span>
-        {{ cat }}
-      </button>
-      }
+    <!-- Controles Minimalistas Zen -->
+    <div
+      class="flex flex-col md:flex-row gap-4 md:gap-6 justify-between items-start md:items-center z-20 relative pt-2 pb-4"
+    >
+      <div class="flex items-center gap-4 w-full md:w-auto">
+        <!-- Búsqueda Soft Pill -->
+        <div class="relative w-full md:w-72 group">
+          <div
+            class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-stone-400 group-focus-within:text-stone-900 dark:group-focus-within:text-stone-100 transition-colors"
+          >
+            <span class="material-symbols-outlined text-[18px]">search</span>
+          </div>
+          <input
+            type="text"
+            [value]="searchQuery()"
+            (input)="onSearchChange($any($event.target).value)"
+            placeholder="Buscar producto o categoría..."
+            class="w-full h-10 pl-11 pr-4 bg-stone-200/50 dark:bg-stone-800/50 hover:bg-stone-200/80 dark:hover:bg-stone-800/80 rounded-full text-[13px] font-medium focus:outline-hidden focus:ring-2 focus:ring-stone-900 dark:focus:ring-stone-100 transition-all placeholder:text-stone-400 dark:placeholder:text-stone-500 text-stone-900 dark:text-stone-100 border-none"
+          />
+        </div>
+
+        <!-- Toggle Vista Soft (Oculto en móvil y tablets pequeñas) -->
+        <div
+          class="hidden md:flex items-center bg-stone-200/50 dark:bg-stone-800/50 p-1 rounded-full border border-stone-200/30 dark:border-stone-700/30 shadow-sm"
+        >
+          <button
+            (click)="toggleViewMode('list')"
+            [class]="
+              viewMode() === 'list'
+                ? 'bg-white dark:bg-stone-700 text-stone-900 dark:text-stone-100 shadow-sm'
+                : 'text-stone-400 hover:text-stone-600'
+            "
+            class="p-1.5 rounded-full transition-all flex items-center justify-center cursor-pointer h-8 w-8"
+          >
+            <span class="material-symbols-outlined text-[18px]">table_rows</span>
+          </button>
+          <button
+            (click)="toggleViewMode('grid')"
+            [class]="
+              viewMode() === 'grid'
+                ? 'bg-white dark:bg-stone-700 text-stone-900 dark:text-stone-100 shadow-sm'
+                : 'text-stone-400 hover:text-stone-600'
+            "
+            class="p-1.5 rounded-full transition-all flex items-center justify-center cursor-pointer h-8 w-8"
+          >
+            <span class="material-symbols-outlined text-[18px]">grid_view</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Filtros Flotantes Zen (Scroll horizontal en móvil/tablet) -->
+      <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar w-[calc(100vw-2rem)] md:w-auto -mx-4 md:mx-0 px-4 md:px-1 pb-1 md:pb-0">
+        <button
+          (click)="clearFilters()"
+          class="px-4 py-1.5 rounded-full text-[13px] font-medium transition-all duration-300 cursor-pointer whitespace-nowrap shrink-0"
+          [ngClass]="
+            !selectedCategory() && !searchQuery()
+              ? 'bg-stone-900 text-white dark:bg-stone-100 dark:text-stone-900 shadow-sm'
+              : 'bg-transparent text-stone-500 dark:text-stone-400 hover:bg-stone-200/50 dark:hover:bg-stone-800/50'
+          "
+        >
+          Todos
+        </button>
+        @for (
+          cat of ['Casacas', 'Pantalones', 'Polos', 'Jeans', 'Accesorios', 'Calzado'];
+          track cat
+        ) {
+          <button
+            (click)="applyCategory(cat)"
+            class="flex items-center gap-2 px-4 py-1.5 rounded-full text-[13px] font-medium transition-all duration-300 cursor-pointer whitespace-nowrap shrink-0"
+            [ngClass]="
+              selectedCategory() === cat
+                ? 'bg-stone-900 text-white dark:bg-stone-100 dark:text-stone-900 shadow-sm'
+                : 'bg-transparent text-stone-500 dark:text-stone-400 hover:bg-stone-200/50 dark:hover:bg-stone-800/50'
+            "
+          >
+            <span class="material-symbols-outlined text-[16px]">{{ getCategoryIcon(cat) }}</span>
+            {{ cat }}
+          </button>
+        }
+      </div>
     </div>
 
-    <!-- Contenedor de Vistas -->
-    @if (viewMode() === 'list') {
-      <div class="bg-white dark:bg-stone-900 rounded-3xl border border-stone-200/60 dark:border-stone-800 shadow-sm overflow-hidden transition-colors duration-300">
-        <!-- Tabla Minimalista Zen -->
-        <div class="overflow-x-auto transition-all duration-300">
+    <!-- TABLA DE DATOS (Zen Canvas) -->
+    <div
+      class="bg-white/80 dark:bg-stone-900/80 backdrop-blur-xl rounded-[2.5rem] border border-stone-200/60 dark:border-stone-800 shadow-xl shadow-stone-200/20 dark:shadow-none overflow-hidden transition-all duration-300"
+    >
+      @if (viewMode() === 'list') {
+        <div class="hidden sm:block overflow-x-auto no-scrollbar transition-all duration-300">
           <table class="w-full text-left border-collapse">
-            <thead class="sticky top-0 bg-stone-50/90 dark:bg-stone-900/90 backdrop-blur-md z-10">
-              <tr class="border-b border-stone-100 dark:border-stone-800 text-stone-400 dark:text-stone-500 text-xs tracking-wider uppercase">
-                <th class="px-6 py-4 w-12 text-center">
-                  <input type="checkbox" [checked]="isAllSelected()" (change)="toggleAllSelection()" class="w-4 h-4 rounded border-stone-300 text-stone-900 focus:ring-stone-900 dark:border-stone-600 dark:bg-stone-800 cursor-pointer transition-all" />
+            <thead>
+              <tr
+                class="text-stone-400 dark:text-stone-500 text-[10px] font-bold tracking-[0.2em] uppercase"
+              >
+                <th class="px-8 py-6 w-12 text-center">
+                  <input
+                    type="checkbox"
+                    [checked]="isAllSelected()"
+                    (change)="toggleAllSelection()"
+                    class="w-4 h-4 rounded border-stone-300 text-stone-900 focus:ring-stone-900 dark:border-stone-600 dark:bg-stone-800 cursor-pointer transition-all"
+                  />
                 </th>
-                <th class="px-6 py-4 font-medium">Producto</th>
-                <th class="px-6 py-4 font-medium">Identificadores</th>
-                <th class="px-6 py-4 font-medium text-center">Inventario</th>
-                <th class="px-6 py-4 font-medium text-right">Cotización</th>
-                <th class="px-6 py-4 font-medium text-right sticky right-0 bg-stone-50/90 dark:bg-stone-900/90 backdrop-blur-md">Acciones</th>
+                <th class="px-8 py-6">Producto</th>
+                <th class="px-8 py-6 hidden lg:table-cell">Identificadores</th>
+                <th class="px-8 py-6 text-center">Inventario</th>
+                <th class="px-8 py-6 text-right hidden sm:table-cell">Cotización</th>
+                <th
+                  class="px-8 py-6 text-right sticky right-0 bg-white/90 dark:bg-stone-900/90 backdrop-blur-md"
+                >
+                  Gestión
+                </th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-stone-50/50 dark:divide-stone-800/30">
+            <tbody class="divide-y divide-stone-100 dark:divide-stone-800/50">
               @for (product of paginatedProducts(); track product.id; let idx = $index) {
-              <tr class="group hover:bg-stone-50/80 dark:hover:bg-stone-800/40 transition-colors duration-200 animate-in fade-in slide-in-from-bottom-2 fill-mode-both" [style.animation-delay]="(idx * 40) + 'ms'">
-                <td class="px-6 py-4 text-center">
-                  <input type="checkbox" [checked]="selectedProducts().includes(product.id)" (change)="toggleSelection(product.id)" class="w-4 h-4 rounded border-stone-300 text-stone-900 focus:ring-stone-900 dark:border-stone-600 dark:bg-stone-800 cursor-pointer transition-all" />
-                </td>
-                
-                <!-- Producto: Imagen + Nombre + Categoría -->
-                <td class="px-6 py-4">
-                  <div class="flex items-center gap-4">
-                    <div class="h-12 w-12 rounded-xl bg-stone-100 dark:bg-stone-800 overflow-hidden shrink-0 border border-stone-200/50 dark:border-stone-700/50 relative group-hover:shadow-md transition-all">
-                      <img [src]="product.image" appImageFallback [alt]="product.name" class="h-full w-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                <tr
+                  class="group hover:bg-stone-50/50 dark:hover:bg-stone-800/30 transition-all duration-300 cursor-default animate-in fade-in slide-in-from-bottom-4 fill-mode-both"
+                  [style.animation-delay]="idx * 30 + 'ms'"
+                >
+                  <td class="px-8 py-5 text-center">
+                    <input
+                      type="checkbox"
+                      [checked]="selectedProducts().includes(product.id)"
+                      (change)="toggleSelection(product.id)"
+                      class="w-4 h-4 rounded border-stone-300 text-stone-900 focus:ring-stone-900 dark:border-stone-600 dark:bg-stone-800 cursor-pointer transition-all"
+                    />
+                  </td>
+
+                  <!-- Producto: Imagen + Nombre + Categoría -->
+                  <td class="px-8 py-5">
+                    <div class="flex items-center gap-4">
+                      <div
+                        class="h-12 w-12 rounded-2xl bg-stone-100 dark:bg-stone-800 overflow-hidden shrink-0 border border-stone-200/50 dark:border-stone-700/50 relative shadow-sm transition-all group-hover:shadow-md"
+                      >
+                        <img
+                          [src]="product.image"
+                          appImageFallback
+                          [alt]="product.name"
+                          class="h-full w-full object-cover group-hover:scale-110 transition-transform duration-500"
+                        />
+                      </div>
+                      <div class="flex flex-col">
+                        <h3
+                          class="text-[13px] font-bold text-stone-900 dark:text-stone-100 group-hover:text-stone-700 dark:group-hover:text-stone-300 transition-colors cursor-pointer leading-tight"
+                          (click)="openEdit(product.id)"
+                        >
+                          {{ product.name }}
+                        </h3>
+                        <span
+                          class="text-[10px] text-stone-400 dark:text-stone-500 font-bold uppercase tracking-widest mt-1"
+                        >
+                          {{ product.category }}
+                        </span>
+                      </div>
                     </div>
-                    <div>
-                      <h3 class="text-sm font-semibold text-stone-900 dark:text-stone-100 group-hover:text-stone-700 transition-colors cursor-pointer" (click)="openEdit(product.id)">{{ product.name }}</h3>
-                      <span class="text-xs text-stone-500 font-medium px-2 py-0.5 rounded-md bg-stone-100 dark:bg-stone-800 mt-1 inline-block">
-                        {{ product.category }}
+                  </td>
+
+                  <!-- Identificadores: Marca + Código -->
+                  <td class="px-8 py-5 hidden lg:table-cell">
+                    <div class="flex flex-col gap-1">
+                      <span class="text-xs font-bold text-stone-800 dark:text-stone-200">{{
+                        product.brand || 'DENRAF'
+                      }}</span>
+                      <span
+                        class="text-[10px] text-stone-400 dark:text-stone-500 font-bold flex items-center gap-1"
+                      >
+                        <span class="material-symbols-outlined text-[12px]">qr_code_2</span>
+                        {{ product.barcode || '---' }}
                       </span>
                     </div>
-                  </div>
-                </td>
-  
-                <!-- Identificadores: Marca + Código -->
-                <td class="px-6 py-4">
-                  <div class="flex flex-col gap-1">
-                    <span class="text-xs font-semibold text-stone-700 dark:text-stone-300">{{ product.brand || 'No asignada' }}</span>
-                    <span class="text-[11px] text-stone-400 dark:text-stone-500 font-bold flex items-center gap-1 bg-stone-100 dark:bg-stone-800/50 w-fit px-1.5 py-0.5 rounded">
-                      <span class="material-icons-outlined text-[12px]">qr_code_2</span>
-                      {{ product.barcode || 'Sin código' }}
-                    </span>
-                  </div>
-                </td>
-  
-                <!-- Inventario -->
-                <td class="px-6 py-4">
-                  <div class="flex flex-col items-center gap-1.5">
-                    <span class="text-sm font-black flex items-center gap-1.5"
-                      [ngClass]="product.stock <= product.minStock ? 'text-red-600 dark:text-red-400' : 'text-stone-900 dark:text-stone-100'">
-                      @if(product.stock <= product.minStock) {
-                        <span class="material-icons-outlined text-[14px]">warning</span>
-                      }
-                      {{ product.stock }} und.
-                    </span>
-                    @if (product.variants && product.variants.length > 0) {
-                      <button (click)="toggleTableRow(product.id)" class="text-[10px] focus:outline-hidden uppercase tracking-wider text-stone-500 hover:text-stone-900 bg-stone-200/50 hover:bg-stone-200 px-2 py-1 rounded transition-colors font-bold flex items-center gap-1 cursor-pointer">
-                        {{ product.variants.length }} var.
-                        <span class="material-icons-outlined text-[12px] transition-transform duration-300" [class.rotate-180]="expandedTableProductId() === product.id">expand_more</span>
-                      </button>
-                    }
-                  </div>
-                </td>
-  
-                <!-- Cotización -->
-                <td class="px-6 py-4 text-right">
-                  <div class="flex flex-col items-end gap-1">
-                    <span class="text-sm font-black text-stone-900 dark:text-stone-100">S/ {{ product.price | number:'1.2-2' }}</span>
-                    <span class="text-xs text-stone-400 font-medium">Costo: S/ {{ product.cost | number:'1.2-2' }}</span>
-                  </div>
-                </td>
-  
-                <!-- Acciones -->
-                <td class="px-6 py-4 text-right sticky right-0 bg-white group-hover:bg-stone-50/80 dark:bg-stone-900 dark:group-hover:bg-stone-800/40 transition-colors">
-                  <div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <button (click)="openEdit(product.id)" title="Editar" class="h-8 w-8 rounded-lg bg-stone-100 dark:bg-stone-800 hover:bg-stone-200 dark:hover:bg-stone-700 text-stone-600 dark:text-stone-300 transition-colors flex items-center justify-center cursor-pointer">
-                      <span class="material-icons-outlined text-[16px]">edit</span>
-                    </button>
-                    <button (click)="handleAction('delete', product.id)" title="Eliminar" class="h-8 w-8 rounded-lg bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/40 text-red-600 dark:text-red-400 transition-colors flex items-center justify-center cursor-pointer">
-                      <span class="material-icons-outlined text-[16px]">delete</span>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-              
-              <!-- ✅ Fila Expandible para Variantes con Animación Fluida -->
-              <tr>
-                <td colspan="6" class="p-0">
-                  <div class="grid transition-all duration-300 ease-in-out" [ngStyle]="{'grid-template-rows': expandedTableProductId() === product.id ? '1fr' : '0fr'}">
-                    <div class="overflow-hidden">
-                      @if(product.variants && product.variants.length > 0) {
-                        <div class="bg-stone-50/50 dark:bg-stone-900/50 py-4 px-6 md:px-12 border-b border-stone-100 dark:border-stone-800">
-                          <div class="grid grid-cols-2 md:grid-cols-4 gap-3 bg-white dark:bg-stone-800 p-4 rounded-xl shadow-xs border border-stone-100 dark:border-stone-700">
-                            @for(variant of product.variants; track variant.id) {
-                              <div class="flex items-center justify-between p-2.5 rounded-lg border border-stone-100 dark:border-stone-700/50 bg-stone-50/50 dark:bg-stone-900/50 hover:bg-white dark:hover:bg-stone-800 transition-colors">
-                                <div class="flex items-center gap-2.5">
-                                  <span class="h-6 w-6 bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 flex items-center justify-center rounded-md text-[11px] font-black">{{ variant.size }}</span>
-                                  <span class="text-xs text-stone-600 dark:text-stone-300 font-medium">{{ variant.color }}</span>
-                                </div>
-                                <span class="text-xs font-black px-2 py-1 rounded bg-white dark:bg-stone-900 shadow-sm border border-stone-100 dark:border-stone-700" [ngClass]="variant.stock <= 0 ? 'text-red-500' : 'text-teal-600 dark:text-teal-400'">{{ variant.stock }}</span>
-                              </div>
-                            }
-                          </div>
-                        </div>
+                  </td>
+
+                  <!-- Inventario -->
+                  <td class="px-8 py-5">
+                    <div class="flex flex-col items-center gap-1.5">
+                      <div
+                        class="px-3 py-1.5 rounded-full inline-flex items-center gap-2 text-[10px] font-black tracking-[0.1em] uppercase transition-all duration-500"
+                        [ngClass]="
+                          product.stock <= product.minStock
+                            ? 'bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border border-red-100/50 dark:border-red-800/30'
+                            : 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 border border-emerald-100/50 dark:border-emerald-800/30'
+                        "
+                      >
+                        <span
+                          class="w-1.5 h-1.5 rounded-full"
+                          [ngClass]="
+                            product.stock <= product.minStock
+                              ? 'bg-red-500 animate-pulse'
+                              : 'bg-emerald-500'
+                          "
+                        ></span>
+                        {{ product.stock }} Unidades
+                      </div>
+                      @if (product.variants && product.variants.length > 0) {
+                        <button
+                          (click)="toggleTableRow(product.id)"
+                          class="text-[9px] focus:outline-hidden uppercase tracking-widest text-stone-400 hover:text-stone-900 dark:hover:text-white transition-colors font-bold flex items-center gap-1 cursor-pointer"
+                        >
+                          {{ product.variants.length }} Variantes
+                          <span
+                            class="material-symbols-outlined text-[12px] transition-transform duration-300"
+                            [class.rotate-180]="expandedTableProductId() === product.id"
+                            >expand_more</span
+                          >
+                        </button>
                       }
                     </div>
-                  </div>
-                </td>
-              </tr>
+                  </td>
+
+                  <!-- Cotización -->
+                  <td class="px-8 py-5 text-right hidden sm:table-cell">
+                    <div class="flex flex-col items-end">
+                      <span
+                        class="font-black text-[15px] text-stone-900 dark:text-white tracking-tight"
+                        >S/ {{ product.price | number: '1.2-2' }}</span
+                      >
+                      <span
+                        class="text-[9px] font-bold text-stone-400 dark:text-stone-500 uppercase tracking-tighter"
+                        >Costo: S/ {{ product.cost | number: '1.2-2' }}</span
+                      >
+                    </div>
+                  </td>
+
+                  <!-- Acciones -->
+                  <td
+                    class="px-8 py-5 text-right whitespace-nowrap sticky right-0 bg-white/95 dark:bg-stone-900/95 group-hover:bg-stone-50/95 dark:group-hover:bg-stone-800/95 transition-all duration-300"
+                  >
+                    <div
+                      class="flex items-center justify-end gap-2 translate-x-2 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all duration-500"
+                    >
+                      <button
+                        (click)="openEdit(product.id)"
+                        class="h-9 w-9 rounded-xl bg-white dark:bg-stone-800 shadow-sm border border-stone-200 dark:border-stone-700 text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 hover:border-stone-300 transition-all flex items-center justify-center cursor-pointer group/btn"
+                        title="Editar"
+                      >
+                        <span
+                          class="material-symbols-outlined text-[18px] group-hover/btn:scale-110 transition-transform"
+                          >edit</span
+                        >
+                      </button>
+                      <button
+                        (click)="handleAction('delete', product.id)"
+                        class="h-9 w-9 rounded-xl bg-red-50/50 dark:bg-red-900/20 shadow-sm border border-red-100 dark:border-red-900/30 text-red-400 hover:text-red-600 dark:hover:text-red-400 hover:border-red-200 transition-all flex items-center justify-center cursor-pointer group/btn"
+                        title="Archivar"
+                      >
+                        <span
+                          class="material-symbols-outlined text-[18px] group-hover/btn:scale-110 transition-transform"
+                          >delete</span
+                        >
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- ✅ Fila Expandible para Variantes con Animación Fluida -->
+                <tr>
+                  <td colspan="6" class="p-0">
+                    <div
+                      class="grid transition-all duration-300 ease-in-out"
+                      [ngStyle]="{
+                        'grid-template-rows':
+                          expandedTableProductId() === product.id ? '1fr' : '0fr',
+                      }"
+                    >
+                      <div class="overflow-hidden">
+                        @if (product.variants && product.variants.length > 0) {
+                          <div
+                            class="bg-stone-50/30 dark:bg-stone-900/20 py-6 px-8 border-b border-stone-100 dark:border-stone-800 shadow-[inset_0_4px_6px_-6px_rgba(0,0,0,0.05)]"
+                          >
+                            <div class="flex flex-wrap gap-3">
+                              @for (variant of product.variants; track variant.id) {
+                                <div
+                                  class="flex items-center gap-3 p-2 pr-4 rounded-2xl border border-stone-200/50 dark:border-stone-700/50 bg-white dark:bg-stone-800 shadow-xs hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 group/var"
+                                >
+                                  <div
+                                    class="h-8 w-8 bg-stone-100 dark:bg-stone-900 text-stone-900 dark:text-white flex items-center justify-center rounded-xl text-[10px] font-black uppercase tracking-wider group-hover/var:bg-stone-900 group-hover/var:text-white transition-colors"
+                                  >
+                                    {{ variant.size }}
+                                  </div>
+                                  <div class="flex flex-col">
+                                    <span
+                                      class="text-[10px] font-bold text-stone-400 dark:text-stone-500 uppercase tracking-widest leading-none mb-1"
+                                      >{{ variant.color }}</span
+                                    >
+                                    <div class="flex items-center gap-1.5">
+                                      <div
+                                        class="w-1.5 h-1.5 rounded-full shadow-sm"
+                                        [ngClass]="
+                                          variant.stock <= 0 ? 'bg-red-500' : 'bg-emerald-400'
+                                        "
+                                      ></div>
+                                      <span
+                                        class="text-[11px] font-black text-stone-700 dark:text-stone-300 leading-none"
+                                        >{{ variant.stock }}</span
+                                      >
+                                    </div>
+                                  </div>
+                                </div>
+                              }
+                            </div>
+                          </div>
+                        }
+                      </div>
+                    </div>
+                  </td>
+                </tr>
               } @empty {
                 <tr>
-                  <td colspan="6" class="px-6 py-24 text-center">
-                    <div class="flex flex-col items-center gap-4">
-                      <div class="h-20 w-20 bg-stone-100 dark:bg-stone-800 rounded-2xl flex items-center justify-center shadow-inner">
-                        <span class="material-icons-outlined text-3xl text-stone-400">inventory_2</span>
+                  <td colspan="6" class="px-8 py-32 text-center">
+                    <div class="flex flex-col items-center gap-4 animate-in fade-in duration-700">
+                      <div
+                        class="h-20 w-20 bg-stone-100 dark:bg-stone-800/50 rounded-[2rem] flex items-center justify-center text-stone-300 dark:text-stone-700 shadow-inner"
+                      >
+                        <span class="material-symbols-outlined text-4xl">inventory_2</span>
                       </div>
-                      <div>
-                        <p class="text-stone-800 dark:text-stone-200 font-bold text-lg mb-1">No hay productos</p>
-                        <p class="text-stone-500 dark:text-stone-400 text-sm">Ajusta los filtros o crea un nuevo producto.</p>
+                      <div class="space-y-1">
+                        <p
+                          class="text-stone-800 dark:text-stone-200 font-bold text-lg tracking-tight"
+                        >
+                          Sin productos encontrados
+                        </p>
+                        <p
+                          class="text-stone-500 dark:text-stone-400 text-sm max-w-[280px] mx-auto leading-relaxed"
+                        >
+                          Intenta ajustar los filtros o agrega un nuevo SKU al catálogo.
+                        </p>
                       </div>
                     </div>
                   </td>
@@ -238,465 +503,837 @@
             </tbody>
           </table>
         </div>
-      </div>
-    }
+      }
 
-    <!-- Vista de Cuadrícula (Bento Cards) -->
-    @if (viewMode() === 'grid') {
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        @for (product of paginatedProducts(); track product.id; let idx = $index) {
-          <div class="bg-white dark:bg-stone-900 rounded-3xl border border-stone-200/60 dark:border-stone-800 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden flex flex-col group animate-in fade-in zoom-in-95 fill-mode-both" [style.animation-delay]="(idx * 40) + 'ms'">
-            <!-- Imagen Hero -->
-            <div class="h-48 w-full bg-stone-100 dark:bg-stone-800 relative overflow-hidden cursor-pointer" (click)="openEdit(product.id)">
-              <img [src]="product.image" appImageFallback [alt]="product.name" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" />
-              <!-- Badge Categoría -->
-              <div class="absolute top-3 left-3 bg-white/90 dark:bg-stone-900/90 backdrop-blur text-xs font-bold px-2.5 py-1 rounded-lg text-stone-800 dark:text-stone-200 shadow-sm">
-                {{ product.category }}
+      @if (viewMode() === 'grid' || viewMode() === 'list') {
+        <div 
+          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 p-4 sm:p-8"
+          [ngClass]="viewMode() === 'list' ? 'sm:hidden' : ''"
+        >
+          @for (product of paginatedProducts(); track product.id; let idx = $index) {
+            <div
+              class="bg-white dark:bg-stone-900/40 rounded-[2rem] border border-stone-200/60 dark:border-stone-800 shadow-sm hover:shadow-md transition-all duration-500 overflow-hidden flex flex-col group animate-in fade-in zoom-in-95 fill-mode-both"
+              [style.animation-delay]="idx * 40 + 'ms'"
+            >
+              <!-- Imagen Hero -->
+              <div
+                class="h-56 w-full bg-stone-100 dark:bg-stone-800/40 relative overflow-hidden cursor-pointer"
+                (click)="openEdit(product.id)"
+              >
+                <img
+                  [src]="product.image"
+                  appImageFallback
+                  [alt]="product.name"
+                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                />
+                <!-- Badge Categoría -->
+                <div
+                  class="absolute top-4 left-4 bg-white/90 dark:bg-stone-900/90 backdrop-blur-md text-[9px] font-black uppercase tracking-[0.2em] px-3 py-1.5 rounded-full text-stone-900 dark:text-white shadow-sm border border-stone-200/50 dark:border-stone-700/50"
+                >
+                  {{ product.category }}
+                </div>
+                <!-- Checkbox -->
+                <div class="absolute top-4 right-4 z-10" (click)="$event.stopPropagation()">
+                  <input
+                    type="checkbox"
+                    [checked]="selectedProducts().includes(product.id)"
+                    (change)="toggleSelection(product.id)"
+                    class="w-5 h-5 rounded-lg border-stone-300 text-stone-900 focus:ring-stone-900 dark:border-stone-600 bg-white/80 dark:bg-stone-800/80 cursor-pointer backdrop-blur shadow-sm transition-all hover:scale-110"
+                  />
+                </div>
+                <!-- Floating Price Badge -->
+                <div
+                  class="absolute bottom-4 left-4 right-4 flex justify-between items-end opacity-0 group-hover:opacity-100 transition-all duration-500 translate-y-2 group-hover:translate-y-0"
+                >
+                  <div
+                    class="bg-white/95 dark:bg-stone-900/95 backdrop-blur-xl px-4 py-2.5 rounded-2xl shadow-xl border border-stone-200/50 dark:border-stone-700/50"
+                  >
+                    <p
+                      class="text-[9px] uppercase tracking-[0.2em] text-stone-400 font-bold mb-0.5"
+                    >
+                      Precio Venta
+                    </p>
+                    <p class="text-sm font-black text-stone-900 dark:text-white tracking-tight">
+                      S/ {{ product.price | number: '1.2-2' }}
+                    </p>
+                  </div>
+                  <div
+                    class="h-10 w-10 bg-black/50 backdrop-blur-md text-white rounded-2xl flex items-center justify-center hover:bg-black transition-colors shadow-lg"
+                  >
+                    <span class="material-symbols-outlined text-[18px]">open_in_new</span>
+                  </div>
+                </div>
               </div>
-              <!-- Checkbox -->
-              <div class="absolute top-3 right-3 z-10" (click)="$event.stopPropagation()">
-                <input type="checkbox" [checked]="selectedProducts().includes(product.id)" (change)="toggleSelection(product.id)" class="w-5 h-5 rounded border-stone-300 text-stone-900 focus:ring-stone-900 dark:border-stone-600 bg-white/80 dark:bg-stone-800/80 cursor-pointer backdrop-blur shadow-sm" />
+
+              <!-- Contenido de la Tarjeta -->
+              <div class="p-6 flex-1 flex flex-col">
+                <div class="flex justify-between items-start mb-4">
+                  <div>
+                    <p
+                      class="text-[9px] font-black uppercase tracking-[0.2em] text-stone-400 mb-1.5"
+                    >
+                      {{ product.brand || 'DENRAF' }}
+                    </p>
+                    <h3
+                      class="text-base font-bold text-stone-900 dark:text-stone-100 leading-tight cursor-pointer hover:text-stone-600 dark:hover:text-stone-300 transition-colors tracking-tight"
+                      (click)="openEdit(product.id)"
+                    >
+                      {{ product.name }}
+                    </h3>
+                  </div>
+                </div>
+
+                <div
+                  class="mt-auto flex items-center justify-between pt-4 border-t border-stone-100 dark:border-stone-800/50"
+                >
+                  <div
+                    class="flex items-center gap-2 bg-stone-50 dark:bg-stone-800/50 px-3 py-1.5 rounded-xl border border-stone-200/50 dark:border-stone-700/50"
+                  >
+                    <span class="material-symbols-outlined text-[14px] text-stone-400"
+                      >qr_code_2</span
+                    >
+                    <span class="text-[10px] font-mono font-bold text-stone-500">{{
+                      product.barcode || '---'
+                    }}</span>
+                  </div>
+
+                  <div class="flex items-center gap-2">
+                    <div
+                      class="flex items-center gap-1.5 bg-white dark:bg-stone-900 shadow-sm border border-stone-200/60 dark:border-stone-700/60 px-3 py-1.5 rounded-xl"
+                    >
+                      <div
+                        class="w-1.5 h-1.5 rounded-full shadow-xs"
+                        [ngClass]="
+                          product.stock <= product.minStock
+                            ? 'bg-red-500 animate-pulse'
+                            : 'bg-emerald-500'
+                        "
+                      ></div>
+                      <span class="text-xs font-black text-stone-900 dark:text-white">{{
+                        product.stock
+                      }}</span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
-            
-            <!-- Contenido de la Tarjeta -->
-            <div class="p-5 flex-1 flex flex-col">
-              <div class="flex justify-between items-start mb-2">
-                <h3 class="text-base font-bold text-stone-900 dark:text-stone-100 leading-tight cursor-pointer hover:text-stone-600 transition-colors" (click)="openEdit(product.id)">{{ product.name }}</h3>
-                <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300" (click)="$event.stopPropagation()">
-                  <button (click)="openEdit(product.id)" class="text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 p-1.5 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors cursor-pointer" title="Editar">
-                    <span class="material-icons-outlined text-[18px]">edit</span>
-                  </button>
-                  <button (click)="handleAction('delete', product.id)" class="text-stone-400 hover:text-red-600 dark:hover:text-red-400 p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors cursor-pointer" title="Archivar">
-                    <span class="material-icons-outlined text-[18px]">delete</span>
-                  </button>
-                </div>
-              </div>
-              
-              <div class="text-xs text-stone-500 font-medium mb-4">{{ product.barcode || 'Sin código' }}</div>
-              
-              <div class="mt-auto pt-4 border-t border-stone-100 dark:border-stone-800 flex items-end justify-between">
-                <div>
-                  <p class="text-[10px] uppercase tracking-widest text-stone-400 font-bold mb-0.5">Precio</p>
-                  <p class="text-lg font-black text-stone-900 dark:text-white">S/ {{ product.price | number:'1.2-2' }}</p>
-                </div>
-                <div class="text-right">
-                  <p class="text-[10px] uppercase tracking-widest text-stone-400 font-bold mb-0.5">Stock</p>
-                  <p class="text-sm font-bold" [ngClass]="product.stock <= product.minStock ? 'text-red-600 dark:text-red-400' : 'text-teal-600 dark:text-teal-400'">{{ product.stock }} und.</p>
-                </div>
-              </div>
-            </div>
+          }
+        </div>
+      }
+
+      <!-- Paginación Zen Footer -->
+      <div
+        class="px-8 py-6 border-t border-stone-100 dark:border-stone-800 flex flex-col sm:flex-row gap-4 items-center justify-between bg-stone-50/50 dark:bg-stone-900/50"
+      >
+        <div class="flex items-center gap-4">
+          <span class="text-[13px] font-medium text-stone-500">
+            Total en inventario:
+            <span class="font-bold text-stone-800 dark:text-stone-200"
+              >{{ filteredProducts().length }} productos</span
+            >
+          </span>
+          <div class="h-4 w-px bg-stone-300 dark:bg-stone-700 hidden sm:block"></div>
+          <div class="flex items-center gap-2">
+            <label class="text-[13px] text-stone-500 hidden sm:block">Mostrar:</label>
+            <select
+              (change)="onPageSizeChange($event)"
+              class="text-[13px] p-1.5 bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-lg outline-none focus:ring-2 focus:ring-stone-900/30 dark:focus:ring-stone-100/30 text-stone-700 dark:text-stone-300 font-medium cursor-pointer transition-all"
+            >
+              <option value="10" [selected]="pageSize() === 10">10</option>
+              <option value="20" [selected]="pageSize() === 20">20</option>
+              <option value="50" [selected]="pageSize() === 50">50</option>
+              <option value="100" [selected]="pageSize() === 100">100</option>
+            </select>
           </div>
-        }
-      </div>
-    }
+        </div>
 
-      <!-- Paginación Footer -->
-      <div class="p-4 border-t border-stone-100 dark:border-stone-800 flex items-center justify-between bg-stone-50/50 dark:bg-stone-900/30 rounded-b-3xl">
-        <span class="text-xs font-medium text-stone-500">
-          Mostrando pág. {{ currentPage() }} de {{ totalPages() }} ({{ filteredProducts().length }} total)
-        </span>
         <div class="flex items-center gap-2">
           <button
             [disabled]="currentPage() === 1"
             (click)="prevPage()"
-            class="h-8 px-3 rounded-lg border border-stone-200 dark:border-stone-700 text-xs font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 disabled:opacity-40 disabled:pointer-events-none transition-colors cursor-pointer">
-            Anterior
+            class="p-2 rounded-xl border border-stone-200 bg-white shadow-sm hover:bg-stone-50 disabled:opacity-50 text-stone-600 dark:bg-stone-800 dark:border-stone-700 dark:text-stone-300 transition-all active:scale-95 cursor-pointer"
+          >
+            <span class="material-symbols-outlined text-sm">chevron_left</span>
           </button>
+          <span class="text-[13px] font-bold mx-4 text-stone-700 dark:text-stone-300">
+            Página {{ currentPage() }} de {{ totalPages() }}
+          </span>
           <button
             [disabled]="currentPage() >= totalPages()"
             (click)="nextPage()"
-            class="h-8 px-3 rounded-lg border border-stone-200 dark:border-stone-700 text-xs font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 disabled:opacity-40 disabled:pointer-events-none transition-colors cursor-pointer">
-            Siguiente
+            class="p-2 rounded-xl border border-stone-200 bg-white shadow-sm hover:bg-stone-50 disabled:opacity-50 text-stone-600 dark:bg-stone-800 dark:border-stone-700 dark:text-stone-300 transition-all active:scale-95 cursor-pointer"
+          >
+            <span class="material-symbols-outlined text-sm">chevron_right</span>
           </button>
         </div>
       </div>
+    </div>
   </div>
 </div>
 
 <!-- Modal de Crear/Editar Producto -->
 <app-ui-animated-dialog [isOpen]="isDialogOpen()" (isOpenChange)="isDialogOpen.set($event)">
-  <div class="flex items-center justify-between mb-6 border-b border-stone-100 dark:border-stone-800 pb-6">
-    <div>
-      <h2 class="text-xl font-bold text-stone-800 dark:text-stone-100">{{ modalTitle() }}</h2>
-      <p class="text-xs text-stone-400 dark:text-stone-500 font-medium tracking-wide uppercase">
-        {{ editingProductId() ? 'Actualizar información' : 'Agregar al inventario' }}
+  <div
+    class="flex items-center justify-between mb-8"
+  >
+    <div class="flex flex-col gap-1">
+      <h2 class="text-2xl font-black tracking-tight text-stone-900 dark:text-white">
+        {{ activeModalTab() === 'INFO' ? '¿Qué vas a vender?' : activeModalTab() === 'VARIANTS' ? 'Tallas y Colores' : 'Precio de Venta' }}
+      </h2>
+      <p class="text-[11px] text-stone-400 dark:text-stone-500 font-black tracking-widest uppercase">
+        {{ modalTitle() }}
       </p>
     </div>
-    <div class="h-10 w-10 rounded-xl bg-stone-900 dark:bg-stone-100 flex items-center justify-center text-white dark:text-stone-900">
-      <span class="material-icons-outlined text-lg">{{
+    <div
+      class="h-12 w-12 rounded-[1.25rem] bg-stone-100 dark:bg-stone-800/80 border border-stone-200/60 dark:border-stone-700/60 flex items-center justify-center text-stone-700 dark:text-stone-300 shadow-xs"
+    >
+      <span class="material-symbols-outlined text-xl">{{
         editingProductId() ? 'edit' : 'inventory_2'
       }}</span>
     </div>
   </div>
 
-  <!-- TABS NAV con Indicador Animado -->
-  <div class="relative flex mb-8 bg-stone-100 dark:bg-stone-800/60 p-1.5 rounded-2xl isolate">
-    <!-- Sliding Indicator -->
-    <div class="absolute inset-y-1.5 bg-white dark:bg-stone-700 rounded-xl shadow-xs transition-all duration-300 ease-out z-0"
-         [ngStyle]="{
-           'width': 'calc(33.333% - 4px)',
-           'left': activeModalTab() === 'INFO' ? '6px' : activeModalTab() === 'VARIANTS' ? 'calc(33.333% + 2px)' : 'calc(66.666% - 2px)'
-         }"></div>
-         
-    <button type="button" (click)="activeModalTab.set('INFO')" [ngClass]="activeModalTab() === 'INFO' ? 'text-stone-900 dark:text-stone-100 font-bold' : 'text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-200'" class="flex-1 py-2.5 text-sm rounded-xl transition-colors duration-300 flex items-center justify-center gap-2 cursor-pointer outline-hidden z-10 font-medium">
-      <span class="material-icons-outlined text-[18px]">info</span> Información
-    </button>
-    <button type="button" (click)="activeModalTab.set('VARIANTS')" [ngClass]="activeModalTab() === 'VARIANTS' ? 'text-stone-900 dark:text-stone-100 font-bold' : 'text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-200'" class="flex-1 py-2.5 text-sm rounded-xl transition-colors duration-300 flex items-center justify-center gap-2 cursor-pointer outline-hidden z-10 font-medium">
-      <span class="material-icons-outlined text-[18px]">style</span> Variantes
-    </button>
-    <button type="button" (click)="activeModalTab.set('FINANCE')" [ngClass]="activeModalTab() === 'FINANCE' ? 'text-stone-900 dark:text-stone-100 font-bold' : 'text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-200'" class="flex-1 py-2.5 text-sm rounded-xl transition-colors duration-300 flex items-center justify-center gap-2 cursor-pointer outline-hidden z-10 font-medium">
-      <span class="material-icons-outlined text-[18px]">payments</span> Finanzas
-    </button>
+  <!-- ASISTENTE GUIADO (STEPPER) -->
+  <div class="mb-10 px-4 max-w-lg mx-auto">
+    <div class="flex items-center justify-between relative">
+      <!-- Background Line -->
+      <div class="absolute left-0 top-5 w-full h-1 bg-stone-100 dark:bg-stone-800 rounded-full z-0"></div>
+      
+      <!-- Progress Line -->
+      <div class="absolute left-0 top-5 h-1 bg-stone-900 dark:bg-stone-100 rounded-full z-0 transition-all duration-500 ease-out"
+        [ngStyle]="{
+          width: activeModalTab() === 'INFO' ? '0%' : activeModalTab() === 'VARIANTS' ? '50%' : '100%'
+        }"
+      ></div>
+
+      <!-- Step 1 -->
+      <button type="button" (click)="activeModalTab.set('INFO')" class="relative z-10 flex flex-col items-center gap-3 group outline-hidden w-24 cursor-pointer">
+        <div class="w-10 h-10 rounded-[1rem] flex items-center justify-center font-black text-sm transition-all duration-500 ease-out"
+          [ngClass]="activeModalTab() === 'INFO' || activeModalTab() === 'VARIANTS' || activeModalTab() === 'FINANCE' ? 'bg-stone-900 text-white dark:bg-stone-100 dark:text-stone-900 shadow-md scale-110' : 'bg-white text-stone-400 dark:bg-stone-900 border-2 border-stone-200 dark:border-stone-700'">
+          @if (activeModalTab() === 'VARIANTS' || activeModalTab() === 'FINANCE') {
+            <span class="material-symbols-outlined text-[18px] animate-in zoom-in duration-300">check</span>
+          } @else {
+            1
+          }
+        </div>
+        <span class="text-[9px] font-black uppercase tracking-widest transition-colors duration-300" [ngClass]="activeModalTab() === 'INFO' ? 'text-stone-900 dark:text-white' : 'text-stone-400'">Detalles</span>
+      </button>
+
+      <!-- Step 2 -->
+      <button type="button" (click)="activeModalTab.set('VARIANTS')" class="relative z-10 flex flex-col items-center gap-3 group outline-hidden w-24 cursor-pointer">
+        <div class="w-10 h-10 rounded-[1rem] flex items-center justify-center font-black text-sm transition-all duration-500 ease-out"
+          [ngClass]="activeModalTab() === 'VARIANTS' || activeModalTab() === 'FINANCE' ? 'bg-stone-900 text-white dark:bg-stone-100 dark:text-stone-900 shadow-md scale-110' : 'bg-white dark:bg-stone-900 text-stone-300 dark:text-stone-600 border-2 border-stone-100 dark:border-stone-800'">
+          @if (activeModalTab() === 'FINANCE') {
+            <span class="material-symbols-outlined text-[18px] animate-in zoom-in duration-300">check</span>
+          } @else {
+            2
+          }
+        </div>
+        <span class="text-[9px] font-black uppercase tracking-widest transition-colors duration-300" [ngClass]="activeModalTab() === 'VARIANTS' ? 'text-stone-900 dark:text-white' : 'text-stone-400'">Inventario</span>
+      </button>
+
+      <!-- Step 3 -->
+      <button type="button" (click)="activeModalTab.set('FINANCE')" class="relative z-10 flex flex-col items-center gap-3 group outline-hidden w-24 cursor-pointer">
+        <div class="w-10 h-10 rounded-[1rem] flex items-center justify-center font-black text-sm transition-all duration-500 ease-out"
+          [ngClass]="activeModalTab() === 'FINANCE' ? 'bg-stone-900 text-white dark:bg-stone-100 dark:text-stone-900 shadow-md scale-110' : 'bg-white dark:bg-stone-900 text-stone-300 dark:text-stone-600 border-2 border-stone-100 dark:border-stone-800'">
+          3
+        </div>
+        <span class="text-[9px] font-black uppercase tracking-widest transition-colors duration-300" [ngClass]="activeModalTab() === 'FINANCE' ? 'text-stone-900 dark:text-white' : 'text-stone-400'">Precios</span>
+      </button>
+    </div>
   </div>
 
   <!-- CONTAINER CON ALTURA MÍNIMA PARA EVITAR SALTOS -->
   <div class="min-h-[420px]">
-
     <!-- PESTAÑA: INFO -->
-    @if(activeModalTab() === 'INFO') {
-    <div class="grid grid-cols-1 md:grid-cols-12 gap-8 animate-in fade-in zoom-in-95 duration-200">
-      <div class="md:col-span-5">
-      <app-ui-label class="mb-2 block">Fotografía del Producto</app-ui-label>
+    @if (activeModalTab() === 'INFO') {
       <div
-        (click)="fileInput.click()"
-        (dragover)="onDragOver($event)"
-        (dragleave)="onDragLeave($event)"
-        (drop)="onDrop($event)"
-        class="relative group h-56 w-full rounded-2xl border-2 border-dashed transition-all duration-300 flex flex-col items-center justify-center cursor-pointer overflow-hidden"
-        [ngClass]="isDragging() ? 'border-teal-500 bg-teal-50/50 dark:bg-teal-900/10 scale-[1.02]' : 'border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-900/50 hover:bg-stone-100 dark:hover:bg-stone-800/80'"
+        class="grid grid-cols-1 md:grid-cols-12 gap-8 animate-in fade-in zoom-in-95 duration-200 pt-2"
       >
-        <input
-          #fileInput
-          type="file"
-          class="hidden"
-          accept="image/*"
-          (change)="onFileSelected($event)"
-        />
-
-        @if (selectedImage()) {
-        <img [src]="selectedImage()" class="absolute inset-0 w-full h-full object-cover" alt="" />
-        <div
-          class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-        >
-          <span class="text-white text-sm font-medium flex items-center gap-2 bg-black/50 px-4 py-2 rounded-full backdrop-blur-sm">
-            <span class="material-icons-outlined text-[18px]">edit</span>
-            Cambiar imagen
-          </span>
-        </div>
-        } @else {
-        <div class="text-center group-hover:scale-105 transition-transform duration-300 pointer-events-none">
+        <!-- Columna de Imagen Premium -->
+        <div class="md:col-span-5">
+          <app-ui-label
+            class="mb-3 block text-[10px] uppercase font-black tracking-widest text-stone-400"
+            >Fotografía del producto</app-ui-label
+          >
           <div
-            class="mx-auto h-12 w-12 rounded-full shadow-sm flex items-center justify-center mb-3 border transition-colors"
-            [ngClass]="isDragging() ? 'bg-teal-100 dark:bg-teal-900/50 border-teal-200 dark:border-teal-800 text-teal-600 dark:text-teal-400' : 'bg-white dark:bg-stone-800 border-stone-100 dark:border-stone-700 text-stone-400 dark:text-stone-500'"
-          >
-            <span class="material-icons-outlined text-2xl">add_a_photo</span>
-          </div>
-          <p class="text-sm font-bold transition-colors" [ngClass]="isDragging() ? 'text-teal-700 dark:text-teal-400' : 'text-stone-700 dark:text-stone-300'">
-            {{ isDragging() ? 'Suelta la imagen aquí' : 'Haz clic o arrastra' }}
-          </p>
-          <p class="text-xs text-stone-400 dark:text-stone-500 mt-1">JPG, PNG • Max 2MB</p>
-        </div>
-        }
-      </div>
-    </div>
-
-    <div class="md:col-span-7 space-y-6">
-      <div class="space-y-1.5">
-        <app-ui-label>Nombre del Producto</app-ui-label>
-        <app-ui-input
-          [value]="productName()"
-          (valueChange)="updateName($event)"
-          placeholder="Ej: Casaca Bomber Negra"
-          class="bg-stone-50 dark:bg-stone-900/50 border-transparent dark:border-stone-800"
-        ></app-ui-input>
-      </div>
-
-      <!-- Marca y Código de Barras -->
-      <div class="grid grid-cols-2 gap-4">
-        <div class="space-y-1.5">
-          <app-ui-label>Marca</app-ui-label>
-          <app-ui-input
-            [value]="productBrand()"
-            (valueChange)="productBrand.set($event)"
-            placeholder="Ej: DENFAR"
-            class="bg-stone-50 dark:bg-stone-900/50 border-transparent dark:border-stone-800"
-          ></app-ui-input>
-        </div>
-        <div class="space-y-1.5">
-          <app-ui-label>Código de Barras</app-ui-label>
-          <div class="flex gap-2">
-            <app-ui-input
-              [value]="productBarcode()"
-              (valueChange)="productBarcode.set($event)"
-              placeholder="Escanea o escribe..."
-              class="bg-stone-50 dark:bg-stone-900/50 border-transparent dark:border-stone-800 flex-1"
-            ></app-ui-input>
-            <button
-               type="button"
-               (click)="generateBarcode()"
-               title="Autogenerar código aleatorio"
-               class="h-10 w-10 flex border border-stone-200 dark:border-stone-700 items-center justify-center shrink-0 rounded-xl bg-stone-50 dark:bg-stone-800 hover:bg-stone-100 dark:hover:bg-stone-700 text-stone-600 dark:text-stone-300 transition-colors"
-            >
-               <span class="material-icons-outlined text-lg">auto_awesome</span>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <div class="space-y-3">
-        <app-ui-label>Categoría</app-ui-label>
-        <div class="grid grid-cols-4 gap-2">
-          @for (cat of ['General', 'Casacas', 'Pantalones', 'Polos', 'Jeans', 'Accesorios',
-          'Calzado']; track cat) {
-          <button
-            type="button"
-            (click)="updateCategory(cat)"
-            class="flex flex-col items-center gap-1 p-3 rounded-xl border transition-all duration-500 cursor-pointer"
+            (click)="fileInput.click()"
+            (dragover)="onDragOver($event)"
+            (dragleave)="onDragLeave($event)"
+            (drop)="onDrop($event)"
+            class="relative group aspect-[4/5] w-full rounded-[2.5rem] border border-dashed transition-all duration-500 flex flex-col items-center justify-center cursor-pointer overflow-hidden shadow-inner"
             [ngClass]="
-              productCategory() === cat
-                ? 'bg-stone-900 text-white dark:bg-stone-100 dark:text-stone-900 border-stone-900 dark:border-stone-100 shadow-md'
-                : 'bg-stone-50 dark:bg-stone-900/50 text-stone-600 dark:text-stone-400 border-stone-200 dark:border-stone-800 hover:border-stone-400 dark:hover:border-stone-600 hover:bg-stone-100 dark:hover:bg-stone-800'
+              isDragging()
+                ? 'border-teal-500 bg-teal-50/50 dark:bg-teal-900/10 scale-[1.02]'
+                : 'border-stone-300 dark:border-stone-700 bg-stone-100/50 dark:bg-stone-900/30 hover:bg-stone-100 hover:border-stone-400 dark:hover:bg-stone-800/80'
             "
           >
-            <span class="material-icons-outlined text-lg">{{ getCategoryIcon(cat) }}</span>
-            <span class="text-[10px] font-medium leading-tight">{{ cat }}</span>
-          </button>
-          }
-        </div>
-      </div>
-    </div>
-  </div>
-  }
+            <input
+              #fileInput
+              type="file"
+              class="hidden"
+              accept="image/*"
+              (change)="onFileSelected($event)"
+            />
 
-  <!-- PESTAÑA: VARIANTES -->
-  @if(activeModalTab() === 'VARIANTS') {
-  <div class="animate-in fade-in zoom-in-95 duration-200">
-      <div class="space-y-3">
-        <div class="flex items-center justify-between">
-          <app-ui-label>Tallas del Producto</app-ui-label>
-          <span class="text-xs text-stone-400">{{ activeSizes().length }} tallas</span>
-        </div>
-
-        <div class="grid grid-cols-6 gap-2">
-          @for (size of availableSizes; track size) {
-          <button
-            type="button"
-            (click)="activeSizes().includes(size) ? removeSize(size) : addSize(size)"
-            class="h-10 rounded-lg border text-sm font-bold transition-all duration-500 relative cursor-pointer"
-            [ngClass]="
-              activeSizes().includes(size)
-                ? 'bg-stone-900 text-white dark:bg-stone-100 dark:text-stone-900 border-stone-900 dark:border-stone-100 shadow-md'
-                : 'bg-white dark:bg-stone-900/50 text-stone-700 dark:text-stone-300 border-stone-200 dark:border-stone-800 hover:border-stone-300 dark:hover:border-stone-600'
-            "
-          >
-            {{ size }}
-            @if (activeSizes().includes(size)) {
-            <span
-              class="absolute -top-1 -right-1 w-4 h-4 bg-teal-600 rounded-full text-[10px] text-white flex items-center justify-center"
-            >
-              {{ countVariantsBySize(size) }}
-            </span>
-            }
-          </button>
-          }
-        </div>
-      </div>
-
-      <!-- Tabs de Tallas para seleccionar colores -->
-      @if (activeSizes().length > 0) {
-      <div class="space-y-3">
-        <app-ui-label>Colores por Talla</app-ui-label>
-
-        <!-- Tabs de tallas -->
-        <div class="flex gap-2 overflow-x-auto no-scrollbar pb-2">
-          @for (size of activeSizes(); track size) {
-          <button
-            type="button"
-            (click)="activeSizeTab.set(size)"
-            class="px-4 py-2 rounded-lg text-sm font-medium transition-all shrink-0 cursor-pointer"
-            [ngClass]="
-              activeSizeTab() === size
-                ? 'bg-stone-900 text-white dark:bg-stone-100 dark:text-stone-900'
-                : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400 hover:bg-stone-200 dark:hover:bg-stone-700'
-            "
-          >
-            Talla {{ size }}
-            <span class="ml-1 text-xs opacity-70">({{ countVariantsBySize(size) }})</span>
-          </button>
-          }
-        </div>
-
-        <!-- Selector de colores para la talla activa -->
-        <div class="p-4 bg-stone-50 dark:bg-stone-900/40 rounded-xl border border-stone-200/60 dark:border-stone-800">
-          <p class="text-xs text-stone-500 mb-3">
-            Selecciona colores para talla {{ activeSizeTab() }}
-          </p>
-          <div class="grid grid-cols-4 gap-2">
-            @for (color of availableColors; track color) {
-            <button
-              type="button"
-              (click)="toggleColorForActiveSize(color)"
-              class="h-9 rounded-lg border text-xs font-medium transition-all duration-500 cursor-pointer"
-              [ngClass]="
-                activeColors().includes(color)
-                  ? 'bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 border-stone-900 dark:border-stone-100 shadow-sm'
-                  : 'bg-white dark:bg-stone-900/50 text-stone-700 dark:text-stone-300 border-stone-200 dark:border-stone-800 hover:border-stone-400 dark:hover:border-stone-600'
-              "
-            >
-              {{ color }}
-            </button>
-            }
-          </div>
-
-          <!-- Input para color personalizado -->
-          <div class="mt-3 pt-3 border-t border-stone-200 dark:border-stone-800">
-            <div class="flex gap-2">
-              <input
-                #customColorInput
-                type="text"
-                placeholder="Otro color (ej: Beige, Café)"
-                class="flex-1 h-9 px-3 text-xs bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-lg focus:ring-2 focus:ring-stone-900 dark:focus:ring-stone-400 focus:border-transparent placeholder:text-stone-400 dark:placeholder:text-stone-600 text-stone-900 dark:text-stone-100"
+            @if (selectedImage()) {
+              <img
+                [src]="selectedImage()"
+                class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                alt=""
               />
-              <button
-                type="button"
-                (click)="addColorToActiveSize(customColorInput.value); customColorInput.value = ''"
-                class="px-4 h-9 bg-stone-200 dark:bg-stone-800 hover:bg-stone-300 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-300 text-xs font-medium rounded-lg transition-colors cursor-pointer"
+              <div
+                class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+              ></div>
+
+              <!-- Floating Pill -->
+              <div
+                class="absolute bottom-6 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-500 translate-y-4 group-hover:translate-y-0"
               >
-                Agregar
-              </button>
+                <span
+                  class="bg-white/90 dark:bg-stone-900/90 text-stone-900 dark:text-white text-[10px] font-black uppercase tracking-widest flex items-center gap-2 px-5 py-2.5 rounded-full backdrop-blur-md shadow-xl border border-white/20"
+                >
+                  <span class="material-symbols-outlined text-[14px]">cameraswitch</span>
+                  Actualizar Foto
+                </span>
+              </div>
+            } @else {
+              <div
+                class="text-center group-hover:-translate-y-2 transition-transform duration-500 pointer-events-none p-6"
+              >
+                <div
+                  class="mx-auto h-16 w-16 rounded-[1.5rem] shadow-sm flex items-center justify-center mb-4 transition-all duration-500"
+                  [ngClass]="
+                    isDragging()
+                      ? 'bg-teal-100 dark:bg-teal-900/50 text-teal-600 dark:text-teal-400 scale-110 rotate-12'
+                      : 'bg-white dark:bg-stone-800 text-stone-400 dark:text-stone-500 group-hover:shadow-md'
+                  "
+                >
+                  <span class="material-symbols-outlined text-2xl">add_a_photo</span>
+                </div>
+                <p
+                  class="text-xs font-black uppercase tracking-widest transition-colors"
+                  [ngClass]="
+                    isDragging()
+                      ? 'text-teal-700 dark:text-teal-400'
+                      : 'text-stone-900 dark:text-stone-300'
+                  "
+                >
+                  {{ isDragging() ? 'Soltar para subir' : 'Subir fotografía' }}
+                </p>
+                <p
+                  class="text-[10px] font-medium text-stone-400 dark:text-stone-500 mt-2 tracking-wide leading-relaxed"
+                >
+                  Formatos recomendados:<br />JPG, PNG, WebP (Max 2MB)
+                </p>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Formulario Bento -->
+        <div class="md:col-span-7 flex flex-col gap-6">
+          <div
+            class="p-6 md:p-8 bg-stone-100/50 dark:bg-stone-900/20 border border-stone-100 dark:border-stone-800/60 rounded-[2.5rem] space-y-6 flex-1"
+          >
+            <div class="space-y-2">
+              <app-ui-label class="text-[10px] uppercase font-black tracking-widest text-stone-400"
+                >¿Cómo se llama el producto?</app-ui-label
+              >
+              <app-ui-input
+                [value]="productName()"
+                (valueChange)="updateName($event)"
+                placeholder="Ej: Casaca Bomber Minimalista"
+                class="bg-white dark:bg-stone-900 shadow-xs border-stone-200/60 dark:border-stone-800/60 rounded-2xl"
+              ></app-ui-input>
+            </div>
+
+            <!-- Marca y Código -->
+            <div class="grid grid-cols-2 gap-6">
+              <div class="space-y-2">
+                <app-ui-label
+                  class="text-[10px] uppercase font-black tracking-widest text-stone-400"
+                  >Marca Comercial</app-ui-label
+                >
+                <app-ui-input
+                  [value]="productBrand()"
+                  (valueChange)="productBrand.set($event)"
+                  placeholder="Ej: VOLCAT"
+                  class="bg-white dark:bg-stone-900 shadow-xs border-stone-200/60 dark:border-stone-800/60 rounded-2xl"
+                ></app-ui-input>
+              </div>
+              <div class="space-y-2">
+                <app-ui-label
+                  class="text-[10px] uppercase font-black tracking-widest text-stone-400 flex items-center justify-between gap-3"
+                >
+                  <span>Código de Barras</span>
+                  <button
+                    type="button"
+                    (click)="generateBarcode()"
+                    class="text-stone-900 dark:text-white underline underline-offset-4 decoration-stone-300 hover:decoration-stone-900 transition-colors"
+                  >
+                    Generar
+                  </button>
+                </app-ui-label>
+                <div class="flex gap-2">
+                  <app-ui-input
+                    [value]="productBarcode()"
+                    (valueChange)="productBarcode.set($event)"
+                    placeholder="Scan o texto..."
+                    class="bg-white dark:bg-stone-900 shadow-xs border-stone-200/60 dark:border-stone-800/60 rounded-2xl flex-1 font-mono text-sm font-bold"
+                  ></app-ui-input>
+                  <div
+                    class="h-10 w-10 shrink-0 bg-stone-900 dark:bg-white text-white dark:text-stone-900 rounded-xl flex items-center justify-center shadow-md"
+                  >
+                    <span class="material-symbols-outlined text-lg">qr_code_scanner</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Categorías -->
+            <div class="space-y-3 pt-2">
+              <app-ui-label class="text-[10px] uppercase font-black tracking-widest text-stone-400"
+                >Categoría</app-ui-label
+              >
+              <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                @for (
+                  cat of [
+                    'General',
+                    'Casacas',
+                    'Pantalones',
+                    'Polos',
+                    'Jeans',
+                    'Accesorios',
+                    'Calzado',
+                  ];
+                  track cat
+                ) {
+                  <button
+                    type="button"
+                    (click)="updateCategory(cat)"
+                    class="flex flex-col items-center justify-center gap-2 py-4 px-2 rounded-[1.25rem] border transition-all duration-300 cursor-pointer"
+                    [ngClass]="
+                      productCategory() === cat
+                        ? 'bg-stone-900 text-white dark:bg-stone-100 dark:text-stone-900 border-stone-900 dark:border-stone-100 shadow-md scale-[1.02]'
+                        : 'bg-white dark:bg-stone-900/40 text-stone-500 dark:text-stone-400 border-stone-200/80 dark:border-stone-800/80 hover:border-stone-400 dark:hover:border-stone-600 hover:bg-stone-50 dark:hover:bg-stone-800/80'
+                    "
+                  >
+                    <span class="material-symbols-outlined text-[22px]">{{
+                      getCategoryIcon(cat)
+                    }}</span>
+                    <span class="text-[9px] font-black uppercase tracking-widest leading-none">{{
+                      cat
+                    }}</span>
+                  </button>
+                }
+              </div>
             </div>
           </div>
         </div>
       </div>
-      }
+    }
 
-      <!-- Tabla de variantes agrupadas por talla -->
-      @if (variants().length > 0) {
-      <div class="mt-6 p-5 bg-stone-100/50 dark:bg-stone-900/30 rounded-xl border border-stone-200/60 dark:border-stone-800">
-        <div class="flex items-center justify-between mb-3">
-          <h3 class="text-sm font-bold text-stone-800 dark:text-stone-200">Stock por Variante</h3>
-          <span class="text-xs text-stone-500">{{ variants().length }} combinaciones</span>
-        </div>
-
-        <div class="max-h-64 overflow-y-auto no-scrollbar space-y-3">
-          @for (size of activeSizes(); track size) {
-          <div class="bg-white dark:bg-stone-900 p-3 rounded-lg border border-stone-100 dark:border-stone-800/60">
-            <p class="text-xs font-bold text-stone-900 dark:text-stone-100 mb-2 flex items-center gap-2">
-              <span
-                class="w-6 h-6 bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 rounded flex items-center justify-center text-[10px]"
-                >{{ size }}</span
+    <!-- PESTAÑA: VARIANTES -->
+    @if (activeModalTab() === 'VARIANTS') {
+      <div
+        class="grid grid-cols-1 lg:grid-cols-12 gap-8 animate-in fade-in zoom-in-95 duration-200 pt-2"
+      >
+        <!-- Left Column: Configurator Bento Boxes -->
+        <div class="lg:col-span-5 flex flex-col gap-6">
+          <!-- Sizes Bento Box -->
+          <div
+            class="p-6 md:p-8 bg-stone-100/50 dark:bg-stone-900/20 border border-stone-100 dark:border-stone-800/60 rounded-[2.5rem] space-y-5"
+          >
+            <div class="flex items-center justify-between">
+              <app-ui-label class="text-[10px] uppercase font-black tracking-widest text-stone-400"
+                >Tallas disponibles</app-ui-label
               >
-              Talla {{ size }}
-            </p>
-            <div class="space-y-2 pl-8">
-              @for (variant of getVariantsBySize(size); track variant.id) {
-              <div class="flex items-center justify-between">
-                <span class="text-xs font-medium text-stone-700 dark:text-stone-300">{{ variant.color }}</span>
-                <input
-                  type="number"
-                  min="0"
-                  [value]="variant.stock"
-                  (input)="updateVariantStock(variant.id, +$any($event.target).value)"
-                  class="w-20 h-8 px-2 text-center text-sm font-bold bg-stone-50 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded focus:ring-2 focus:ring-stone-900 dark:focus:ring-stone-400 focus:border-transparent text-stone-900 dark:text-stone-100"
-                  placeholder="0"
-                />
-              </div>
+              <span
+                class="text-[9px] font-bold text-stone-500 bg-white dark:bg-stone-800/80 border border-stone-200/60 dark:border-stone-700/60 shadow-xs px-2.5 py-1 rounded-lg"
+                >{{ activeSizes().length }} Activas</span
+              >
+            </div>
+            <div class="flex flex-wrap gap-2.5">
+              @for (size of availableSizes; track size) {
+                <button
+                  type="button"
+                  (click)="activeSizes().includes(size) ? removeSize(size) : addSize(size)"
+                  class="h-12 w-12 rounded-[1rem] border text-xs font-black transition-all duration-300 relative cursor-pointer flex items-center justify-center outline-hidden"
+                  [ngClass]="
+                    activeSizes().includes(size)
+                      ? 'bg-stone-900 text-white dark:bg-stone-100 dark:text-stone-900 border-stone-900 dark:border-stone-100 shadow-md scale-[1.05] z-10'
+                      : 'bg-white dark:bg-stone-900/40 text-stone-400 border-stone-200/80 dark:border-stone-800/80 hover:border-stone-400 hover:text-stone-900 dark:hover:text-white dark:hover:border-stone-500 hover:bg-stone-50 dark:hover:bg-stone-800/80'
+                  "
+                >
+                  {{ size }}
+                  @if (activeSizes().includes(size)) {
+                    <span
+                      class="absolute -top-1.5 -right-1.5 w-[18px] h-[18px] bg-teal-500 rounded-full text-[9px] text-white flex items-center justify-center shadow-sm border-2 border-white dark:border-stone-900"
+                    >
+                      {{ countVariantsBySize(size) }}
+                    </span>
+                  }
+                </button>
               }
             </div>
           </div>
+
+          <!-- Colors Bento Box -->
+          @if (activeSizes().length > 0) {
+            <div class="p-6 md:p-8 bg-stone-100/50 dark:bg-stone-900/20 border border-stone-100 dark:border-stone-800/60 rounded-[2.5rem] space-y-5 flex-1 flex flex-col animate-in fade-in zoom-in-95 duration-300">
+              <app-ui-label class="text-[10px] uppercase font-black tracking-widest text-stone-400"
+                >Colores para esta talla</app-ui-label
+              >
+
+              <!-- Size Tabs for Colors -->
+              <div class="flex gap-2 overflow-x-auto no-scrollbar pb-1">
+                @for (size of activeSizes(); track size) {
+                  <button
+                    type="button"
+                    (click)="activeSizeTab.set(size)"
+                    class="px-5 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all shrink-0 cursor-pointer border outline-hidden"
+                    [ngClass]="
+                      activeSizeTab() === size
+                        ? 'bg-white dark:bg-stone-800/80 text-stone-900 dark:text-white border-stone-200/80 dark:border-stone-700/80 shadow-sm'
+                        : 'bg-transparent text-stone-400 border-transparent hover:bg-stone-200/50 dark:hover:bg-stone-800/50'
+                    "
+                  >
+                    {{ size }}
+                  </button>
+                }
+              </div>
+
+              <!-- Color Config Area -->
+              <div
+                class="bg-white dark:bg-stone-900/40 p-5 rounded-[1.5rem] shadow-xs border border-stone-200/60 dark:border-stone-800/60 space-y-5 mt-auto"
+              >
+                <div class="flex flex-wrap gap-2">
+                  @for (color of availableColors; track color) {
+                    <button
+                      type="button"
+                      (click)="toggleColorForActiveSize(color)"
+                      class="px-4 py-2 rounded-xl border text-[10px] font-black uppercase tracking-wider transition-all duration-300 cursor-pointer outline-hidden"
+                      [ngClass]="
+                        activeColors().includes(color)
+                          ? 'bg-stone-900 text-white dark:bg-stone-100 dark:text-stone-900 border-stone-900 dark:border-stone-100 shadow-sm scale-[1.02]'
+                          : 'bg-stone-50 dark:bg-stone-800/40 text-stone-500 dark:text-stone-400 border-stone-200/60 dark:border-stone-700/60 hover:border-stone-400 dark:hover:border-stone-500'
+                      "
+                    >
+                      {{ color }}
+                    </button>
+                  }
+                </div>
+                
+                <!-- Custom Color Input -->
+                <div class="pt-4 border-t border-stone-100 dark:border-stone-800/60 flex gap-2">
+                  <input
+                    #customColorInput
+                    type="text"
+                    placeholder="Nuevo color..."
+                    class="flex-1 h-10 px-4 text-[11px] font-bold uppercase bg-stone-50 dark:bg-stone-800/50 border border-stone-200/60 dark:border-stone-700/60 rounded-[14px] focus:ring-0 focus:border-stone-900 dark:focus:border-stone-100 outline-hidden placeholder:text-stone-400 transition-colors"
+                  />
+                  <button
+                    type="button"
+                    (click)="
+                      addColorToActiveSize(customColorInput.value); customColorInput.value = ''
+                    "
+                    class="h-10 w-10 shrink-0 bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 rounded-[14px] transition-all flex items-center justify-center cursor-pointer hover:scale-105 active:scale-95 shadow-md outline-hidden"
+                  >
+                    <span class="material-symbols-outlined text-[18px]">add</span>
+                  </button>
+                </div>
+              </div>
+            </div>
           }
         </div>
 
-        <div class="mt-3 pt-3 border-t border-stone-200 dark:border-stone-800 flex items-center justify-between">
-          <span class="text-xs text-stone-500">Stock Total</span>
-          <span class="text-lg font-bold text-stone-900 dark:text-stone-100"
-            >{{ totalStock() }} <span class="text-xs font-normal text-stone-400">und.</span></span
+        <!-- Right Column: Stock Matrix -->
+        <div class="lg:col-span-7 flex flex-col gap-6">
+          <div class="flex items-center justify-between px-2 pt-1">
+            <app-ui-label class="text-[10px] uppercase font-black tracking-widest text-stone-400"
+              >¿Cuántos tienes en stock?</app-ui-label
+            >
+            <span
+              class="text-[10px] font-black text-stone-900 dark:text-white uppercase tracking-widest bg-stone-100 dark:bg-stone-800/80 px-3 py-1.5 rounded-lg border border-stone-200/60 dark:border-stone-700/60 shadow-xs"
+            >
+              Total: {{ totalStock() }} und.
+            </span>
+          </div>
+
+          @if (variants().length > 0) {
+            <div
+              class="bg-stone-100/50 dark:bg-stone-900/20 border border-stone-100 dark:border-stone-800/60 rounded-[2.5rem] overflow-hidden flex flex-col flex-1 max-h-[500px]"
+            >
+              <div class="flex-1 overflow-y-auto no-scrollbar p-6 md:p-8 space-y-8">
+                @for (size of activeSizes(); track size) {
+                  <div class="space-y-4 animate-in fade-in duration-300">
+                    <div class="flex items-center gap-4">
+                      <span
+                        class="text-[10px] font-black uppercase tracking-widest text-stone-900 dark:text-white bg-white dark:bg-stone-800 px-4 py-1.5 rounded-full border border-stone-200/60 dark:border-stone-700/60 shadow-xs"
+                        >Talla {{ size }}</span
+                      >
+                      <div class="h-px flex-1 bg-gradient-to-r from-stone-200/60 dark:from-stone-700/60 to-transparent"></div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      @for (variant of getVariantsBySize(size); track variant.id) {
+                        <div
+                          class="flex items-center justify-between bg-white dark:bg-stone-900/40 p-3.5 rounded-[1.5rem] border border-stone-200/60 dark:border-stone-700/50 hover:border-stone-400 dark:hover:border-stone-500 transition-colors group shadow-xs hover:shadow-sm"
+                        >
+                          <div class="flex flex-col px-1">
+                            <span
+                              class="text-[9px] uppercase tracking-widest font-black text-stone-400 mb-0.5"
+                              >Color</span
+                            >
+                            <span class="text-xs font-black text-stone-900 dark:text-white">{{
+                              variant.color
+                            }}</span>
+                          </div>
+                          <div class="flex items-center gap-3">
+                            <span
+                              class="text-[9px] uppercase tracking-widest font-black text-stone-400"
+                              >Stock</span
+                            >
+                            <input
+                              type="number"
+                              min="0"
+                              [value]="variant.stock"
+                              (input)="updateVariantStock(variant.id, +$any($event.target).value)"
+                              class="w-16 h-10 text-center text-sm font-black bg-stone-50 dark:bg-stone-800/80 border border-stone-200/60 dark:border-stone-700/60 rounded-xl focus:ring-0 focus:border-stone-900 dark:focus:border-stone-100 text-stone-900 dark:text-white shadow-inner transition-colors outline-hidden hover:bg-stone-100 dark:hover:bg-stone-700"
+                            />
+                          </div>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          } @else {
+            <div
+              class="flex-1 min-h-[300px] flex items-center justify-center bg-stone-100/50 dark:bg-stone-900/20 border border-stone-200/50 dark:border-stone-800/60 rounded-[2.5rem] border-dashed"
+            >
+              <div class="text-center p-8">
+                <div class="h-16 w-16 bg-white dark:bg-stone-800/80 rounded-[1.5rem] mx-auto flex items-center justify-center shadow-sm border border-stone-200/60 dark:border-stone-700/60 mb-4 transition-transform hover:scale-105 duration-500">
+                  <span
+                    class="material-symbols-outlined text-3xl text-stone-300 dark:text-stone-600"
+                    >style</span
+                  >
+                </div>
+                <p class="text-xs font-black uppercase tracking-widest text-stone-400">
+                  Matriz Vacía
+                </p>
+                <p class="text-[11px] font-medium text-stone-500 mt-2 max-w-[200px] mx-auto leading-relaxed">
+                  Selecciona tallas y colores en el panel izquierdo para generar el inventario.
+                </p>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- PESTAÑA: FINANZAS -->
+    @if (activeModalTab() === 'FINANCE') {
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 animate-in fade-in zoom-in-95 duration-200 pt-2">
+        
+        <!-- Left Column: Product Summary -->
+        <div class="lg:col-span-5 flex flex-col gap-6">
+          <div class="p-6 md:p-8 bg-stone-100/50 dark:bg-stone-900/20 border border-stone-100 dark:border-stone-800/60 rounded-[2.5rem] flex flex-col items-center text-center relative overflow-hidden h-full justify-center">
+            <!-- Blur Background -->
+            @if (selectedImage()) {
+              <div class="absolute inset-0 opacity-20 blur-2xl z-0 scale-110" [style.backgroundImage]="'url(' + selectedImage() + ')'" style="background-size: cover; background-position: center;"></div>
+            }
+
+            <div class="relative z-10 w-full flex flex-col items-center">
+              <div class="w-32 h-32 rounded-[2rem] overflow-hidden shadow-md border-4 border-white dark:border-stone-800 mb-6 bg-white dark:bg-stone-800 shrink-0">
+                @if (selectedImage()) {
+                  <img [src]="selectedImage()" class="w-full h-full object-cover" />
+                } @else {
+                  <div class="w-full h-full flex items-center justify-center bg-stone-50 dark:bg-stone-900/50">
+                    <span class="material-symbols-outlined text-4xl text-stone-300 dark:text-stone-600">inventory_2</span>
+                  </div>
+                }
+              </div>
+
+              <h3 class="text-lg font-black text-stone-900 dark:text-white leading-tight mb-2">
+                {{ productName() || 'Producto sin nombre' }}
+              </h3>
+              <div class="flex items-center gap-2 mb-8">
+                <span class="px-3 py-1 bg-white dark:bg-stone-800/80 rounded-full text-[10px] font-black uppercase tracking-widest text-stone-500 shadow-xs border border-stone-200/60 dark:border-stone-700/60">
+                  {{ productCategory() }}
+                </span>
+                <span class="px-3 py-1 bg-stone-900 dark:bg-stone-100 rounded-full text-[10px] font-black uppercase tracking-widest text-white dark:text-stone-900 shadow-xs">
+                  {{ totalStock() }} und.
+                </span>
+              </div>
+
+              <div class="w-full bg-white/80 dark:bg-stone-800/80 rounded-2xl p-4 border border-stone-200/60 dark:border-stone-700/60 text-left flex items-center justify-between shadow-xs backdrop-blur-sm">
+                <div>
+                  <p class="text-[9px] uppercase font-black tracking-widest text-stone-400 mb-0.5">Opciones cargadas</p>
+                  <p class="text-[13px] font-black text-stone-900 dark:text-white leading-none">{{ activeSizes().length }} Tallas, {{ variants().length }} Combos</p>
+                </div>
+                <div class="h-10 w-10 bg-stone-50 dark:bg-stone-900 rounded-[14px] flex items-center justify-center border border-stone-100 dark:border-stone-800 shrink-0">
+                  <span class="material-symbols-outlined text-stone-400 text-lg">style</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: Pricing & Margin -->
+        <div class="lg:col-span-7 flex flex-col gap-6">
+          <div class="flex items-center justify-between px-2 pt-1">
+            <app-ui-label class="text-[10px] uppercase font-black tracking-widest text-stone-400"
+              >Precios y Márgenes</app-ui-label
+            >
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <!-- Cost Price -->
+            <div class="space-y-3 bg-stone-100/50 dark:bg-stone-900/20 p-6 rounded-[2rem] border border-stone-100 dark:border-stone-800/60 flex flex-col justify-center transition-all hover:bg-stone-100 dark:hover:bg-stone-900/40">
+              <app-ui-label class="text-[10px] uppercase text-stone-400 font-black tracking-widest"
+                >Precio de Compra</app-ui-label
+              >
+              <div
+                class="flex items-center gap-3 bg-white dark:bg-stone-800/80 p-4 rounded-2xl border border-stone-200/60 dark:border-stone-700/60 focus-within:border-stone-900 dark:focus-within:border-stone-100 focus-within:shadow-md transition-all"
+              >
+                <span class="text-stone-300 dark:text-stone-600 font-black text-2xl pl-1">S/</span>
+                <input
+                  type="number"
+                  inputmode="decimal"
+                  placeholder="0.00"
+                  [value]="costPrice()"
+                  (input)="updateCost($any($event.target).value)"
+                  class="w-full bg-transparent border-none p-0 text-3xl font-black text-stone-800 dark:text-stone-100 outline-hidden focus:ring-0 placeholder:text-stone-300 dark:placeholder:text-stone-600"
+                />
+              </div>
+            </div>
+
+            <!-- Sale Price -->
+            <div class="space-y-3 bg-teal-50/50 dark:bg-teal-900/10 p-6 rounded-[2rem] border border-teal-100 dark:border-teal-900/30 flex flex-col justify-center transition-all hover:bg-teal-50 dark:hover:bg-teal-900/20">
+              <app-ui-label
+                class="text-[10px] uppercase font-black tracking-widest text-teal-600 dark:text-teal-500"
+                >Precio de Venta</app-ui-label
+              >
+              <div
+                class="flex items-center gap-3 bg-white dark:bg-stone-800/80 p-4 rounded-2xl border border-teal-200/60 dark:border-teal-800/60 focus-within:border-teal-600 dark:focus-within:border-teal-400 focus-within:shadow-md transition-all"
+              >
+                <span class="text-teal-300 dark:text-teal-700 font-black text-2xl pl-1">S/</span>
+                <input
+                  type="number"
+                  inputmode="decimal"
+                  placeholder="0.00"
+                  [value]="salePrice()"
+                  (input)="updateSale($any($event.target).value)"
+                  class="w-full bg-transparent border-none p-0 text-3xl font-black text-stone-900 dark:text-white outline-hidden focus:ring-0 placeholder:text-stone-300 dark:placeholder:text-stone-600"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Profit Margin Card -->
+          <div
+            class="relative overflow-hidden bg-stone-900 dark:bg-white p-8 md:p-10 rounded-[2.5rem] shadow-lg flex flex-col justify-center items-center text-center group mt-auto h-full min-h-[220px]"
           >
-        </div>
-      </div>
-      }
-    </div>
-  }
+            <div class="flex flex-col z-10 items-center justify-center">
+              <p
+                class="text-[11px] uppercase text-stone-400 dark:text-stone-500 font-black tracking-widest mb-3"
+              >
+                Tu ganancia limpia
+              </p>
+              <p class="text-5xl md:text-6xl font-black text-white dark:text-stone-900 mb-6 tracking-tight">
+                + S/ {{ profit() | number: '1.2-2' }}
+              </p>
+              <div class="flex items-center gap-2 bg-white/10 dark:bg-stone-900/10 px-5 py-2.5 rounded-full border border-white/20 dark:border-stone-900/20 backdrop-blur-md">
+                <span class="material-symbols-outlined text-[16px] text-teal-400 dark:text-teal-600">trending_up</span>
+                <span
+                  class="text-xs font-black text-white dark:text-stone-900 uppercase tracking-widest"
+                >
+                  {{ margin() }}% Margen
+                </span>
+              </div>
+            </div>
 
-  <!-- PESTAÑA: FINANZAS -->
-  @if(activeModalTab() === 'FINANCE') {
-  <div class="animate-in fade-in zoom-in-95 duration-200 max-w-2xl mx-auto pt-6">
-    <div class="mb-4 text-center">
-      <h3 class="text-lg font-bold text-stone-900 dark:text-stone-100">Configuración Financiera</h3>
-      <p class="text-sm text-stone-500 dark:text-stone-400">Establece tus precios de costo y venta para el producto.</p>
-    </div>
-    
-    <div class="mt-6 p-8 rounded-3xl bg-stone-50 dark:bg-stone-900/30 border border-stone-100 dark:border-stone-800 grid grid-cols-3 gap-8 shadow-[inset_0_2px_10px_rgba(0,0,0,0.02)] dark:shadow-none">
-      <div class="space-y-2">
-        <app-ui-label class="text-xs uppercase text-stone-400 dark:text-stone-500 font-bold tracking-widest">Costo Unitario</app-ui-label>
-        <div class="flex items-end gap-1 border-b-2 border-stone-200 dark:border-stone-700 focus-within:border-stone-900 dark:focus-within:border-stone-100 transition-colors pb-1">
-          <span class="text-stone-400 dark:text-stone-500 font-medium mb-1">S/</span>
-          <input
-            type="number"
-            placeholder="0.00"
-            [value]="costPrice()"
-            (input)="updateCost($any($event.target).value)"
-            class="w-full bg-transparent border-none p-0 text-xl font-bold text-stone-700 dark:text-stone-100 outline-hidden focus:ring-0 placeholder:text-stone-300 dark:placeholder:text-stone-600"
-          />
+            <!-- Absolute Circular Progress inside dark card -->
+            <div class="absolute -right-12 -top-12 h-64 w-64 opacity-5 group-hover:opacity-10 transition-opacity duration-1000 pointer-events-none">
+              <svg viewBox="0 0 56 56" class="h-full w-full rotate-[-90deg]">
+                <circle
+                  cx="28"
+                  cy="28"
+                  r="24"
+                  stroke="currentColor"
+                  stroke-width="8"
+                  fill="transparent"
+                  class="text-white dark:text-stone-900"
+                ></circle>
+                <circle
+                  cx="28"
+                  cy="28"
+                  r="24"
+                  stroke="currentColor"
+                  stroke-width="8"
+                  fill="transparent"
+                  class="text-teal-400 dark:text-teal-600 transition-all duration-1000 ease-out"
+                  stroke-linecap="round"
+                  [style.stroke-dasharray]="150.7"
+                  [style.stroke-dashoffset]="150.7 - 150.7 * (+margin() / 100)"
+                ></circle>
+              </svg>
+            </div>
+            
+            <div class="absolute -left-20 -bottom-20 w-64 h-64 bg-teal-500/20 rounded-full blur-[80px]"></div>
+          </div>
         </div>
       </div>
-
-      <div class="space-y-2 pl-4 border-l-2 border-dashed border-stone-200 dark:border-stone-700">
-        <app-ui-label class="text-xs uppercase font-bold tracking-widest text-teal-600 dark:text-teal-500">Precio Venta</app-ui-label>
-        <div class="flex items-end gap-1 border-b-2 border-teal-200 dark:border-teal-900/60 focus-within:border-teal-600 dark:focus-within:border-teal-400 transition-colors pb-1">
-          <span class="text-teal-600/60 dark:text-teal-500/60 font-medium mb-1">S/</span>
-          <input
-            type="number"
-            placeholder="0.00"
-            [value]="salePrice()"
-            (input)="updateSale($any($event.target).value)"
-            class="w-full bg-transparent border-none p-0 text-2xl font-black text-stone-900 dark:text-white outline-hidden focus:ring-0 placeholder:text-stone-300 dark:placeholder:text-stone-600"
-          />
-        </div>
-      </div>
-
-      <div class="space-y-2 text-right flex flex-col justify-center bg-white dark:bg-stone-800/80 p-4 rounded-2xl shadow-sm border border-stone-100 dark:border-stone-700">
-        <p class="text-[10px] uppercase text-stone-400 dark:text-stone-500 font-bold tracking-widest mb-1">Ganancia Neta</p>
-        <p class="text-xl font-black text-teal-600 dark:text-teal-400">
-          + S/ {{ profit() | number : '1.2-2' }}
-        </p>
-        <div class="mt-2">
-          <p class="text-xs font-bold text-teal-700 dark:text-teal-300 bg-teal-50 dark:bg-teal-900/30 px-3 py-1 rounded-full inline-block border border-teal-100 dark:border-teal-800/50">
-            {{ margin() }}% utilidad
-          </p>
-        </div>
-      </div>
-    </div>
+    }
   </div>
-  }
-  
-  </div> <!-- Fin Contenedor de Altura Fija -->
+  <!-- Fin Contenedor de Altura Fija -->
 
-  <!-- Footer fijo con botones -->
+  <!-- Footer fijo Asistente Action Bar -->
   <div
-    class="sticky bottom-0 left-0 right-0 bg-linear-to-t from-[#FDFCFC] dark:from-stone-950 via-[#FDFCFC] dark:via-stone-950 to-transparent pt-6 pb-2 px-8 -mx-8 mt-8"
+    class="sticky bottom-0 left-0 right-0 bg-white dark:bg-stone-950 border-t border-stone-200/80 dark:border-stone-800/80 pt-5 pb-0 -mx-8 -mb-8 mt-8 z-20 px-8"
   >
-    <div class="flex gap-4">
-      <app-ui-button
-        variant="outline"
-        class="w-1/3 border-stone-200 dark:border-stone-700 rounded-xl h-12 text-stone-700 dark:text-stone-300"
-        (onClick)="isDialogOpen.set(false)"
+    <div class="flex items-center justify-between gap-4 max-w-lg mx-auto w-full">
+      <!-- Back / Cancel Button -->
+      <button
+        type="button"
+        (click)="activeModalTab() === 'INFO' ? isDialogOpen.set(false) : activeModalTab() === 'VARIANTS' ? activeModalTab.set('INFO') : activeModalTab.set('VARIANTS')"
+        class="h-12 px-6 flex items-center justify-center rounded-[1rem] text-[11px] font-black uppercase tracking-widest transition-all cursor-pointer outline-hidden gap-2 bg-stone-100 hover:bg-stone-200 text-stone-500 hover:text-stone-900 dark:bg-stone-900 dark:hover:bg-stone-800 dark:text-stone-400 dark:hover:text-white"
       >
-        Cancelar
-      </app-ui-button>
-      <app-ui-button
-        [disabled]="!isFormValid()"
-        class="w-2/3 rounded-xl shadow-lg transition-all h-12 text-base"
-        [ngClass]="
-          isFormValid()
-            ? 'bg-stone-900 dark:bg-stone-100 hover:bg-black dark:hover:bg-white text-white dark:text-stone-900'
-            : 'bg-stone-200 dark:bg-stone-800 text-stone-400 dark:text-stone-600 cursor-not-allowed'
-        "
-        (onClick)="saveProduct()"
-      >
-        {{ editingProductId() ? 'Actualizar Producto' : 'Guardar Producto' }}
-      </app-ui-button>
+        <span class="material-symbols-outlined text-[16px]">{{ activeModalTab() === 'INFO' ? 'close' : 'arrow_back' }}</span>
+        {{ activeModalTab() === 'INFO' ? 'Salir' : 'Volver' }}
+      </button>
+      
+      <!-- Next / Save Button -->
+      @if (activeModalTab() === 'FINANCE') {
+        <button
+          type="button"
+          [disabled]="!isFormValid()"
+          (click)="saveProduct()"
+          class="flex-1 h-12 rounded-[1rem] text-[11px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 outline-hidden"
+          [ngClass]="
+            isFormValid()
+              ? 'bg-emerald-500 hover:bg-emerald-600 dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white cursor-pointer shadow-xs hover:shadow-sm'
+              : 'bg-stone-50 dark:bg-stone-900/50 text-stone-400 dark:text-stone-600 cursor-not-allowed border border-stone-200 dark:border-stone-800'
+          "
+        >
+          <span class="material-symbols-outlined text-[18px]">
+            {{ editingProductId() ? 'update' : 'check_circle' }}
+          </span>
+          {{ editingProductId() ? 'Actualizar Producto' : 'Guardar y terminar' }}
+        </button>
+      } @else {
+        <button
+          type="button"
+          (click)="activeModalTab() === 'INFO' ? activeModalTab.set('VARIANTS') : activeModalTab.set('FINANCE')"
+          class="flex-1 h-12 rounded-[1rem] text-[11px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 outline-hidden bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 hover:bg-stone-800 dark:hover:bg-white cursor-pointer shadow-xs hover:shadow-sm"
+        >
+          Siguiente paso
+          <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+        </button>
+      }
     </div>
   </div>
 </app-ui-animated-dialog>

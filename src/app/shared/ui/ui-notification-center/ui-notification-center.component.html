@@ -10,7 +10,7 @@
   [class.bg-stone-100]="panelOpen() && !isDarkMode()"
   [class.dark:bg-stone-800]="panelOpen() && isDarkMode()">
   
-  <span class="material-icons-outlined text-[19px]">notifications</span>
+  <span class="material-symbols-outlined text-[19px]">notifications</span>
   
   <!-- Badge -->
   @if (notificationService.unreadCount() > 0) {
@@ -37,7 +37,7 @@
     <div class="px-5 pt-5 pb-3 border-b border-stone-100 dark:border-stone-800">
       <div class="flex items-center justify-between mb-3">
         <div class="flex items-center gap-2.5">
-          <span class="material-icons-outlined text-stone-900 dark:text-stone-100 text-[22px]">notifications</span>
+          <span class="material-symbols-outlined text-stone-900 dark:text-stone-100 text-[22px]">notifications</span>
           <h2 class="text-[17px] font-semibold text-stone-900 dark:text-stone-100 tracking-tight">
             Notificaciones
           </h2>
@@ -54,14 +54,14 @@
               (click)="markAllAsRead()"
               class="p-1.5 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
               title="Marcar todas como leídas">
-              <span class="material-icons-outlined text-stone-500 dark:text-stone-400 text-[18px]">done_all</span>
+              <span class="material-symbols-outlined text-stone-500 dark:text-stone-400 text-[18px]">done_all</span>
             </button>
           }
           <button
             (click)="closePanel()"
             class="p-1.5 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
             title="Cerrar">
-            <span class="material-icons-outlined text-stone-500 dark:text-stone-400 text-[18px]">close</span>
+            <span class="material-symbols-outlined text-stone-500 dark:text-stone-400 text-[18px]">close</span>
           </button>
         </div>
       </div>
@@ -109,7 +109,7 @@
         <!-- Empty State -->
         <div class="flex flex-col items-center justify-center h-full px-6 py-16">
           <div class="w-16 h-16 rounded-2xl bg-stone-100 dark:bg-stone-800 flex items-center justify-center mb-4">
-            <span class="material-icons-outlined text-stone-300 dark:text-stone-600 text-3xl">
+            <span class="material-symbols-outlined text-stone-300 dark:text-stone-600 text-3xl">
               notifications_none
             </span>
           </div>
@@ -139,7 +139,7 @@
               <div class="flex gap-3">
                 <!-- Icon -->
                 <div [class]="getIconClass(notification.type)">
-                  <span class="material-icons-outlined text-[17px]">
+                  <span class="material-symbols-outlined text-[17px]">
                     {{ notification.icon }}
                   </span>
                 </div>
@@ -181,7 +181,7 @@
                   (click)="deleteNotification(notification.id, $event)"
                   class="p-1 rounded-lg hover:bg-stone-200 dark:hover:bg-stone-700 transition-all opacity-0 group-hover:opacity-100 self-start mt-0.5"
                   title="Eliminar">
-                  <span class="material-icons-outlined text-stone-400 dark:text-stone-500 text-[14px]">close</span>
+                  <span class="material-symbols-outlined text-stone-400 dark:text-stone-500 text-[14px]">close</span>
                 </button>
               </div>
             </div>
@@ -196,7 +196,7 @@
         (click)="goToNotificationsPage()"
         class="text-[12px] font-semibold text-stone-600 dark:text-stone-300 hover:text-stone-900 dark:hover:text-white transition-colors flex items-center gap-1">
         Ver todas
-        <span class="material-icons-outlined text-[14px]">arrow_forward</span>
+        <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
       </button>
 
       @if (notificationService.allNotifications().length > 0) {

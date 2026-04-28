@@ -9,7 +9,7 @@
       <div class="flex items-center gap-3 w-full sm:w-auto">
         <app-period-selector class="flex-1 sm:flex-initial" (periodChange)="onPeriodChange($event)" />
         <button (click)="descargarExcel()" class="bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 rounded-xl px-5 py-2.5 font-medium shadow-sm hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center gap-2">
-          <span class="material-icons-outlined text-sm">download</span> Excel
+          <span class="material-symbols-outlined text-sm">download</span> Excel
         </button>
         <app-ui-export-menu [data]="exportData()" type="reports" />
       </div>
@@ -59,7 +59,7 @@
                   'text-emerald-600 dark:text-emerald-400': weekComparison().isPositive,
                   'text-rose-600 dark:text-rose-400': !weekComparison().isPositive
                 }">
-                <span class="material-icons-outlined text-sm">{{ weekComparison().isPositive ? 'trending_up' : 'trending_down' }}</span>
+                <span class="material-symbols-outlined text-sm">{{ weekComparison().isPositive ? 'trending_up' : 'trending_down' }}</span>
                 <span class="font-bold text-sm">{{ weekComparison().arrow }} {{ weekComparison().percentage | number : '1.1-1' }}%</span>
               </div>
             </div>
@@ -90,11 +90,11 @@
         <!-- HERO BOX: Ingresos Totales (DARK) -->
         <div class="flex-1 bg-stone-900 rounded-3xl p-6 lg:p-8 flex flex-col justify-between relative overflow-hidden group">
           <div class="absolute -right-10 -bottom-10 opacity-10 group-hover:scale-110 transition-transform duration-700">
-            <span class="material-icons-outlined text-[150px] text-white">query_stats</span>
+            <span class="material-symbols-outlined text-[150px] text-white">query_stats</span>
           </div>
           <div class="relative z-10">
             <div class="flex items-center gap-2 text-stone-400 mb-2">
-              <span class="material-icons-outlined text-sm">attach_money</span>
+              <span class="material-symbols-outlined text-sm">attach_money</span>
               <span class="text-xs uppercase tracking-widest font-semibold">Ingresos Totales</span>
             </div>
             <p class="text-4xl lg:text-5xl font-bold text-white tracking-tight">S/ {{ totalRevenue() | number : '1.0-0' }}</p>
@@ -112,7 +112,7 @@
         <div class="flex-1 bg-white dark:bg-stone-900 rounded-3xl border border-stone-200/60 dark:border-stone-800 shadow-sm p-6 lg:p-8 flex flex-col justify-between">
           <div>
             <div class="flex items-center gap-2 text-stone-500 dark:text-stone-400 mb-2">
-              <span class="material-icons-outlined text-sm">trending_up</span>
+              <span class="material-symbols-outlined text-sm">trending_up</span>
               <span class="text-xs uppercase tracking-widest font-semibold">Ganancia Neta</span>
             </div>
             <p class="text-3xl lg:text-4xl font-bold text-emerald-600 dark:text-emerald-500 tracking-tight">S/ {{ totalProfit() | number : '1.0-0' }}</p>
@@ -138,7 +138,7 @@
       <!-- Productos Vendidos -->
       <div class="bg-white dark:bg-stone-900 border border-stone-200/60 dark:border-stone-800 rounded-2xl p-4 flex items-center gap-4 hover:border-stone-300 dark:hover:border-stone-700 transition-colors">
         <div class="w-10 h-10 rounded-full bg-stone-100 dark:bg-stone-800 flex items-center justify-center text-stone-600 dark:text-stone-400">
-          <span class="material-icons-outlined text-lg">inventory_2</span>
+          <span class="material-symbols-outlined text-lg">inventory_2</span>
         </div>
         <div>
           <p class="text-xs text-stone-500 font-medium">Productos Vendidos</p>
@@ -149,7 +149,7 @@
       <!-- Meta Mensual -->
       <div class="bg-white dark:bg-stone-900 border border-stone-200/60 dark:border-stone-800 rounded-2xl p-4 flex items-center gap-4 hover:border-stone-300 dark:hover:border-stone-700 transition-colors">
         <div class="w-10 h-10 rounded-full bg-stone-100 dark:bg-stone-800 flex items-center justify-center text-stone-600 dark:text-stone-400">
-          <span class="material-icons-outlined text-lg">flag</span>
+          <span class="material-symbols-outlined text-lg">flag</span>
         </div>
         <div class="flex-1">
           <p class="text-xs text-stone-500 font-medium">Meta Mensual</p>
@@ -163,7 +163,7 @@
       <!-- Ticket Promedio -->
       <div class="bg-white dark:bg-stone-900 border border-stone-200/60 dark:border-stone-800 rounded-2xl p-4 flex items-center gap-4 hover:border-stone-300 dark:hover:border-stone-700 transition-colors">
         <div class="w-10 h-10 rounded-full bg-stone-100 dark:bg-stone-800 flex items-center justify-center text-stone-600 dark:text-stone-400">
-          <span class="material-icons-outlined text-lg">receipt</span>
+          <span class="material-symbols-outlined text-lg">receipt</span>
         </div>
         <div>
           <p class="text-xs text-stone-500 font-medium">Ticket Promedio</p>
@@ -174,7 +174,7 @@
       <!-- Mejor Feria -->
       <div class="bg-white dark:bg-stone-900 border border-stone-200/60 dark:border-stone-800 rounded-2xl p-4 flex items-center gap-4 hover:border-stone-300 dark:hover:border-stone-700 transition-colors">
         <div class="w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center text-amber-600 dark:text-amber-400">
-          <span class="material-icons-outlined text-lg">star</span>
+          <span class="material-symbols-outlined text-lg">star</span>
         </div>
         <div>
           <p class="text-xs text-amber-600/80 dark:text-amber-500 font-medium">Mejor Feria</p>
@@ -195,13 +195,13 @@
       <div class="lg:col-span-5 bg-stone-900 rounded-3xl p-6 lg:p-8 relative overflow-hidden group flex flex-col">
         <!-- Icon de fondo -->
         <div class="absolute -right-8 -bottom-8 opacity-10 group-hover:scale-110 transition-transform duration-700">
-          <span class="material-icons-outlined text-[140px] text-white">celebration</span>
+          <span class="material-symbols-outlined text-[140px] text-white">celebration</span>
         </div>
 
         <div class="relative z-10 flex-1 flex flex-col">
           <div class="flex items-center gap-3 mb-6">
             <div class="w-10 h-10 rounded-xl bg-amber-500/20 flex items-center justify-center">
-              <span class="material-icons-outlined text-amber-400">celebration</span>
+              <span class="material-symbols-outlined text-amber-400">celebration</span>
             </div>
             <div>
               <h3 class="text-lg font-bold text-white">Ferias vs Tienda</h3>
@@ -213,7 +213,7 @@
           <div class="bg-white/5 backdrop-blur-sm rounded-2xl p-5 mb-4 border border-white/10">
             <div class="flex items-center justify-between mb-3">
               <div class="flex items-center gap-2">
-                <span class="material-icons-outlined text-amber-400 text-sm">storefront</span>
+                <span class="material-symbols-outlined text-amber-400 text-sm">storefront</span>
                 <span class="text-xs uppercase tracking-wider text-amber-400 font-semibold">Ferias</span>
               </div>
               <span class="text-xs text-stone-400">Jue + Dom</span>
@@ -226,7 +226,7 @@
           <div class="bg-white/5 backdrop-blur-sm rounded-2xl p-5 mb-6 border border-white/10">
             <div class="flex items-center justify-between mb-3">
               <div class="flex items-center gap-2">
-                <span class="material-icons-outlined text-stone-400 text-sm">store</span>
+                <span class="material-symbols-outlined text-stone-400 text-sm">store</span>
                 <span class="text-xs uppercase tracking-wider text-stone-400 font-semibold">Tienda</span>
               </div>
               <span class="text-xs text-stone-500">Lun–Sáb</span>
@@ -440,7 +440,7 @@
           @if (activeInsightsTab() === 'prediccion') {
             <div class="flex flex-col h-full bento-tab-content">
               <div class="text-center mb-6 mt-2">
-                <span class="material-icons-outlined text-4xl text-stone-300 dark:text-stone-600 mb-2">auto_graph</span>
+                <span class="material-symbols-outlined text-4xl text-stone-300 dark:text-stone-600 mb-2">auto_graph</span>
                 <h3 class="text-lg font-bold text-stone-900 dark:text-stone-100">Próxima Feria</h3>
                 <p class="text-xs text-stone-500">Cálculo basado en histórico transaccional.</p>
               </div>
@@ -448,7 +448,7 @@
               <!-- Fecha + Nombre -->
               <div class="bg-linear-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-2xl p-5 mb-4 border border-amber-200 dark:border-amber-800">
                 <div class="flex items-center gap-3 mb-2">
-                  <span class="material-icons-outlined text-2xl text-amber-600">event</span>
+                  <span class="material-symbols-outlined text-2xl text-amber-600">event</span>
                   <div>
                     <p class="text-xs font-medium text-amber-700 dark:text-amber-400">{{ nextFairPrediction().day }}</p>
                     <p class="text-lg font-bold text-amber-900 dark:text-amber-100">{{ nextFairPrediction().name }}</p>
@@ -489,7 +489,7 @@
               <!-- Feria Acobamba (Jueves) -->
               <div class="group p-5 bg-linear-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-2xl border border-amber-200 dark:border-amber-800 transition-all duration-300 hover:shadow-lg">
                 <div class="flex items-center gap-3 mb-4">
-                  <span class="material-icons-outlined text-3xl text-amber-600 transition-transform duration-300 group-hover:rotate-6 group-hover:scale-110">store</span>
+                  <span class="material-symbols-outlined text-3xl text-amber-600 transition-transform duration-300 group-hover:rotate-6 group-hover:scale-110">store</span>
                   <div>
                     <p class="text-xs font-medium text-amber-700 dark:text-amber-400">Jueves</p>
                     <p class="text-xl font-bold text-amber-900 dark:text-amber-100">Acobamba</p>
@@ -504,7 +504,7 @@
                   </div>
                   <div class="flex items-center gap-2">
                     <span class="px-3 py-1 bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-400 rounded-full text-xs font-medium flex items-center gap-1">
-                      <span class="material-icons-outlined text-sm">trending_flat</span>
+                      <span class="material-symbols-outlined text-sm">trending_flat</span>
                       {{ fairTrend().thursday.trend }}
                     </span>
                   </div>
@@ -517,7 +517,7 @@
               <!-- Feria Paucara (Domingo) -->
               <div class="group p-5 bg-linear-to-br from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 rounded-2xl border border-emerald-200 dark:border-emerald-800 transition-all duration-300 hover:shadow-lg">
                 <div class="flex items-center gap-3 mb-4">
-                  <span class="material-icons-outlined text-3xl text-emerald-600 transition-transform duration-300 group-hover:rotate-6 group-hover:scale-110">storefront</span>
+                  <span class="material-symbols-outlined text-3xl text-emerald-600 transition-transform duration-300 group-hover:rotate-6 group-hover:scale-110">storefront</span>
                   <div>
                     <p class="text-xs font-medium text-emerald-700 dark:text-emerald-400">Domingo</p>
                     <p class="text-xl font-bold text-emerald-900 dark:text-emerald-100">Paucara</p>
@@ -532,7 +532,7 @@
                   </div>
                   <div class="flex items-center gap-2">
                     <span class="px-3 py-1 bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-400 rounded-full text-xs font-medium flex items-center gap-1">
-                      <span class="material-icons-outlined text-sm">trending_flat</span>
+                      <span class="material-symbols-outlined text-sm">trending_flat</span>
                       {{ fairTrend().sunday.trend }}
                     </span>
                   </div>

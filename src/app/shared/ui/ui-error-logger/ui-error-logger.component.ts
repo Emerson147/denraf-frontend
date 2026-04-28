@@ -14,7 +14,7 @@ import { ErrorHandlerService, ErrorLog } from '../../../core/services/error-hand
         class="fixed bottom-24 right-6 w-12 h-12 bg-red-500 text-white rounded-full shadow-2xl flex items-center justify-center z-30 hover:bg-red-600 transition-colors"
         title="Ver errores del sistema"
       >
-        <span class="material-icons-outlined text-xl">bug_report</span>
+        <span class="material-symbols-outlined text-xl">bug_report</span>
         <div class="absolute -top-1 -right-1 w-5 h-5 bg-yellow-400 text-red-900 text-xs font-bold rounded-full flex items-center justify-center">
           {{ errorCount() }}
         </div>
@@ -37,7 +37,7 @@ import { ErrorHandlerService, ErrorLog } from '../../../core/services/error-hand
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-3">
                 <div class="w-10 h-10 bg-red-500 rounded-full flex items-center justify-center">
-                  <span class="material-icons-outlined text-white text-xl">bug_report</span>
+                  <span class="material-symbols-outlined text-white text-xl">bug_report</span>
                 </div>
                 <div>
                   <h2 class="text-lg font-bold text-stone-800">Error Logger</h2>
@@ -64,7 +64,7 @@ import { ErrorHandlerService, ErrorLog } from '../../../core/services/error-hand
                   (click)="showLogger.set(false)"
                   class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-stone-100 transition-colors"
                 >
-                  <span class="material-icons-outlined text-stone-500">close</span>
+                  <span class="material-symbols-outlined text-stone-500">close</span>
                 </button>
               </div>
             </div>
@@ -97,7 +97,7 @@ import { ErrorHandlerService, ErrorLog } from '../../../core/services/error-hand
             @if (displayLogs().length === 0) {
               <div class="flex flex-col items-center justify-center py-12 text-center">
                 <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-3">
-                  <span class="material-icons-outlined text-green-500 text-3xl">check_circle</span>
+                  <span class="material-symbols-outlined text-green-500 text-3xl">check_circle</span>
                 </div>
                 <p class="text-stone-500 text-sm">No hay errores</p>
                 <p class="text-stone-400 text-xs mt-1">Todo funcionando correctamente</p>
@@ -118,7 +118,7 @@ import { ErrorHandlerService, ErrorLog } from '../../../core/services/error-hand
                   <div class="flex items-start gap-2">
                     <!-- Severity icon -->
                     <span 
-                      class="material-icons-outlined text-lg shrink-0"
+                      class="material-symbols-outlined text-lg shrink-0"
                       [class.text-red-500]="log.severity === 'critical'"
                       [class.text-orange-500]="log.severity === 'high'"
                       [class.text-yellow-600]="log.severity === 'medium'"

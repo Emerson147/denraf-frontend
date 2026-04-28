@@ -27,7 +27,7 @@ import { NotificationService, Notification, NotificationType, NotificationCatego
               <button
                 (click)="notificationService.markAllAsRead()"
                 class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-stone-600 dark:text-stone-300 bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 hover:bg-stone-50 dark:hover:bg-stone-700 transition-all">
-                <span class="material-icons-outlined text-[16px]">done_all</span>
+                <span class="material-symbols-outlined text-[16px]">done_all</span>
                 Marcar todas como leídas
               </button>
             }
@@ -35,7 +35,7 @@ import { NotificationService, Notification, NotificationType, NotificationCatego
               <button
                 (click)="notificationService.clearAll()"
                 class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-rose-600 dark:text-rose-400 bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-all">
-                <span class="material-icons-outlined text-[16px]">delete_sweep</span>
+                <span class="material-symbols-outlined text-[16px]">delete_sweep</span>
                 Limpiar todo
               </button>
             }
@@ -69,7 +69,7 @@ import { NotificationService, Notification, NotificationType, NotificationCatego
           @if (filteredGroups().length === 0) {
             <div class="flex flex-col items-center justify-center px-6 py-20">
               <div class="w-20 h-20 rounded-2xl bg-stone-100 dark:bg-stone-800 flex items-center justify-center mb-5">
-                <span class="material-icons-outlined text-stone-300 dark:text-stone-600 text-4xl">notifications_none</span>
+                <span class="material-symbols-outlined text-stone-300 dark:text-stone-600 text-4xl">notifications_none</span>
               </div>
               <p class="text-stone-500 dark:text-stone-400 text-sm font-medium">No hay notificaciones</p>
               <p class="text-stone-400 dark:text-stone-500 text-xs mt-1">Te avisaremos cuando algo importante suceda</p>
@@ -96,7 +96,7 @@ import { NotificationService, Notification, NotificationType, NotificationCatego
                   <div class="flex gap-4">
                     <!-- Icon -->
                     <div [class]="getIconClass(notification.type)">
-                      <span class="material-icons-outlined text-[18px]">{{ notification.icon }}</span>
+                      <span class="material-symbols-outlined text-[18px]">{{ notification.icon }}</span>
                     </div>
 
                     <!-- Content -->
@@ -140,7 +140,7 @@ import { NotificationService, Notification, NotificationType, NotificationCatego
                       (click)="deleteNotification(notification.id, $event)"
                       class="p-1.5 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 transition-all opacity-0 group-hover:opacity-100 self-start"
                       title="Eliminar">
-                      <span class="material-icons-outlined text-stone-400 text-[16px]">close</span>
+                      <span class="material-symbols-outlined text-stone-400 text-[16px]">close</span>
                     </button>
                   </div>
                 </div>

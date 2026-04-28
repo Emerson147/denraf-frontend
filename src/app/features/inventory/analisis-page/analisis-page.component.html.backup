@@ -17,7 +17,7 @@
       <div class="px-6 py-5 border-b border-white/10">
         <div class="flex items-center gap-3">
           <div class="h-10 w-10 rounded-xl bg-white/10 backdrop-blur flex items-center justify-center">
-            <span class="material-icons-outlined text-xl">account_balance_wallet</span>
+            <span class="material-symbols-outlined text-xl">account_balance_wallet</span>
           </div>
           <div>
             <h2 class="text-xl font-bold">Salud Financiera</h2>
@@ -84,7 +84,7 @@
           @if (capitalHealth().liquidityRatio > 30) {
             <div class="mt-3 p-3 bg-red-500/20 rounded-lg border border-red-500/30">
               <p class="text-xs font-medium flex items-center gap-2">
-                <span class="material-icons-outlined text-sm">warning</span>
+                <span class="material-symbols-outlined text-sm">warning</span>
                 Meta: Libera <span class="font-bold">S/ {{ capitalHealth().targetLiberation | number:'1.0-0' }}</span> en 60 días
               </p>
             </div>
@@ -99,7 +99,7 @@
         <div class="px-6 py-4 border-b border-stone-200 dark:border-stone-800 flex items-center justify-between">
           <div class="flex items-center gap-3">
             <div class="h-9 w-9 rounded-xl bg-red-600/80 dark:bg-red-600/70 flex items-center justify-center text-white">
-              <span class="material-icons-outlined text-lg">local_fire_department</span>
+              <span class="material-symbols-outlined text-lg">local_fire_department</span>
             </div>
             <div>
               <h2 class="text-lg font-bold text-stone-800 dark:text-stone-100">Liquidación Urgente</h2>
@@ -235,7 +235,7 @@
           <div class="px-5 py-4 border-b border-stone-200 dark:border-stone-800">
             <div class="flex items-center gap-2.5">
               <div class="h-8 w-8 rounded-lg bg-emerald-600/80 dark:bg-emerald-600/70 flex items-center justify-center text-white">
-                <span class="material-icons-outlined text-base">autorenew</span>
+                <span class="material-symbols-outlined text-base">autorenew</span>
               </div>
               <div>
                 <h3 class="text-sm font-bold text-stone-800 dark:text-stone-100">Básicos</h3>
@@ -274,7 +274,7 @@
         <div class="px-5 py-4 border-b border-stone-200 dark:border-stone-800">
           <div class="flex items-center gap-2.5">
             <div class="h-8 w-8 rounded-lg bg-sky-600/80 dark:bg-sky-600/70 flex items-center justify-center text-white">
-              <span class="material-icons-outlined text-base">palette</span>
+              <span class="material-symbols-outlined text-base">palette</span>
             </div>
             <div>
               <h3 class="text-sm font-bold text-stone-800 dark:text-stone-100">Variedad</h3>
@@ -310,7 +310,7 @@
           <div class="px-5 py-4 border-b border-stone-200 dark:border-stone-800">
             <div class="flex items-center gap-2.5">
               <div class="h-8 w-8 rounded-lg bg-red-600/80 dark:bg-red-600/70 flex items-center justify-center text-white">
-                <span class="material-icons-outlined text-base">ac_unit</span>
+                <span class="material-symbols-outlined text-base">ac_unit</span>
               </div>
               <div>
                 <h3 class="text-sm font-bold text-stone-800 dark:text-stone-100">Estancados</h3>
@@ -349,7 +349,7 @@
       <div class="bg-white dark:bg-stone-900 border-r border-b border-stone-200 dark:border-stone-800 p-4">
         <div class="flex items-center gap-2 mb-2">
           <div class="h-7 w-7 rounded-lg bg-stone-800 dark:bg-stone-700 flex items-center justify-center text-white">
-            <span class="material-icons-outlined text-sm">inventory_2</span>
+            <span class="material-symbols-outlined text-sm">inventory_2</span>
           </div>
           <p class="text-xs uppercase tracking-wide text-stone-500 dark:text-stone-400">Valor</p>
         </div>
@@ -361,7 +361,7 @@
       <div class="bg-red-50/10 dark:bg-red-950/10 border-r border-b border-red-200/20 dark:border-red-900/20 p-4">
         <div class="flex items-center gap-2 mb-2">
           <div class="h-7 w-7 rounded-lg bg-red-600/80 dark:bg-red-600/70 flex items-center justify-center text-white">
-            <span class="material-icons-outlined text-sm">error_outline</span>
+            <span class="material-symbols-outlined text-sm">error_outline</span>
           </div>
           <p class="text-xs uppercase tracking-wide text-stone-600 dark:text-stone-400">Críticos</p>
         </div>
@@ -373,7 +373,7 @@
       <div class="bg-white dark:bg-stone-900 border-r border-b border-stone-200 dark:border-stone-800 p-4">
         <div class="flex items-center gap-2 mb-2">
           <div class="h-7 w-7 rounded-lg bg-stone-700 dark:bg-stone-600 flex items-center justify-center text-white">
-            <span class="material-icons-outlined text-sm">autorenew</span>
+            <span class="material-symbols-outlined text-sm">autorenew</span>
           </div>
           <p class="text-xs uppercase tracking-wide text-stone-500 dark:text-stone-400">Rotación</p>
         </div>
@@ -385,7 +385,7 @@
       <div class="bg-amber-50/10 dark:bg-amber-950/10 border-b border-amber-200/20 dark:border-amber-900/20 p-4">
         <div class="flex items-center gap-2 mb-2">
           <div class="h-7 w-7 rounded-lg bg-amber-600/80 dark:bg-amber-600/70 flex items-center justify-center text-white">
-            <span class="material-icons-outlined text-sm">notifications_active</span>
+            <span class="material-symbols-outlined text-sm">notifications_active</span>
           </div>
           <p class="text-xs uppercase tracking-wide text-stone-600 dark:text-stone-400">Alertas</p>
         </div>
@@ -416,7 +416,7 @@
                      'bg-amber-600/80 text-white': alert.alertType === 'low',
                      'bg-stone-600 text-white': alert.alertType === 'overstock'
                    }">
-                <span class="material-icons-outlined text-sm">
+                <span class="material-symbols-outlined text-sm">
                   @if (alert.alertType === 'stockout') { inventory }
                   @else if (alert.alertType === 'critical') { error_outline }
                   @else if (alert.alertType === 'low') { warning }

@@ -14,7 +14,7 @@ import { ClickOutsideDirective } from '../../directives/click-outside/click-outs
         class="flex h-8 w-8 items-center justify-center rounded-full text-stone-400 hover:bg-stone-100 hover:text-stone-600 transition-colors"
         (click)="toggle($event)"
       >
-        <span class="material-icons-outlined text-lg">more_vert</span> </button>
+        <span class="material-symbols-outlined text-lg">more_vert</span> </button>
 
       @if (isOpen) {
         <div 
@@ -25,7 +25,7 @@ import { ClickOutsideDirective } from '../../directives/click-outside/click-outs
               (click)="onAction('edit')"
               class="group flex w-full items-center px-4 py-2 text-sm text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-700"
             >
-              <span class="material-icons-outlined mr-3 text-stone-400 dark:text-stone-500 group-hover:text-stone-600 dark:group-hover:text-stone-300">edit</span>
+              <span class="material-symbols-outlined mr-3 text-stone-400 dark:text-stone-500 group-hover:text-stone-600 dark:group-hover:text-stone-300">edit</span>
               Editar
             </button>
 
@@ -33,7 +33,7 @@ import { ClickOutsideDirective } from '../../directives/click-outside/click-outs
               (click)="onAction('delete')"
               class="group flex w-full items-center px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
             >
-              <span class="material-icons-outlined mr-3 text-red-400 dark:text-red-500 group-hover:text-red-600 dark:group-hover:text-red-400">delete</span>
+              <span class="material-symbols-outlined mr-3 text-red-400 dark:text-red-500 group-hover:text-red-600 dark:group-hover:text-red-400">delete</span>
               Eliminar
             </button>
           </div>

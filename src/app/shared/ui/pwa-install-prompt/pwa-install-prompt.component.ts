@@ -29,7 +29,7 @@ import { CommonModule } from '@angular/common';
                 (click)="dismissPrompt()"
                 class="h-8 w-8 rounded-lg hover:bg-white/10 flex items-center justify-center transition-colors"
               >
-                <span class="material-icons-outlined text-lg">close</span>
+                <span class="material-symbols-outlined text-lg">close</span>
               </button>
             </div>
           </div>
@@ -38,21 +38,21 @@ import { CommonModule } from '@angular/common';
           <div class="p-6 space-y-3">
             <div class="flex items-center gap-3 text-sm">
               <div class="h-8 w-8 rounded-lg bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center">
-                <span class="material-icons-outlined text-emerald-600 dark:text-emerald-400 text-base">offline_bolt</span>
+                <span class="material-symbols-outlined text-emerald-600 dark:text-emerald-400 text-base">offline_bolt</span>
               </div>
               <span class="text-stone-700 dark:text-stone-300">Funciona sin internet</span>
             </div>
             
             <div class="flex items-center gap-3 text-sm">
               <div class="h-8 w-8 rounded-lg bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center">
-                <span class="material-icons-outlined text-blue-600 dark:text-blue-400 text-base">speed</span>
+                <span class="material-symbols-outlined text-blue-600 dark:text-blue-400 text-base">speed</span>
               </div>
               <span class="text-stone-700 dark:text-stone-300">Carga instantánea</span>
             </div>
             
             <div class="flex items-center gap-3 text-sm">
               <div class="h-8 w-8 rounded-lg bg-purple-50 dark:bg-purple-900/30 flex items-center justify-center">
-                <span class="material-icons-outlined text-purple-600 dark:text-purple-400 text-base">notifications_active</span>
+                <span class="material-symbols-outlined text-purple-600 dark:text-purple-400 text-base">notifications_active</span>
               </div>
               <span class="text-stone-700 dark:text-stone-300">Notificaciones en tiempo real</span>
             </div>
@@ -70,7 +70,7 @@ import { CommonModule } from '@angular/common';
               (click)="installPWA()"
               class="flex-1 px-4 py-3 rounded-xl bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 font-medium text-sm hover:bg-black dark:hover:bg-stone-200 transition-colors shadow-lg flex items-center justify-center gap-2"
             >
-              <span class="material-icons-outlined text-base">download</span>
+              <span class="material-symbols-outlined text-base">download</span>
               Instalar
             </button>
           </div>

@@ -32,7 +32,7 @@ import { ToastService } from '../../../core/services/toast.service';
           }"
         >
           <span 
-            class="material-icons-outlined text-xl shrink-0"
+            class="material-symbols-outlined text-xl shrink-0"
             [ngClass]="{
               'text-emerald-600': toast.type === 'success',
               'text-rose-600': toast.type === 'error',
@@ -49,7 +49,7 @@ import { ToastService } from '../../../core/services/toast.service';
             (click)="toastService.remove(toast.id)"
             class="shrink-0 h-6 w-6 rounded-lg hover:bg-stone-100 flex items-center justify-center text-stone-400 hover:text-stone-600 transition-colors"
           >
-            <span class="material-icons-outlined text-sm">close</span>
+            <span class="material-symbols-outlined text-sm">close</span>
           </button>
         </div>
       }

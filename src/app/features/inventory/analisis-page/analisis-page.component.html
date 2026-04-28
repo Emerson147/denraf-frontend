@@ -40,7 +40,7 @@
           <!-- Sector 1: El Gran Total y Liquidez -->
           <div class="w-full lg:w-1/3 border-b lg:border-b-0 lg:border-r border-white/10 pb-6 lg:pb-0 lg:pr-8">
             <div class="flex items-center gap-2 text-stone-400 mb-2">
-              <span class="material-icons-outlined text-sm">attach_money</span>
+              <span class="material-symbols-outlined text-sm">attach_money</span>
               <span class="text-xs uppercase tracking-widest font-semibold">Capital Inventariado</span>
             </div>
             <h2 class="text-4xl lg:text-5xl font-bold tracking-tight text-white mb-6">S/ {{ capitalHealth().totalInvested | number:'1.0-0' }}</h2>
@@ -58,7 +58,7 @@
               
               @if (capitalHealth().liquidityRatio > 30) {
                 <div class="inline-flex items-center gap-2 mt-2 px-3 py-1.5 rounded-lg bg-red-500/10 border border-red-500/20">
-                  <span class="material-icons-outlined text-red-400 text-sm">warning</span>
+                  <span class="material-symbols-outlined text-red-400 text-sm">warning</span>
                   <p class="text-xs text-red-200 font-medium">Meta liberación 60d: <span class="font-bold text-white">S/ {{ capitalHealth().targetLiberation | number:'1.0-0' }}</span></p>
                 </div>
               }
@@ -107,7 +107,7 @@
         <div class="p-6 lg:p-8 flex items-center justify-between border-b border-stone-100 dark:border-stone-800">
           <div>
             <h2 class="text-lg font-bold text-stone-900 dark:text-stone-100 flex items-center gap-2">
-              <span class="material-icons-outlined text-red-500">local_fire_department</span>
+              <span class="material-symbols-outlined text-red-500">local_fire_department</span>
               Plan de Liquidación
             </h2>
             <p class="text-xs text-stone-500 dark:text-stone-400 mt-0.5">Estrategias de precio graduales para recuperar el capital</p>
@@ -120,7 +120,7 @@
         @if (liquidationSuggestions().length === 0) {
           <div class="flex-1 flex flex-col items-center justify-center p-12 text-center">
             <div class="w-16 h-16 rounded-full bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center mb-4">
-              <span class="material-icons-outlined text-3xl text-emerald-500">verified</span>
+              <span class="material-symbols-outlined text-3xl text-emerald-500">verified</span>
             </div>
             <h3 class="text-sm font-bold text-stone-900 dark:text-stone-100">Cero Capital Congelado</h3>
             <p class="text-xs text-stone-500 dark:text-stone-400 mt-1 max-w-sm">No tienes productos con más de 8 ferias sin venta. Tu inventario está sano.</p>
@@ -204,14 +204,14 @@
         <div class="grid grid-cols-2 gap-3 mt-auto">
           <div class="bg-stone-50 dark:bg-stone-800/50 rounded-2xl p-4 border border-stone-100 dark:border-stone-800/60">
             <div class="w-8 h-8 rounded-full bg-emerald-500/10 flex items-center justify-center mb-2">
-              <span class="material-icons-outlined text-[16px] text-emerald-600">moving</span>
+              <span class="material-symbols-outlined text-[16px] text-emerald-600">moving</span>
             </div>
             <p class="text-2xl font-bold text-stone-900 dark:text-stone-100">{{ basicProducts().length }}</p>
             <p class="text-xs text-stone-500 font-medium">Básicos Activos</p>
           </div>
           <div class="bg-stone-50 dark:bg-stone-800/50 rounded-2xl p-4 border border-stone-100 dark:border-stone-800/60">
             <div class="w-8 h-8 rounded-full bg-red-500/10 flex items-center justify-center mb-2">
-              <span class="material-icons-outlined text-[16px] text-red-600">error_outline</span>
+              <span class="material-symbols-outlined text-[16px] text-red-600">error_outline</span>
             </div>
             <p class="text-2xl font-bold text-stone-900 dark:text-stone-100">{{ stockAlerts().length }}</p>
             <p class="text-xs text-stone-500 font-medium">Focos Rojos</p>
@@ -238,13 +238,13 @@
               <div>
                 <p class="text-sm font-bold text-stone-900 dark:text-stone-100 mb-1 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">{{ item.product.name }}</p>
                 <div class="flex items-center gap-3 text-[11px] font-medium text-stone-500">
-                  <span class="flex items-center gap-1"><span class="material-icons-outlined text-[14px]">inventory_2</span> {{ item.product.stock }} ud</span>
-                  <span class="flex items-center gap-1"><span class="material-icons-outlined text-[14px]">sync</span> {{ item.rotationPerFair | number:'1.1-1' }}/f</span>
+                  <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">inventory_2</span> {{ item.product.stock }} ud</span>
+                  <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">sync</span> {{ item.rotationPerFair | number:'1.1-1' }}/f</span>
                 </div>
               </div>
               @if (item.shouldReorder) {
                 <div class="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center text-emerald-600 dark:text-emerald-400" title="Requiere Compra">
-                   <span class="material-icons-outlined text-[16px]">add_shopping_cart</span>
+                   <span class="material-symbols-outlined text-[16px]">add_shopping_cart</span>
                 </div>
               }
             </div>
@@ -267,8 +267,8 @@
               <div>
                 <p class="text-sm font-bold text-stone-900 dark:text-stone-100 mb-1 group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">{{ item.product.name }}</p>
                 <div class="flex items-center gap-3 text-[11px] font-medium text-stone-500">
-                  <span class="flex items-center gap-1"><span class="material-icons-outlined text-[14px]">calendar_today</span> {{ item.fairsSinceLastSale }}f sin venta</span>
-                  <span class="flex items-center gap-1"><span class="material-icons-outlined text-[14px]">sync</span> {{ item.rotationPerFair | number:'1.1-1' }}/f</span>
+                  <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">calendar_today</span> {{ item.fairsSinceLastSale }}f sin venta</span>
+                  <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">sync</span> {{ item.rotationPerFair | number:'1.1-1' }}/f</span>
                 </div>
               </div>
             </div>
@@ -282,7 +282,7 @@
         <!-- Alertas de Stock Agotado/Crítico -->
         <div class="bg-red-500/5 dark:bg-red-500/[0.02] rounded-3xl border border-red-100 dark:border-red-900/20 shadow-sm p-6 flex flex-col flex-1 overflow-hidden">
            <h2 class="text-[11px] uppercase tracking-[0.1em] font-bold text-red-600 dark:text-red-500 mb-4 flex items-center gap-2">
-            <span class="material-icons-outlined text-[18px]">warning</span> Foco Rojo (Agotados)
+            <span class="material-symbols-outlined text-[18px]">warning</span> Foco Rojo (Agotados)
           </h2>
           <div class="flex-1 overflow-y-auto pr-2 space-y-2 custom-scrollbar">
             @for (alert of stockAlerts(); track alert.id) {
@@ -298,7 +298,7 @@
             }
             @if (stockAlerts().length === 0) {
               <div class="flex flex-col items-center justify-center h-full text-center opacity-50">
-                <span class="material-icons-outlined text-stone-400 mb-2">check_circle</span>
+                <span class="material-symbols-outlined text-stone-400 mb-2">check_circle</span>
                 <p class="text-xs text-stone-500 font-medium">No hay alertas críticas</p>
               </div>
             }
@@ -308,7 +308,7 @@
         <!-- Sugerencias de Reordenamiento -->
         <div class="bg-white dark:bg-stone-900 rounded-3xl border border-stone-200/60 dark:border-stone-800 shadow-sm p-6 flex flex-col flex-1 overflow-hidden">
           <h2 class="text-[11px] uppercase tracking-[0.1em] font-bold text-stone-800 dark:text-stone-200 mb-4 flex items-center gap-2">
-            <span class="material-icons-outlined text-[18px]">inventory</span> Sugerido Comprar
+            <span class="material-symbols-outlined text-[18px]">inventory</span> Sugerido Comprar
           </h2>
           <div class="flex-1 overflow-y-auto pr-2 space-y-2 custom-scrollbar">
             @for (suggestion of reorderSuggestions().slice(0, 8); track suggestion.product.id) {
@@ -328,7 +328,7 @@
             }
             @if (reorderSuggestions().length === 0) {
                <div class="flex flex-col items-center justify-center h-full text-center opacity-50">
-                <span class="material-icons-outlined text-stone-400 mb-2">check_circle</span>
+                <span class="material-symbols-outlined text-stone-400 mb-2">check_circle</span>
                 <p class="text-xs text-stone-500 font-medium">Stock saludable</p>
               </div>
             }

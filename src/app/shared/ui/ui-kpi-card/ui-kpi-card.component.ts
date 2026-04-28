@@ -11,7 +11,7 @@ import { CommonModule } from '@angular/common';
       <!-- Header con icono -->
       <div class="flex items-start justify-between mb-4">
         <div class="h-12 w-12 rounded-xl bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 flex items-center justify-center transition-colors duration-300">
-          <span class="material-icons-outlined text-2xl">{{ icon }}</span>
+          <span class="material-symbols-outlined text-2xl">{{ icon }}</span>
         </div>
         
         <!-- Badge de tendencia -->
@@ -23,13 +23,13 @@ import { CommonModule } from '@angular/common';
                  'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300': trend === 'stable'
                }">
             @if (trend === 'up') {
-              <span class="material-icons-outlined text-sm">trending_up</span>
+              <span class="material-symbols-outlined text-sm">trending_up</span>
             }
             @if (trend === 'down') {
-              <span class="material-icons-outlined text-sm">trending_down</span>
+              <span class="material-symbols-outlined text-sm">trending_down</span>
             }
             @if (trend === 'stable') {
-              <span class="material-icons-outlined text-sm">remove</span>
+              <span class="material-symbols-outlined text-sm">remove</span>
             }
             <span>{{ change > 0 ? '+' : '' }}{{ change | number:'1.1-1' }}%</span>
           </div>

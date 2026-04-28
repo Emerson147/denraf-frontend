@@ -14,7 +14,7 @@ import { CommonModule } from '@angular/common';
         <div
           class="w-12 h-12 rounded-xl bg-stone-200/50 dark:bg-stone-700/50 flex items-center justify-center transition-colors duration-300"
         >
-          <span class="material-icons-outlined text-2xl text-stone-600 dark:text-stone-300">{{
+          <span class="material-symbols-outlined text-2xl text-stone-600 dark:text-stone-300">{{
             materialIcon()
           }}</span>
         </div>

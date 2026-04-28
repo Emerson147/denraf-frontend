@@ -43,7 +43,7 @@ export interface CartItem {
           <div
             class="fixed top-6 right-6 bg-emerald-500/90 backdrop-blur-sm text-white px-5 py-3 rounded-2xl shadow-2xl animate-in slide-in-from-top-2 text-sm font-bold flex items-center gap-2 z-70 border border-emerald-400"
           >
-            <span class="material-icons-outlined text-lg">check_circle</span>
+            <span class="material-symbols-outlined text-lg">check_circle</span>
             {{ successMessage }}
           </div>
         }
@@ -58,7 +58,7 @@ export interface CartItem {
             class="absolute top-4 right-4 z-50 w-8 h-8 flex items-center justify-center rounded-full bg-stone-100 dark:bg-stone-800 text-stone-500 hover:text-stone-800 dark:text-stone-400 dark:hover:text-stone-100 transition-colors shadow-sm no-print"
             aria-label="Cancelar venta"
           >
-            <span class="material-icons-outlined text-sm font-bold">close</span>
+            <span class="material-symbols-outlined text-sm font-bold">close</span>
           </button>
 
           <!-- Header Limpio -->
@@ -97,7 +97,7 @@ export interface CartItem {
                 Cliente
               </p>
               <p class="text-sm font-bold text-stone-900 dark:text-white flex items-center gap-2">
-                <span class="material-icons-outlined text-[16px] text-stone-400">person</span>
+                <span class="material-symbols-outlined text-[16px] text-stone-400">person</span>
                 {{ clientName }}
               </p>
               @if (clientPhone) {
@@ -193,7 +193,7 @@ export interface CartItem {
                 (click)="printTicket()"
                 class="flex-1 py-3.5 rounded-xl bg-stone-100 dark:bg-stone-800 hover:bg-stone-200 dark:hover:bg-stone-700 text-stone-900 dark:text-white font-bold flex items-center justify-center gap-2 transition-all active:scale-95 text-xs"
               >
-                <span class="material-icons-outlined text-lg">print</span>
+                <span class="material-symbols-outlined text-lg">print</span>
                 IMPRIMIR
               </button>
               <button
@@ -201,7 +201,7 @@ export interface CartItem {
                 [disabled]="!clientPhone"
                 class="flex-1 py-3.5 rounded-xl bg-[#25D366]/10 hover:bg-[#25D366]/20 text-[#1da851] dark:text-[#25D366] font-bold flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed text-xs"
               >
-                <span class="material-icons-outlined text-lg">chat</span>
+                <span class="material-symbols-outlined text-lg">chat</span>
                 WHATSAPP
               </button>
             </div>

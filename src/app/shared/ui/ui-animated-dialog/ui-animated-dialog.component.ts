@@ -7,40 +7,40 @@ import { CommonModule } from '@angular/common';
   imports: [CommonModule],
   template: `
     @if (showModal()) {
-    <div class="fixed inset-0 z-50 flex items-center justify-center px-4">
-      <div
-        class="fixed inset-0 bg-stone-900/40 dark:bg-black/60 backdrop-blur-md transition-all duration-400 ease-out"
-        [class.opacity-0]="!animateIn()"
-        [class.opacity-100]="animateIn()"
-        (click)="close()"
-      ></div>
-
-      <div
-        class="relative z-10 w-full max-h-[90vh] flex flex-col transform rounded-4xl bg-white dark:bg-stone-900 shadow-2xl border border-stone-100/50 dark:border-stone-800/50 transition-all duration-400 ease-spring"
-        [class.max-w-md]="maxWidth === 'sm'"
-        [class.max-w-2xl]="maxWidth === 'md'"
-        [class.max-w-4xl]="maxWidth === 'lg'"
-        [style.transform-origin]="transformOrigin()"
-        [class.scale-90]="!animateIn()"
-        [class.opacity-0]="!animateIn()"
-        [class.translate-y-8]="!animateIn()"
-        [class.scale-100]="animateIn()"
-        [class.opacity-100]="animateIn()"
-        [class.translate-y-0]="animateIn()"
-        (click)="$event.stopPropagation()"
-      >
-        <div class="overflow-y-auto no-scrollbar flex-1 p-8 pb-4">
-          <ng-content></ng-content>
-        </div>
-
-        <button
+      <div class="fixed inset-0 z-50 flex items-center justify-center px-4">
+        <div
+          class="fixed inset-0 bg-stone-900/40 dark:bg-black/60 backdrop-blur-md transition-all duration-400 ease-out"
+          [class.opacity-0]="!animateIn()"
+          [class.opacity-100]="animateIn()"
           (click)="close()"
-          class="absolute top-6 right-6 p-2 rounded-full text-stone-400 hover:bg-stone-100 hover:text-stone-800 transition-colors z-10"
+        ></div>
+
+        <div
+          class="relative z-10 w-full max-h-[90vh] flex flex-col transform rounded-4xl bg-white dark:bg-stone-900 shadow-2xl border border-stone-100/50 dark:border-stone-800/50 transition-all duration-400 ease-spring"
+          [class.max-w-md]="maxWidth === 'sm'"
+          [class.max-w-2xl]="maxWidth === 'md'"
+          [class.max-w-4xl]="maxWidth === 'lg'"
+          [style.transform-origin]="transformOrigin()"
+          [class.scale-90]="!animateIn()"
+          [class.opacity-0]="!animateIn()"
+          [class.translate-y-8]="!animateIn()"
+          [class.scale-100]="animateIn()"
+          [class.opacity-100]="animateIn()"
+          [class.translate-y-0]="animateIn()"
+          (click)="$event.stopPropagation()"
         >
-          <span class="material-icons-outlined text-lg">close</span>
-        </button>
+          <div class="overflow-y-auto no-scrollbar flex-1 p-8 pb-4">
+            <ng-content></ng-content>
+          </div>
+
+          <button
+            (click)="close()"
+            class="absolute top-6 right-6 p-2 rounded-full text-stone-400 hover:bg-stone-100 hover:text-stone-800 transition-colors z-10"
+          >
+            <span class="material-symbols-outlined text-lg">close</span>
+          </button>
+        </div>
       </div>
-    </div>
     }
   `,
   styles: [
@@ -55,7 +55,7 @@ import { CommonModule } from '@angular/common';
 export class UiAnimatedDialogComponent {
   private destroyRef = inject(DestroyRef);
   private activeTimeouts: number[] = [];
-  
+
   @Input() trigger: HTMLElement | null = null;
   @Input() maxWidth: 'sm' | 'md' | 'lg' = 'lg';
   transformOrigin = signal('center center');
@@ -99,11 +99,11 @@ export class UiAnimatedDialogComponent {
   close() {
     this.isOpenChange.emit(false);
   }
-  
+
   constructor() {
     // 🧹 Cleanup automático de todos los timeouts de animación
     this.destroyRef.onDestroy(() => {
-      this.activeTimeouts.forEach(timeoutId => clearTimeout(timeoutId));
+      this.activeTimeouts.forEach((timeoutId) => clearTimeout(timeoutId));
       this.activeTimeouts = [];
     });
   }

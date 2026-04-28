@@ -31,7 +31,7 @@ import { CommonModule } from '@angular/common';
       <div 
         class="fixed top-4 right-4 z-50 px-4 py-3 rounded-xl bg-emerald-500 text-white shadow-xl backdrop-blur-sm border border-emerald-400 flex items-center gap-3 animate-slide-in-right"
       >
-        <span class="material-icons-outlined text-lg">cloud_done</span>
+        <span class="material-symbols-outlined text-lg">cloud_done</span>
         <div>
           <p class="text-sm font-medium">Conexión restaurada</p>
         </div>

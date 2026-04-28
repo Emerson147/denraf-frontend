@@ -9,7 +9,7 @@ import { CommonModule } from '@angular/common';
   template: `
     <div class="flex flex-col items-center justify-center py-12 sm:py-16 px-4 text-center">
       <div class="h-16 w-16 sm:h-20 sm:w-20 rounded-full bg-stone-100 flex items-center justify-center mb-4">
-        <span class="material-icons-outlined text-3xl sm:text-4xl text-stone-400">
+        <span class="material-symbols-outlined text-3xl sm:text-4xl text-stone-400">
           {{ icon() }}
         </span>
       </div>
@@ -24,7 +24,7 @@ import { CommonModule } from '@angular/common';
           (click)="actionClick.emit()"
           class="inline-flex items-center gap-2 px-4 py-2 bg-stone-900 text-white text-sm font-medium rounded-xl hover:bg-stone-800 transition-colors shadow-sm hover:shadow-md"
         >
-          <span class="material-icons-outlined text-lg">add</span>
+          <span class="material-symbols-outlined text-lg">add</span>
           {{ actionLabel() }}
         </button>
       }

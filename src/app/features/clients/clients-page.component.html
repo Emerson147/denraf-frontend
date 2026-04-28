@@ -23,56 +23,47 @@
     <!-- KPI PILLS (matching Dashboard/Reports)     -->
     <!-- ═══════════════════════════════════════════ -->
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-
       <!-- Total Clientes -->
-      <div class="bg-white dark:bg-stone-900 rounded-3xl border border-stone-200/60 dark:border-stone-800 p-5 transition-colors duration-300 hover:border-stone-300 dark:hover:border-stone-700">
-        <div class="flex items-center gap-3 mb-3">
-          <div class="w-10 h-10 rounded-full bg-stone-100 dark:bg-stone-800 flex items-center justify-center text-stone-600 dark:text-stone-400">
-            <span class="material-symbols-outlined text-lg">groups</span>
-          </div>
-          <p class="text-xs text-stone-500 dark:text-stone-400 font-medium">Audiencia</p>
+      <div class="bg-white/80 dark:bg-stone-900/80 backdrop-blur-xl rounded-[2rem] p-5 border border-stone-200/60 dark:border-stone-800 shadow-xl shadow-stone-200/20 dark:shadow-none transition-colors flex items-center gap-4 group hover:border-stone-300 dark:hover:border-stone-700">
+        <div class="w-12 h-12 rounded-2xl bg-stone-100 dark:bg-stone-800 flex items-center justify-center group-hover:scale-105 transition-transform shrink-0">
+          <span class="material-symbols-outlined text-stone-900 dark:text-white text-xl">groups</span>
         </div>
-        <div>
+        <div class="min-w-0">
+          <p class="text-[10px] text-stone-500 dark:text-stone-400 uppercase tracking-widest font-black truncate">Audiencia</p>
           @if (isLoading()) {
-            <div class="h-7 w-16 bg-stone-100 dark:bg-stone-800 rounded-lg animate-pulse"></div>
+            <div class="h-6 w-16 bg-stone-100 dark:bg-stone-800 rounded-md animate-pulse mt-1"></div>
           } @else {
-            <p class="text-2xl font-bold text-stone-900 dark:text-stone-100">{{ clientService.totalClients() }}</p>
-            <p class="text-xs text-stone-500 dark:text-stone-400 mt-0.5">Clientes registrados</p>
+            <p class="text-2xl font-black text-stone-900 dark:text-stone-100 mt-0.5 tracking-tight leading-none">{{ clientService.totalClients() }}</p>
           }
         </div>
       </div>
 
-      <!-- Clientes Gold -->
-      <div class="bg-white dark:bg-stone-900 rounded-3xl border border-stone-200/60 dark:border-stone-800 p-5 transition-colors duration-300 hover:border-stone-300 dark:hover:border-stone-700">
-        <div class="flex items-center gap-3 mb-3">
-          <div class="w-10 h-10 rounded-full bg-amber-50 dark:bg-amber-900/20 flex items-center justify-center text-amber-500 dark:text-amber-400">
-            <span class="material-symbols-outlined text-lg">workspace_premium</span>
-          </div>
-          <p class="text-xs text-stone-500 dark:text-stone-400 font-medium">Clientes VIP</p>
+      <!-- Clientes VIP -->
+      <div class="bg-white/80 dark:bg-stone-900/80 backdrop-blur-xl rounded-[2rem] p-5 border border-stone-200/60 dark:border-stone-800 shadow-xl shadow-stone-200/20 dark:shadow-none transition-colors flex items-center gap-4 group hover:border-stone-300 dark:hover:border-stone-700">
+        <div class="w-12 h-12 rounded-2xl bg-stone-100 dark:bg-stone-800 flex items-center justify-center group-hover:scale-105 transition-transform shrink-0">
+          <span class="material-symbols-outlined text-stone-900 dark:text-white text-xl">workspace_premium</span>
         </div>
-        <div>
+        <div class="min-w-0">
+          <p class="text-[10px] text-stone-500 dark:text-stone-400 uppercase tracking-widest font-black truncate">Clientes VIP</p>
           @if (isLoading()) {
-            <div class="h-7 w-12 bg-stone-100 dark:bg-stone-800 rounded-lg animate-pulse"></div>
+            <div class="h-6 w-12 bg-stone-100 dark:bg-stone-800 rounded-md animate-pulse mt-1"></div>
           } @else {
-            <p class="text-2xl font-bold text-amber-600 dark:text-amber-500">{{ goldClients() }}</p>
-            <p class="text-xs text-stone-500 dark:text-stone-400 mt-0.5">Alta recurrencia</p>
+            <p class="text-2xl font-black text-stone-900 dark:text-stone-100 mt-0.5 tracking-tight leading-none">{{ goldClients() }}</p>
           }
         </div>
       </div>
 
       <!-- Valor Total LTV -->
-      <div class="bg-white dark:bg-stone-900 rounded-3xl border border-stone-200/60 dark:border-stone-800 p-5 transition-colors duration-300 hover:border-stone-300 dark:hover:border-stone-700">
-        <div class="flex items-center gap-3 mb-3">
-          <div class="w-10 h-10 rounded-full bg-teal-50 dark:bg-teal-900/20 flex items-center justify-center text-teal-600 dark:text-teal-400">
-            <span class="material-symbols-outlined text-lg">monetization_on</span>
-          </div>
-          <p class="text-xs text-stone-500 dark:text-stone-400 font-medium">LTV Acumulado</p>
+      <div class="bg-white/80 dark:bg-stone-900/80 backdrop-blur-xl rounded-[2rem] p-5 border border-stone-200/60 dark:border-stone-800 shadow-xl shadow-stone-200/20 dark:shadow-none transition-colors flex items-center gap-4 group hover:border-stone-300 dark:hover:border-stone-700">
+        <div class="w-12 h-12 rounded-2xl bg-stone-900 dark:bg-stone-100 flex items-center justify-center group-hover:scale-105 transition-transform shrink-0">
+          <span class="material-symbols-outlined text-white dark:text-stone-900 text-xl">monetization_on</span>
         </div>
-        <div>
+        <div class="min-w-0">
+          <p class="text-[10px] text-stone-500 dark:text-stone-400 uppercase tracking-widest font-black truncate">LTV Acumulado</p>
           @if (isLoading()) {
-            <div class="h-7 w-24 bg-stone-100 dark:bg-stone-800 rounded-lg animate-pulse"></div>
+            <div class="h-6 w-20 bg-stone-100 dark:bg-stone-800 rounded-md animate-pulse mt-1"></div>
           } @else {
-            <p class="text-2xl font-bold text-teal-700 dark:text-teal-400">
+            <p class="text-2xl font-black text-stone-900 dark:text-stone-100 mt-0.5 tracking-tight leading-none truncate">
               S/ {{ totalClientValue() | number: '1.0-0' }}
             </p>
           }
@@ -141,7 +132,7 @@
     @if (!isLoading() || clientService.clients().length > 0) {
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         @for (client of filteredClients(); track client.id) {
-          <div class="group relative bg-white dark:bg-stone-900 rounded-3xl border border-stone-200/60 dark:border-stone-800 shadow-sm p-6 transition-all duration-300 hover:shadow-md hover:border-stone-300 dark:hover:border-stone-700 overflow-hidden">
+          <div class="group relative bg-white dark:bg-stone-900 rounded-3xl border border-stone-200/60 dark:border-stone-800 shadow-sm p-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:border-stone-300 dark:hover:border-stone-700 overflow-hidden">
 
             <!-- Subtle gradient accent on hover -->
             <div class="absolute top-0 right-0 w-40 h-40 bg-gradient-to-bl from-stone-100/50 dark:from-stone-800/30 rounded-full blur-3xl opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-500"></div>
@@ -164,7 +155,8 @@
 
             <!-- Client Header -->
             <div class="relative z-10 flex items-start gap-4 mb-5">
-              <div class="h-12 w-12 rounded-xl bg-stone-100 dark:bg-stone-800 flex items-center justify-center text-lg font-bold text-stone-600 dark:text-stone-300 shrink-0">
+              <div class="h-12 w-12 rounded-[1.2rem] flex items-center justify-center text-xl font-black shrink-0 transition-all duration-300 group-hover:scale-105"
+                   [ngClass]="getClientTier(client).avatarColor">
                 {{ client.name.charAt(0).toUpperCase() }}
               </div>
 
@@ -206,28 +198,28 @@
             <div class="relative z-10 flex flex-col gap-4 pt-4 border-t border-stone-100 dark:border-stone-800">
               <!-- Preferences -->
               <div class="flex items-start justify-between">
-                <div class="flex gap-4">
+                <div class="flex gap-2 flex-wrap">
                   @if (client.sizeTop || client.sizeBottom || client.stylePreference) {
                     @if (client.sizeTop) {
-                      <div>
-                        <p class="text-[10px] uppercase tracking-[0.1em] text-stone-400 dark:text-stone-500 font-semibold">Top</p>
-                        <p class="text-sm font-bold text-stone-800 dark:text-stone-200">{{ client.sizeTop }}</p>
+                      <div class="flex items-center gap-1.5 bg-stone-50 dark:bg-stone-800/50 px-2 py-1 rounded-lg border border-stone-100 dark:border-stone-700/50">
+                        <span class="text-[9px] uppercase tracking-wider text-stone-400 font-bold">Top</span>
+                        <span class="text-[10px] font-black bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 px-1.5 py-0.5 rounded">{{ client.sizeTop }}</span>
                       </div>
                     }
                     @if (client.sizeBottom) {
-                      <div>
-                        <p class="text-[10px] uppercase tracking-[0.1em] text-stone-400 dark:text-stone-500 font-semibold">Bottom</p>
-                        <p class="text-sm font-bold text-stone-800 dark:text-stone-200">{{ client.sizeBottom }}</p>
+                      <div class="flex items-center gap-1.5 bg-stone-50 dark:bg-stone-800/50 px-2 py-1 rounded-lg border border-stone-100 dark:border-stone-700/50">
+                        <span class="text-[9px] uppercase tracking-wider text-stone-400 font-bold">Bot</span>
+                        <span class="text-[10px] font-black bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 border border-stone-200 dark:border-stone-700 px-1.5 py-0.5 rounded">{{ client.sizeBottom }}</span>
                       </div>
                     }
                     @if (client.stylePreference) {
-                      <div>
-                        <p class="text-[10px] uppercase tracking-[0.1em] text-stone-400 dark:text-stone-500 font-semibold">Estilo</p>
-                        <p class="text-sm font-bold text-stone-800 dark:text-stone-200">{{ client.stylePreference }}</p>
+                      <div class="flex items-center gap-1.5 bg-stone-50 dark:bg-stone-800/50 px-2 py-1 rounded-lg border border-stone-100 dark:border-stone-700/50">
+                        <span class="text-[9px] uppercase tracking-wider text-stone-400 font-bold">Est</span>
+                        <span class="text-[10px] font-bold text-stone-600 dark:text-stone-400 px-1 py-0.5">{{ client.stylePreference }}</span>
                       </div>
                     }
                   } @else {
-                    <p class="text-xs text-stone-400 dark:text-stone-500 flex items-center h-full pt-1">Sin preferencias guardadas</p>
+                    <p class="text-[11px] font-medium text-stone-400 dark:text-stone-500 flex items-center h-full pt-1 italic">Sin preferencias guardadas</p>
                   }
                 </div>
               </div>
@@ -236,10 +228,10 @@
               <a
                 [href]="getWhatsappLink(client.phone)"
                 target="_blank"
-                class="h-9 w-full rounded-xl bg-stone-100 dark:bg-stone-800/80 hover:bg-stone-200 dark:hover:bg-stone-700/80 text-stone-600 dark:text-stone-300 flex items-center justify-center gap-2 transition-colors duration-200 font-medium text-sm"
+                class="h-10 w-full rounded-xl bg-stone-50 dark:bg-stone-800/50 border border-stone-100 dark:border-stone-700/50 hover:bg-emerald-50 hover:border-emerald-200 dark:hover:bg-emerald-500/10 dark:hover:border-emerald-500/30 hover:text-emerald-600 dark:hover:text-emerald-400 text-stone-500 dark:text-stone-400 flex items-center justify-center gap-2 transition-all duration-300 font-bold text-xs group"
                 title="Contactar por WhatsApp">
-                <span class="material-symbols-outlined text-lg text-emerald-500">chat</span>
-                WhatsApp
+                <span class="material-symbols-outlined text-lg text-stone-400 dark:text-stone-500 group-hover:text-emerald-500 dark:group-hover:text-emerald-400 transition-colors duration-300">chat</span>
+                Contactar
               </a>
             </div>
           </div>
@@ -254,158 +246,184 @@
      MODAL: CREAR / EDITAR CLIENTE
      ===================================================== -->
 <app-ui-animated-dialog [isOpen]="isDialogOpen()" (isOpenChange)="isDialogOpen.set($event)">
-  <div class="flex items-center justify-between mb-6 border-b border-stone-100 dark:border-stone-800 pb-4">
+  <div class="flex items-center justify-between mb-6">
     <div>
-      <h2 class="text-xl font-bold text-stone-800 dark:text-stone-100">{{ modalTitle() }}</h2>
-      <p class="text-xs text-stone-400 dark:text-stone-500 font-medium tracking-wide uppercase">
-        {{ isEditing() ? 'Actualizar datos del cliente' : 'Registro de perfil' }}
+      <h2 class="text-2xl font-black text-stone-900 dark:text-stone-100 tracking-tight">{{ modalTitle() }}</h2>
+      <p class="text-xs text-stone-500 dark:text-stone-400 font-bold tracking-widest uppercase mt-1">
+        {{ isEditing() ? 'Actualizar perfil' : 'Nuevo registro' }}
       </p>
     </div>
-    <div class="h-10 w-10 rounded-xl bg-stone-900 dark:bg-stone-100 flex items-center justify-center text-white dark:text-stone-900">
-      <span class="material-symbols-outlined text-lg">{{ isEditing() ? 'edit' : 'person_add' }}</span>
+    <div class="h-12 w-12 rounded-2xl bg-stone-100 dark:bg-stone-800 flex items-center justify-center text-stone-900 dark:text-white">
+      <span class="material-symbols-outlined text-2xl">{{ isEditing() ? 'edit_square' : 'person_add' }}</span>
     </div>
   </div>
 
-  <div class="space-y-4">
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    
+    <!-- Columna Izquierda: Datos Personales (Bento Box) -->
+    <div class="space-y-4">
+      <div class="bg-stone-50 dark:bg-stone-900/50 rounded-3xl p-5 border border-stone-200/60 dark:border-stone-800 shadow-sm space-y-4">
+        
+        <div class="flex items-center gap-2 mb-2">
+          <span class="material-symbols-outlined text-stone-400 text-lg">badge</span>
+          <p class="text-xs font-bold text-stone-800 dark:text-stone-200 uppercase tracking-widest">Información Básica</p>
+        </div>
 
-    <!-- Nombre y Teléfono -->
-    <div class="grid grid-cols-2 gap-4">
-      <div class="col-span-2 space-y-1">
-        <app-ui-label>Nombre Completo <span class="text-rose-500">*</span></app-ui-label>
-        <app-ui-input
-          placeholder="Ej: María Pérez López"
-          [value]="formName()"
-          (valueChange)="formName.set($event)"
-        ></app-ui-input>
-      </div>
-
-      <div class="space-y-1">
-        <app-ui-label>Celular / WhatsApp <span class="text-rose-500">*</span></app-ui-label>
-        <app-ui-input
-          placeholder="999 888 777"
-          [value]="formPhone()"
-          (valueChange)="formPhone.set($event)"
-        ></app-ui-input>
-      </div>
-
-      <div class="space-y-1">
-        <app-ui-label>Email (Opcional)</app-ui-label>
-        <app-ui-input
-          type="email"
-          placeholder="cliente@email.com"
-          [value]="formEmail()"
-          (valueChange)="formEmail.set($event)"
-        ></app-ui-input>
-      </div>
-    </div>
-
-    <!-- Dirección -->
-    <div class="space-y-1">
-      <app-ui-label>Dirección (Opcional)</app-ui-label>
-      <app-ui-input
-        placeholder="Ej: Jr. Lima 123, Paucara"
-        [value]="formAddress()"
-        (valueChange)="formAddress.set($event)"
-      ></app-ui-input>
-    </div>
-
-    <!-- Preferencias de Tallas -->
-    <div class="bg-stone-50 dark:bg-stone-800/50 rounded-xl p-4 border border-stone-100 dark:border-stone-700 space-y-3">
-      <p class="text-sm font-semibold text-stone-800 dark:text-stone-200">Preferencias de Ropa</p>
-
-      <div class="grid grid-cols-3 gap-3">
-        <!-- Talla Superior -->
         <div class="space-y-1">
-          <app-ui-label class="text-xs">Talla Superior</app-ui-label>
-          <select
-            [value]="formSizeTop()"
-            (change)="formSizeTop.set($any($event.target).value)"
-            class="h-10 w-full rounded-lg border border-stone-200 dark:border-stone-600 bg-white dark:bg-stone-800 text-sm px-3 font-medium text-stone-800 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-stone-400"
-          >
-            <option value="XS">XS</option>
-            <option value="S">S</option>
-            <option value="M">M</option>
-            <option value="L">L</option>
-            <option value="XL">XL</option>
-            <option value="XXL">XXL</option>
-          </select>
+          <app-ui-label class="text-[10px] uppercase font-bold text-stone-500">Nombre Completo <span class="text-rose-500">*</span></app-ui-label>
+          <app-ui-input
+            placeholder="Ej: María Pérez López"
+            [value]="formName()"
+            (valueChange)="formName.set($event)"
+          ></app-ui-input>
+        </div>
+
+        <div class="space-y-1">
+          <app-ui-label class="text-[10px] uppercase font-bold text-stone-500">Celular / WhatsApp <span class="text-rose-500">*</span></app-ui-label>
+          <app-ui-input
+            placeholder="999 888 777"
+            [value]="formPhone()"
+            (valueChange)="formPhone.set($event)"
+          ></app-ui-input>
+        </div>
+
+        <div class="space-y-1">
+          <app-ui-label class="text-[10px] uppercase font-bold text-stone-500">Email (Opcional)</app-ui-label>
+          <app-ui-input
+            type="email"
+            placeholder="cliente@email.com"
+            [value]="formEmail()"
+            (valueChange)="formEmail.set($event)"
+          ></app-ui-input>
+        </div>
+      </div>
+
+      <!-- Bento Box: Dirección -->
+      <div class="bg-stone-50 dark:bg-stone-900/50 rounded-3xl p-5 border border-stone-200/60 dark:border-stone-800 shadow-sm space-y-3">
+        <div class="flex items-center gap-2 mb-1">
+          <span class="material-symbols-outlined text-stone-400 text-lg">home_pin</span>
+          <p class="text-xs font-bold text-stone-800 dark:text-stone-200 uppercase tracking-widest">Localización</p>
+        </div>
+        <div class="space-y-1">
+          <app-ui-input
+            placeholder="Ej: Jr. Lima 123, Paucara"
+            [value]="formAddress()"
+            (valueChange)="formAddress.set($event)"
+          ></app-ui-input>
+        </div>
+      </div>
+    </div>
+
+    <!-- Columna Derecha: Preferencias y Notas (Bento Boxes) -->
+    <div class="space-y-4">
+      
+      <!-- Preferencias de Ropa: Táctil -->
+      <div class="bg-stone-50 dark:bg-stone-900/50 rounded-3xl p-5 border border-stone-200/60 dark:border-stone-800 shadow-sm space-y-5">
+        <div class="flex items-center gap-2 mb-1">
+          <span class="material-symbols-outlined text-stone-400 text-lg">checkroom</span>
+          <p class="text-xs font-bold text-stone-800 dark:text-stone-200 uppercase tracking-widest">Preferencias</p>
+        </div>
+
+        <!-- Talla Superior -->
+        <div>
+          <p class="text-[10px] text-stone-500 dark:text-stone-400 uppercase font-bold mb-2">Talla Superior (Top)</p>
+          <div class="flex flex-wrap gap-2">
+            @for (size of ['XS', 'S', 'M', 'L', 'XL', 'XXL']; track size) {
+              <button
+                (click)="formSizeTop.set($any(size))"
+                class="h-9 min-w-[2.5rem] px-3 rounded-xl text-xs font-black transition-all duration-200"
+                [ngClass]="formSizeTop() === size 
+                  ? 'bg-stone-900 text-white shadow-md dark:bg-stone-100 dark:text-stone-900 scale-105' 
+                  : 'bg-white text-stone-500 border border-stone-200 hover:border-stone-400 dark:bg-stone-800 dark:border-stone-700 dark:text-stone-400 dark:hover:border-stone-500'">
+                {{ size }}
+              </button>
+            }
+          </div>
         </div>
 
         <!-- Talla Inferior -->
-        <div class="space-y-1">
-          <app-ui-label class="text-xs">Talla Inferior</app-ui-label>
-          <select
-            [value]="formSizeBottom()"
-            (change)="formSizeBottom.set($any($event.target).value)"
-            class="h-10 w-full rounded-lg border border-stone-200 dark:border-stone-600 bg-white dark:bg-stone-800 text-sm px-3 font-medium text-stone-800 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-stone-400"
-          >
-            <option value="28">28</option>
-            <option value="30">30</option>
-            <option value="32">32</option>
-            <option value="34">34</option>
-            <option value="36">36</option>
-            <option value="38">38</option>
-          </select>
+        <div>
+          <p class="text-[10px] text-stone-500 dark:text-stone-400 uppercase font-bold mb-2">Talla Inferior (Bottom)</p>
+          <div class="flex flex-wrap gap-2">
+            @for (size of ['28', '30', '32', '34', '36', '38']; track size) {
+              <button
+                (click)="formSizeBottom.set(size)"
+                class="h-9 min-w-[2.5rem] px-3 rounded-xl text-xs font-black transition-all duration-200"
+                [ngClass]="formSizeBottom() === size 
+                  ? 'bg-stone-900 text-white shadow-md dark:bg-stone-100 dark:text-stone-900 scale-105' 
+                  : 'bg-white text-stone-500 border border-stone-200 hover:border-stone-400 dark:bg-stone-800 dark:border-stone-700 dark:text-stone-400 dark:hover:border-stone-500'">
+                {{ size }}
+              </button>
+            }
+          </div>
         </div>
 
         <!-- Estilo -->
-        <div class="space-y-1">
-          <app-ui-label class="text-xs">Estilo</app-ui-label>
-          <select
-            [value]="formStyle()"
-            (change)="formStyle.set($any($event.target).value)"
-            class="h-10 w-full rounded-lg border border-stone-200 dark:border-stone-600 bg-white dark:bg-stone-800 text-sm px-3 font-medium text-stone-800 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-stone-400"
-          >
-            <option value="Casual">Casual</option>
-            <option value="Elegante">Elegante</option>
-            <option value="Urbano">Urbano</option>
-            <option value="Deportivo">Deportivo</option>
-            <option value="Formal">Formal</option>
-          </select>
+        <div>
+          <p class="text-[10px] text-stone-500 dark:text-stone-400 uppercase font-bold mb-2">Estilo Favorito</p>
+          <div class="flex flex-wrap gap-2">
+            @for (style of ['Casual', 'Elegante', 'Urbano', 'Deportivo', 'Formal']; track style) {
+              <button
+                (click)="formStyle.set(style)"
+                class="h-8 px-4 rounded-full text-xs font-bold transition-all duration-200"
+                [ngClass]="formStyle() === style 
+                  ? 'bg-stone-900 text-white shadow-md dark:bg-stone-100 dark:text-stone-900' 
+                  : 'bg-white text-stone-500 border border-stone-200 hover:border-stone-400 dark:bg-stone-800 dark:border-stone-700 dark:text-stone-400 dark:hover:border-stone-500'">
+                {{ style }}
+              </button>
+            }
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- Notas internas -->
-    <div class="space-y-1">
-      <app-ui-label>Notas Internas (Opcional)</app-ui-label>
-      <textarea
-        [value]="formNotes()"
-        (input)="formNotes.set($any($event.target).value)"
-        rows="2"
-        placeholder="Ej: Prefiere colores oscuros, viene los jueves..."
-        class="w-full px-3 py-2 rounded-lg border border-stone-200 dark:border-stone-600 bg-white dark:bg-stone-800 text-sm text-stone-800 dark:text-stone-100 placeholder-stone-400 dark:placeholder-stone-500 focus:outline-none focus:ring-2 focus:ring-stone-400 resize-none transition-all"
-      ></textarea>
-    </div>
+      <!-- Bento Box: Notas Internas -->
+      <div class="bg-stone-50 dark:bg-stone-900/50 rounded-3xl p-5 border border-stone-200/60 dark:border-stone-800 shadow-sm space-y-3">
+        <div class="flex items-center gap-2 mb-1">
+          <span class="material-symbols-outlined text-stone-400 text-lg">edit_note</span>
+          <p class="text-xs font-bold text-stone-800 dark:text-stone-200 uppercase tracking-widest">Notas Internas</p>
+        </div>
+        <textarea
+          [value]="formNotes()"
+          (input)="formNotes.set($any($event.target).value)"
+          rows="2"
+          placeholder="Ej: Prefiere colores oscuros, visita los jueves..."
+          class="w-full px-4 py-3 rounded-2xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800/80 text-sm font-medium text-stone-800 dark:text-stone-100 placeholder-stone-400 focus:outline-none focus:border-stone-900 dark:focus:border-stone-100 focus:ring-0 resize-none transition-all duration-300"
+        ></textarea>
+      </div>
 
-    <!-- Error -->
+    </div>
+  </div>
+
+  <!-- Error & Acciones -->
+  <div class="mt-6 space-y-4 border-t border-stone-100 dark:border-stone-800 pt-6">
     @if (formError()) {
-      <div class="p-3 bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800 rounded-lg">
-        <p class="text-sm text-rose-600 dark:text-rose-400 flex items-center gap-2">
-          <span class="material-symbols-outlined text-sm">error</span>
+      <div class="p-4 bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800/50 rounded-2xl">
+        <p class="text-xs font-bold text-rose-600 dark:text-rose-400 flex items-center gap-2 uppercase tracking-wide">
+          <span class="material-symbols-outlined text-base">error</span>
           {{ formError() }}
         </p>
       </div>
     }
 
-    <!-- Acciones -->
-    <div class="flex gap-3 pt-4">
+    <div class="flex gap-3">
       <app-ui-button
         variant="outline"
-        class="w-1/3 border-stone-200 rounded-xl"
+        class="w-1/3 border-stone-200 rounded-2xl"
         (onClick)="closeDialog()"
       >
         Cancelar
       </app-ui-button>
 
       <app-ui-button
-        class="w-2/3 bg-stone-900 dark:bg-stone-100 hover:bg-black dark:hover:bg-stone-200 text-white dark:text-stone-900 rounded-xl shadow-sm"
+        class="w-2/3 bg-stone-900 dark:bg-stone-100 hover:bg-black dark:hover:bg-stone-200 text-white dark:text-stone-900 rounded-2xl shadow-sm"
         (onClick)="saveClient()"
         [disabled]="isSaving()"
       >
-        <span class="flex items-center justify-center gap-2">
+        <span class="flex items-center justify-center gap-2 font-black tracking-widest uppercase text-sm">
           @if (isSaving()) {
             <span class="material-symbols-outlined text-sm animate-spin">refresh</span>
+          } @else {
+            <span class="material-symbols-outlined text-[18px]">{{ isEditing() ? 'save' : 'done_all' }}</span>
           }
           {{ isEditing() ? 'Guardar Cambios' : 'Registrar Cliente' }}
         </span>

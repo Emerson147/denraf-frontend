@@ -172,18 +172,21 @@ export class ClientsPageComponent {
   getClientTier(client: Client) {
     const spent = client.totalSpent;
     if (spent > 2000 || client.tier === 'gold') return {
-      label: 'GOLD',
-      color: 'bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-800',
-      icon: 'star',
+      label: 'VIP',
+      color: 'bg-stone-900 text-white dark:bg-stone-100 dark:text-stone-900 shadow-sm border border-stone-800 dark:border-stone-200',
+      avatarColor: 'bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 shadow-lg shadow-stone-900/20 dark:shadow-stone-100/10',
+      icon: 'workspace_premium',
     };
     if (spent > 500 || client.tier === 'silver') return {
-      label: 'SILVER',
-      color: 'bg-slate-50 text-slate-700 border border-slate-200 dark:bg-slate-800/40 dark:text-slate-300 dark:border-slate-700',
-      icon: 'workspace_premium',
+      label: 'RECURRENTE',
+      color: 'bg-stone-200 text-stone-800 dark:bg-stone-800 dark:text-stone-200 border border-stone-300 dark:border-stone-700',
+      avatarColor: 'bg-stone-200 dark:bg-stone-800 text-stone-800 dark:text-stone-200 shadow-sm border border-stone-300 dark:border-stone-700',
+      icon: 'verified',
     };
     return {
       label: 'NUEVO',
-      color: 'bg-stone-50 text-stone-600 border border-stone-200 dark:bg-stone-800/40 dark:text-stone-400 dark:border-stone-700',
+      color: 'bg-transparent text-stone-500 border border-stone-200 dark:border-stone-800',
+      avatarColor: 'bg-stone-50 dark:bg-stone-900/50 text-stone-500 dark:text-stone-400 border border-stone-100 dark:border-stone-800',
       icon: 'person',
     };
   }

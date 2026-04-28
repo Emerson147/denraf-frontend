@@ -222,16 +222,15 @@ export class ApexChartConfigService {
     };
   }
 
-  /**
-   * Configuración para gráfico de dona (categorías, porcentajes)
-   */
   getDonutChartConfig(options: {
     series: number[];
     labels: string[];
     height?: number;
+    formatType?: 'currency' | 'quantity';
   }): ApexOptions {
     const isDark = this.themeService.darkMode();
     const colors = this.getColors();
+    const formatType = options.formatType || 'currency';
     
     return {
       ...this.getBaseConfig(),
@@ -270,7 +269,8 @@ export class ApexChartConfigService {
                 color: isDark ? '#fafaf9' : '#1c1917', // stone-50 dark / stone-900 light
                 offsetY: 10,
                 formatter: (val: string) => {
-                  return `S/ ${parseFloat(val).toFixed(0)}`;
+                  const num = parseFloat(val);
+                  return formatType === 'currency' ? `S/ ${num.toFixed(0)}` : `${num.toFixed(0)}`;
                 }
               },
               total: {
@@ -280,7 +280,7 @@ export class ApexChartConfigService {
                 color: isDark ? '#a8a29e' : '#78716c', // stone-400 dark / stone-500 light
                 formatter: (w: any) => {
                   const total = w.globals.seriesTotals.reduce((a: number, b: number) => a + b, 0);
-                  return `S/ ${total.toFixed(0)}`;
+                  return formatType === 'currency' ? `S/ ${total.toFixed(0)}` : `${total.toFixed(0)}`;
                 }
               }
             }

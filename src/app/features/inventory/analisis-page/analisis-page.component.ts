@@ -89,8 +89,8 @@ export class AnalisisPageComponent {
   });
 
   basicProducts = computed(() => {
-    // Tarjeta "Básicos" (Alta rotación) - Rotación de >= 2 por feria
-    const basicos = this.productosAnalizadosBackend().filter(p => p.rotacionPorFeria >= 2);
+    // Tarjeta "Básicos" (Alta rotación) - Rotación de >= 1 por feria
+    const basicos = this.productosAnalizadosBackend().filter(p => p.rotacionPorFeria >= 1);
     return basicos.map(item => ({
       product: { id: item.productoId, name: item.nombre, stock: item.stock },
       rotationPerFair: item.rotacionPorFeria,
@@ -100,7 +100,7 @@ export class AnalisisPageComponent {
 
   productClassifications = computed(() => {
     // Tarjeta "Variedad" (Media/Baja rotación) - Todo el que no sea congelado ni alta rotación
-    const variedad = this.productosAnalizadosBackend().filter(p => p.estado !== 'CONGELADO' && p.rotacionPorFeria < 2);
+    const variedad = this.productosAnalizadosBackend().filter(p => p.estado !== 'CONGELADO' && p.rotacionPorFeria < 1);
     return variedad.map(item => ({
       product: { id: item.productoId, name: item.nombre, stock: item.stock },
       classification: 'variedad',
@@ -167,7 +167,8 @@ export class AnalisisPageComponent {
         m.overstockedProducts
       ],
       labels: ['Saludable', 'Stock Bajo', 'Crítico', 'Sobrestock'],
-      height: 300
+      height: 300,
+      formatType: 'quantity'
     });
   });
 }

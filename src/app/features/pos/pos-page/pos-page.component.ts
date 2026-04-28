@@ -72,6 +72,11 @@ export class PosPageComponent {
   showMobileCart = signal(false); // 📱 Control del bottom sheet móvil
   showClearConfirm = signal(false); // 🗑️ Confirmación para vaciar
 
+  // 📱 Touch variables para Bottom Sheet
+  touchStartY = 0;
+  touchCurrentY = 0;
+  sheetTransform = signal('translateY(0)');
+
   // --- INTEGRACIÓN CLIENTES ---
   selectedClient = signal<Client | null>(null);
   clientSearchQuery = signal('');
@@ -678,5 +683,31 @@ export class PosPageComponent {
 
   trackByCategory(_index: number, category: string): string {
     return category;
+  }
+
+  // 📱 LÓGICA DE SWIPE DOWN (MÓVIL)
+  onTouchStart(e: TouchEvent) {
+    this.touchStartY = e.touches[0].clientY;
+  }
+  
+  onTouchMove(e: TouchEvent) {
+    this.touchCurrentY = e.touches[0].clientY;
+    const delta = this.touchCurrentY - this.touchStartY;
+    if (delta > 0) {
+      // Pulling down (arrastrando hacia abajo)
+      this.sheetTransform.set(`translateY(${delta}px)`);
+    }
+  }
+
+  onTouchEnd() {
+    const delta = this.touchCurrentY - this.touchStartY;
+    if (delta > 100) {
+      // Swipe down threshold reached, close the sheet
+      this.showMobileCart.set(false);
+    }
+    // Reset
+    this.sheetTransform.set('translateY(0)');
+    this.touchStartY = 0;
+    this.touchCurrentY = 0;
   }
 }

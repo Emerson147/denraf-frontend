@@ -19,6 +19,11 @@ export interface CartItem {
     category?: string;
   };
   quantity: number;
+  variant?: {
+    id: string;
+    size: string;
+    color: string;
+  };
 }
 
 @Component({
@@ -48,14 +53,20 @@ export interface CartItem {
           </div>
         }
 
+        <!-- Ranura de impresora (Falsa) -->
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[320px] h-2 bg-black/40 rounded-b-xl blur-[2px] z-20"></div>
+
         <!-- Ticket Container Clean Modern POS -->
         <div
-          class="relative z-10 w-full max-w-[380px] bg-white dark:bg-[#111111] shadow-2xl animate-print-in overflow-hidden rounded-3xl border border-stone-200 dark:border-stone-800"
+          class="relative z-10 w-full max-w-[380px] max-h-[95vh] flex flex-col bg-white dark:bg-[#111111] shadow-[0_20px_60px_rgba(0,0,0,0.3)] animate-printer-slide overflow-hidden rounded-3xl"
         >
+          <!-- Efecto de textura sutil de papel de fondo -->
+          <div class="absolute inset-0 opacity-[0.03] dark:opacity-[0.02] pointer-events-none shrink-0" style="background-image: url('data:image/svg+xml,%3Csvg width=\'100\' height=\'100\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noise\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.8\' numOctaves=\'4\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100\' height=\'100\' filter=\'url(%23noise)\'/%3E%3C/svg%3E');"></div>
+
           <!-- Botón X Elegante para Cancelar -->
           <button
             (click)="cancel()"
-            class="absolute top-4 right-4 z-50 w-8 h-8 flex items-center justify-center rounded-full bg-stone-100 dark:bg-stone-800 text-stone-500 hover:text-stone-800 dark:text-stone-400 dark:hover:text-stone-100 transition-colors shadow-sm no-print"
+            class="absolute top-6 right-5 z-50 w-8 h-8 flex items-center justify-center rounded-full bg-stone-100 dark:bg-stone-800 text-stone-500 hover:text-stone-800 dark:text-stone-400 dark:hover:text-stone-100 transition-colors shadow-sm no-print"
             aria-label="Cancelar venta"
           >
             <span class="material-symbols-outlined text-sm font-bold">close</span>
@@ -63,7 +74,7 @@ export interface CartItem {
 
           <!-- Header Limpio -->
           <div
-            class="p-8 pb-6 text-center border-b border-stone-100 dark:border-stone-800 relative"
+            class="p-8 pb-6 text-center relative shrink-0"
           >
             <div
               class="mx-auto h-12 w-12 bg-stone-900 dark:bg-white text-white dark:text-stone-900 rounded-[1rem] flex items-center justify-center mb-3 text-2xl font-bold shadow-sm"
@@ -91,7 +102,7 @@ export interface CartItem {
           <!-- Cliente -->
           @if (clientName !== 'Cliente') {
             <div
-              class="px-8 py-4 border-b border-stone-100 dark:border-stone-800 bg-stone-50/50 dark:bg-stone-900/50"
+              class="px-8 py-4 border-t border-b border-dashed border-stone-200 dark:border-stone-800 bg-stone-50/30 dark:bg-stone-900/30 shrink-0"
             >
               <p class="text-[10px] font-bold text-stone-400 uppercase tracking-widest mb-1">
                 Cliente
@@ -104,13 +115,15 @@ export interface CartItem {
                 <p class="text-xs text-stone-500 mt-0.5 ml-6">{{ clientPhone }}</p>
               }
             </div>
+          } @else {
+            <div class="mx-8 border-t border-dashed border-stone-200 dark:border-stone-800 shrink-0"></div>
           }
 
-          <!-- Items -->
-          <div class="p-8 py-4 text-sm space-y-3 max-h-[35vh] overflow-y-auto no-scrollbar">
+          <!-- Items (Este es el que hace scroll) -->
+          <div class="px-8 py-4 text-sm space-y-3 flex-1 overflow-y-auto no-scrollbar min-h-0 relative">
             @for (item of items; track item.product.id) {
               <div
-                class="flex justify-between items-start py-2 border-b border-stone-100 dark:border-stone-800/50 last:border-0"
+                class="flex justify-between items-start py-2 border-b border-dashed border-stone-100 dark:border-stone-800/80 last:border-0"
               >
                 <div class="flex gap-3 flex-1 items-start">
                   <span
@@ -122,8 +135,13 @@ export interface CartItem {
                       class="text-stone-900 dark:text-stone-100 font-bold text-xs leading-tight block"
                       >{{ item.product.name }}</span
                     >
-                    @if (item.product.category) {
-                      <span class="text-[10px] font-bold text-stone-400 uppercase tracking-wider">{{
+                    @if (item.variant) {
+                      <div class="flex items-center gap-1.5 mt-1 mb-0.5">
+                        <span class="inline-flex px-1 py-0.5 rounded text-[8px] font-black uppercase tracking-wider bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900">{{ item.variant.size }}</span>
+                        <span class="inline-flex px-1 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300 border border-stone-200 dark:border-stone-700">{{ item.variant.color }}</span>
+                      </div>
+                    } @else if (item.product.category) {
+                      <span class="text-[9px] font-bold text-stone-400 uppercase tracking-wider block mt-0.5">{{
                         item.product.category
                       }}</span>
                     }
@@ -137,8 +155,8 @@ export interface CartItem {
           </div>
 
           <!-- Totales -->
-          <div class="px-8 pb-4">
-            <div class="border-t-2 border-stone-900 dark:border-white pt-4 space-y-2">
+          <div class="px-8 pb-4 relative shrink-0">
+            <div class="border-t-2 border-dashed border-stone-300 dark:border-stone-700 pt-4 space-y-2">
               <div
                 class="flex justify-between text-xs text-stone-500 dark:text-stone-400 font-medium"
               >
@@ -159,16 +177,34 @@ export interface CartItem {
               </div>
 
               <!-- Método de pago y cambio -->
-              @if (paymentMethod && amountPaid > 0) {
-                <div class="bg-stone-50 dark:bg-stone-900 rounded-xl p-4 mt-4 space-y-2">
+              @if (paymentMethod) {
+                <div class="bg-stone-50 dark:bg-stone-900 rounded-xl p-4 mt-4 space-y-3 border border-stone-100 dark:border-stone-800">
                   <div
-                    class="flex justify-between text-xs font-bold text-stone-500 dark:text-stone-400 uppercase tracking-wider"
+                    class="flex justify-between items-center text-xs font-bold text-stone-500 dark:text-stone-400 uppercase tracking-wider"
                   >
-                    <span>Pago vía {{ paymentMethod }}</span>
-                    <span class="text-stone-900 dark:text-white"
-                      >S/ {{ amountPaid | number: '1.2-2' }}</span
+                    <span>Método de Pago</span>
+                    <div 
+                      class="px-2.5 py-1 rounded-md text-[10px] font-black text-white flex items-center gap-1 shadow-sm"
+                      [ngClass]="{
+                        'bg-emerald-500 shadow-emerald-500/20': paymentMethod === 'Efectivo',
+                        'bg-[#742384] shadow-[#742384]/20': paymentMethod === 'Yape' || paymentMethod === 'Plin',
+                        'bg-stone-900 dark:bg-stone-100 dark:text-stone-900 shadow-stone-900/20': paymentMethod === 'Tarjeta'
+                      }"
                     >
+                      <span class="material-symbols-outlined text-[14px]">
+                        {{ paymentMethod === 'Efectivo' ? 'payments' : paymentMethod === 'Tarjeta' ? 'credit_card' : 'qr_code_scanner' }}
+                      </span>
+                      {{ paymentMethod }}
+                    </div>
                   </div>
+                  
+                  @if (amountPaid > 0) {
+                    <div class="flex justify-between text-xs font-bold text-stone-500 dark:text-stone-400 mt-2">
+                      <span>Monto Entregado</span>
+                      <span class="text-stone-900 dark:text-white">S/ {{ amountPaid | number: '1.2-2' }}</span>
+                    </div>
+                  }
+                  
                   @if (change > 0) {
                     <div
                       class="flex justify-between text-sm font-bold text-stone-900 dark:text-white pt-2 border-t border-stone-200 dark:border-stone-700"
@@ -182,13 +218,28 @@ export interface CartItem {
                 </div>
               }
             </div>
+
+            <!-- Código QR y Mensaje de Despedida -->
+            <div class="pt-6 pb-2 text-center flex flex-col items-center justify-center">
+              @if (qrCode) {
+                <div class="bg-white p-2 rounded-xl border border-stone-200 dark:border-stone-700 shadow-sm inline-block mb-3">
+                  <img [src]="qrCode" alt="Código QR" class="w-20 h-20" />
+                </div>
+              }
+              <p class="text-[10px] font-bold text-stone-500 uppercase tracking-widest">
+                ¡Gracias por su preferencia!
+              </p>
+            </div>
           </div>
 
           <!-- Acciones -->
           <div
-            class="p-8 pt-0 flex flex-col gap-2 no-print border-t border-stone-100 dark:border-stone-800 bg-stone-50/50 dark:bg-[#111111]"
+            class="px-8 pb-8 pt-4 flex flex-col gap-2 no-print relative bg-stone-50/50 dark:bg-stone-900/30 shrink-0"
           >
-            <div class="flex gap-2 mt-4">
+            <!-- Sombra superior para separar el papel real de la zona de botones -->
+            <div class="absolute top-0 left-0 right-0 h-4 bg-gradient-to-b from-stone-200/40 dark:from-stone-900/80 to-transparent pointer-events-none"></div>
+            
+            <div class="flex gap-2">
               <button
                 (click)="printTicket()"
                 class="flex-1 py-3.5 rounded-xl bg-stone-100 dark:bg-stone-800 hover:bg-stone-200 dark:hover:bg-stone-700 text-stone-900 dark:text-white font-bold flex items-center justify-center gap-2 transition-all active:scale-95 text-xs"
@@ -208,8 +259,14 @@ export interface CartItem {
 
             <button
               (click)="close()"
-              class="w-full mt-2 py-4 rounded-xl bg-stone-900 dark:bg-white text-white dark:text-stone-900 font-bold hover:opacity-90 transition-all active:scale-95 text-sm tracking-widest uppercase shadow-xl shadow-stone-900/20"
+              class="w-full mt-2 py-4 rounded-xl font-bold transition-all active:scale-95 text-sm tracking-widest uppercase shadow-xl flex items-center justify-center gap-2"
+              [ngClass]="{
+                'bg-emerald-500 text-white hover:bg-emerald-600 shadow-emerald-500/20': paymentMethod === 'Efectivo',
+                'bg-[#742384] text-white hover:bg-[#5c1b69] shadow-[#742384]/20': paymentMethod === 'Yape' || paymentMethod === 'Plin',
+                'bg-stone-900 dark:bg-white text-white dark:text-stone-900 hover:opacity-90 shadow-stone-900/20': !paymentMethod || paymentMethod === 'Tarjeta'
+              }"
             >
+              <span class="material-symbols-outlined text-[18px]">done_all</span>
               Confirmar Venta
             </button>
           </div>
@@ -219,20 +276,25 @@ export interface CartItem {
   `,
   styles: [
     `
-      /* Animación de "Impresión" */
-      @keyframes printIn {
+      /* Animación de "Impresión de Ticket" */
+      @keyframes printerSlide {
         0% {
           opacity: 0;
-          transform: translateY(-50px) scale(0.95);
+          transform: translateY(-80px);
+          clip-path: inset(100% 0 0 0);
+        }
+        30% {
+          opacity: 1;
         }
         100% {
           opacity: 1;
-          transform: translateY(0) scale(1);
+          transform: translateY(0);
+          clip-path: inset(0 0 0 0);
         }
       }
 
-      .animate-print-in {
-        animation: printIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      .animate-printer-slide {
+        animation: printerSlide 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
       }
 
       /* Animación de slide-in para toast */

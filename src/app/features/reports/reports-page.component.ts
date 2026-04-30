@@ -10,12 +10,16 @@ import {
   PeriodSelectorComponent,
 } from '../../shared/ui';
 import { Period } from '../../shared/ui/period-selector/period-selector.component';
+import { BackendAuthService, UserDTO } from '../../core/services/backend-auth.service';
+import { SalesService } from '../../core/services/sales.service';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-reports-page',
   standalone: true,
   imports: [
     CommonModule,
+    RouterModule,
     NgApexchartsModule,
     UiPageHeaderComponent,
     UiExportMenuComponent,
@@ -29,10 +33,13 @@ import { Period } from '../../shared/ui/period-selector/period-selector.componen
 export class ReportsPageComponent implements OnInit {
   public reportService = inject(ReportService);
   private apexConfigService = inject(ApexChartConfigService);
+  private authService = inject(BackendAuthService);
+  private salesService = inject(SalesService);
 
   // Estado
   loading = computed(() => this.reportService.isLoading());
   reportData = computed(() => this.reportService.reportData());
+  systemUsers = signal<UserDTO[]>([]);
 
   // Tabs para paneles Bento
   activeAnalysisTab = signal<'topProductos' | 'categorias' | 'abc'>('topProductos');
@@ -40,6 +47,12 @@ export class ReportsPageComponent implements OnInit {
 
   ngOnInit() {
     this.reportService.fetchReport('semana');
+    
+    // Cargar usuarios para cruzar con las ventas
+    this.authService.getUsers().subscribe({
+      next: (users) => this.systemUsers.set(users),
+      error: (err) => console.error('Error cargando usuarios para reportes:', err)
+    });
   }
 
   onPeriodChange(period: Period) {
@@ -157,14 +170,60 @@ export class ReportsPageComponent implements OnInit {
   });
 
   vendorSalesWithPercentage = computed(() => {
-    return (this.reportData()?.ventasPorVendedor || []).map(v => ({
-      ...v,
-      name: v.nombre,
-      revenue: v.totalIngresos,
-      count: v.totalVentas,
-      avgTicket: v.ticketPromedio,
-      percentage: v.participacion * 100
+    const allUsers = this.systemUsers();
+
+    // 🚀 FULL REACTIVE MODE: Siempre calculamos desde Angular para garantizar 100% tiempo real sin F5
+    const periodSales = this.reportService.currentPeriod() === 'semana' 
+                        ? this.salesService.weeklySales() 
+                        : this.salesService.monthlySales();
+    
+    const localSales: Record<string, { count: number, revenue: number }> = {};
+    let totalRevenue = 0;
+
+    periodSales.forEach(s => {
+      // Agrupar por vendedorId si existe en los usuarios, sino por createdBy
+      const userObj = allUsers.find(u => u.id === s.vendedorId);
+      const sellerName = userObj ? (userObj.nombre || userObj.email) : (s.createdBy || 'Sistema');
+      
+      if (!localSales[sellerName]) localSales[sellerName] = { count: 0, revenue: 0 };
+      localSales[sellerName].count += 1;
+      localSales[sellerName].revenue += s.total;
+      totalRevenue += s.total;
+    });
+
+    const results = Object.entries(localSales).map(([nombre, data]) => ({
+      name: nombre,
+      revenue: data.revenue,
+      count: data.count,
+      avgTicket: data.count > 0 ? data.revenue / data.count : 0,
+      percentage: totalRevenue > 0 ? (data.revenue / totalRevenue) * 100 : 0
     }));
+
+    // Asegurar que TODOS los usuarios registrados aparezcan, incluso con S/ 0
+    allUsers.forEach(u => {
+       const uName = u.nombre || u.email || 'Desconocido';
+       if (!localSales[uName]) {
+         results.push({
+            name: uName,
+            revenue: 0,
+            count: 0,
+            avgTicket: 0,
+            percentage: 0
+         });
+       }
+    });
+
+    // Remover duplicados en el array final
+    const uniqueResults = [];
+    const seenNames = new Set();
+    for (const r of results) {
+       if (!seenNames.has(r.name)) {
+          seenNames.add(r.name);
+          uniqueResults.push(r);
+       }
+    }
+
+    return uniqueResults.sort((a, b) => b.revenue - a.revenue);
   });
 
   // Datos para exportar
@@ -229,7 +288,7 @@ export class ReportsPageComponent implements OnInit {
     return this.apexConfigService.getBarChartConfig({
       series: [{ name: 'Ingresos', data: vendors.map(v => v.revenue) }],
       categories: vendors.map(v => v.name),
-      height: 280
+      height: 250
     });
   });
 }

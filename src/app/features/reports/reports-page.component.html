@@ -136,49 +136,49 @@
     <!-- ═══════════════════════════════════════════════════════ -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
       <!-- Productos Vendidos -->
-      <div class="bg-white dark:bg-stone-900 border border-stone-200/60 dark:border-stone-800 rounded-2xl p-4 flex items-center gap-4 hover:border-stone-300 dark:hover:border-stone-700 transition-colors">
-        <div class="w-10 h-10 rounded-full bg-stone-100 dark:bg-stone-800 flex items-center justify-center text-stone-600 dark:text-stone-400">
-          <span class="material-symbols-outlined text-lg">inventory_2</span>
+      <div class="bg-white/80 dark:bg-stone-900/80 backdrop-blur-xl border border-stone-200/60 dark:border-stone-800 rounded-[2rem] p-5 flex items-center gap-4 hover:border-stone-300 dark:hover:border-stone-700 transition-colors shadow-xl shadow-stone-200/20 dark:shadow-none group">
+        <div class="w-12 h-12 rounded-2xl bg-stone-100 dark:bg-stone-800 flex items-center justify-center text-stone-600 dark:text-stone-400 group-hover:scale-105 transition-transform shrink-0">
+          <span class="material-symbols-outlined text-xl">inventory_2</span>
         </div>
-        <div>
-          <p class="text-xs text-stone-500 font-medium">Productos Vendidos</p>
-          <p class="text-lg font-bold text-stone-900 dark:text-stone-100">{{ totalProductsSold() }}</p>
+        <div class="min-w-0">
+          <p class="text-[10px] uppercase tracking-widest font-black text-stone-500 dark:text-stone-400 truncate">Prod. Vendidos</p>
+          <p class="text-2xl font-black text-stone-900 dark:text-stone-100 mt-0.5 tracking-tight leading-none">{{ totalProductsSold() }}</p>
         </div>
       </div>
 
       <!-- Meta Mensual -->
-      <div class="bg-white dark:bg-stone-900 border border-stone-200/60 dark:border-stone-800 rounded-2xl p-4 flex items-center gap-4 hover:border-stone-300 dark:hover:border-stone-700 transition-colors">
-        <div class="w-10 h-10 rounded-full bg-stone-100 dark:bg-stone-800 flex items-center justify-center text-stone-600 dark:text-stone-400">
-          <span class="material-symbols-outlined text-lg">flag</span>
+      <div class="bg-white/80 dark:bg-stone-900/80 backdrop-blur-xl border border-stone-200/60 dark:border-stone-800 rounded-[2rem] p-5 flex items-center gap-4 hover:border-stone-300 dark:hover:border-stone-700 transition-colors shadow-xl shadow-stone-200/20 dark:shadow-none group">
+        <div class="w-12 h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400 group-hover:scale-105 transition-transform shrink-0">
+          <span class="material-symbols-outlined text-xl">flag</span>
         </div>
-        <div class="flex-1">
-          <p class="text-xs text-stone-500 font-medium">Meta Mensual</p>
-          <p class="text-lg font-bold text-stone-900 dark:text-stone-100">{{ monthlyGoalPercentage() | number:'1.0-0' }}%</p>
-          <div class="w-full bg-stone-100 dark:bg-stone-800 h-1 rounded-full overflow-hidden mt-1">
+        <div class="flex-1 min-w-0">
+          <p class="text-[10px] uppercase tracking-widest font-black text-emerald-600/80 dark:text-emerald-500 truncate">Meta Mensual</p>
+          <p class="text-2xl font-black text-stone-900 dark:text-stone-100 mt-0.5 tracking-tight leading-none mb-1.5">{{ monthlyGoalPercentage() | number:'1.0-0' }}%</p>
+          <div class="w-full bg-stone-100 dark:bg-stone-800 h-1.5 rounded-full overflow-hidden">
             <div class="h-full bg-emerald-500 rounded-full transition-all duration-1000" [style.width.%]="monthlyGoalPercentage()"></div>
           </div>
         </div>
       </div>
 
       <!-- Ticket Promedio -->
-      <div class="bg-white dark:bg-stone-900 border border-stone-200/60 dark:border-stone-800 rounded-2xl p-4 flex items-center gap-4 hover:border-stone-300 dark:hover:border-stone-700 transition-colors">
-        <div class="w-10 h-10 rounded-full bg-stone-100 dark:bg-stone-800 flex items-center justify-center text-stone-600 dark:text-stone-400">
-          <span class="material-symbols-outlined text-lg">receipt</span>
+      <div class="bg-white/80 dark:bg-stone-900/80 backdrop-blur-xl border border-stone-200/60 dark:border-stone-800 rounded-[2rem] p-5 flex items-center gap-4 hover:border-stone-300 dark:hover:border-stone-700 transition-colors shadow-xl shadow-stone-200/20 dark:shadow-none group">
+        <div class="w-12 h-12 rounded-2xl bg-stone-100 dark:bg-stone-800 flex items-center justify-center text-stone-600 dark:text-stone-400 group-hover:scale-105 transition-transform shrink-0">
+          <span class="material-symbols-outlined text-xl">receipt</span>
         </div>
-        <div>
-          <p class="text-xs text-stone-500 font-medium">Ticket Promedio</p>
-          <p class="text-lg font-bold text-stone-900 dark:text-stone-100">S/ {{ (reportData()?.ticketPromedio || 0) | number:'1.2-2' }}</p>
+        <div class="min-w-0">
+          <p class="text-[10px] uppercase tracking-widest font-black text-stone-500 dark:text-stone-400 truncate">Ticket Promedio</p>
+          <p class="text-2xl font-black text-stone-900 dark:text-stone-100 mt-0.5 tracking-tight leading-none truncate">S/ {{ (reportData()?.ticketPromedio || 0) | number:'1.2-2' }}</p>
         </div>
       </div>
 
       <!-- Mejor Feria -->
-      <div class="bg-white dark:bg-stone-900 border border-stone-200/60 dark:border-stone-800 rounded-2xl p-4 flex items-center gap-4 hover:border-stone-300 dark:hover:border-stone-700 transition-colors">
-        <div class="w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center text-amber-600 dark:text-amber-400">
-          <span class="material-symbols-outlined text-lg">star</span>
+      <div class="bg-white/80 dark:bg-stone-900/80 backdrop-blur-xl border border-stone-200/60 dark:border-stone-800 rounded-[2rem] p-5 flex items-center gap-4 hover:border-stone-300 dark:hover:border-stone-700 transition-colors shadow-xl shadow-stone-200/20 dark:shadow-none group">
+        <div class="w-12 h-12 rounded-2xl bg-amber-50 dark:bg-amber-900/20 flex items-center justify-center text-amber-500 dark:text-amber-400 group-hover:scale-105 transition-transform shrink-0">
+          <span class="material-symbols-outlined text-xl">star</span>
         </div>
-        <div>
-          <p class="text-xs text-amber-600/80 dark:text-amber-500 font-medium">Mejor Feria</p>
-          <p class="text-lg font-bold text-stone-900 dark:text-stone-100">{{ fairComparison().mejorFeria }}</p>
+        <div class="min-w-0">
+          <p class="text-[10px] uppercase tracking-widest font-black text-amber-600/80 dark:text-amber-500 truncate">Mejor Feria</p>
+          <p class="text-xl font-black text-stone-900 dark:text-stone-100 mt-1 tracking-tight leading-none truncate">{{ fairComparison().mejorFeria }}</p>
         </div>
       </div>
     </div>
@@ -378,7 +378,11 @@
             <h3 class="text-lg font-bold text-stone-900 dark:text-stone-100">Ventas por Vendedor</h3>
             <p class="text-xs text-stone-500 dark:text-stone-400 mt-0.5">Rendimiento del equipo</p>
           </div>
-          <span class="px-3 py-1 bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400 text-xs rounded-full font-medium">{{ vendorSalesWithPercentage().length }} vendedores</span>
+          <a routerLink="/goals" class="group flex items-center gap-1.5 px-3 py-1.5 bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-stone-700 text-xs rounded-full font-bold transition-colors cursor-pointer">
+            <span class="material-symbols-outlined text-[14px] text-amber-500">military_tech</span>
+            Ver Logros
+            <span class="material-symbols-outlined text-[14px] group-hover:translate-x-0.5 transition-transform">arrow_forward</span>
+          </a>
         </div>
 
         <!-- Chart de Barras -->
@@ -396,28 +400,25 @@
           ></apx-chart>
         </div>
 
-        <!-- Podio — vendedores top 3 -->
-        <div class="px-6 pb-6 flex-1 overflow-y-auto bento-scroll">
-          <div class="grid grid-cols-3 gap-3 mt-4">
+        <!-- Podio — Nombres debajo del gráfico (Sin Scroll) -->
+        <div class="px-6 pb-6 mt-auto">
+          <p class="text-[10px] uppercase tracking-widest font-black text-stone-400 mb-3 text-center">Top 3 Rendimiento</p>
+          <div class="grid grid-cols-3 gap-3">
             @for (vendor of vendorSalesWithPercentage().slice(0, 3); track vendor.name; let i = $index) {
-              <div class="p-4 rounded-2xl border transition-all duration-300 hover:shadow-md cursor-pointer hover:-translate-y-0.5 text-center" [ngClass]="{
-                'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800': i === 0,
-                'bg-slate-50 dark:bg-slate-900/20 border-slate-200 dark:border-slate-800': i === 1,
-                'bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800': i === 2
+              <div class="flex items-center gap-3 p-3 rounded-2xl border transition-colors hover:border-stone-300 dark:hover:border-stone-600 cursor-pointer" [ngClass]="{
+                'bg-stone-900 border-stone-900 dark:bg-stone-100 dark:border-stone-100 text-white dark:text-stone-900 shadow-sm': i === 0,
+                'bg-stone-50 border-stone-200/60 dark:bg-stone-800/50 dark:border-stone-700 text-stone-800 dark:text-stone-200': i > 0
               }">
-                <div class="h-10 w-10 mx-auto rounded-full flex items-center justify-center font-bold text-sm mb-2" [ngClass]="{
-                  'bg-yellow-500 text-white': i === 0,
-                  'bg-slate-400 text-white': i === 1,
-                  'bg-amber-500 text-white': i === 2
-                }">{{ vendor.name.charAt(0).toUpperCase() }}</div>
-                <p class="font-bold text-stone-900 dark:text-stone-100 text-sm truncate">{{ vendor.name }}</p>
-                <p class="text-xs text-stone-500 dark:text-stone-400 mb-2">
-                  @if (i === 0) { 🥇 Top }
-                  @else if (i === 1) { 🥈 2do }
-                  @else { 🥉 3ro }
-                </p>
-                <p class="text-lg font-bold text-stone-900 dark:text-stone-100">S/ {{ vendor.revenue | number:'1.0-0' }}</p>
-                <p class="text-xs text-stone-500">{{ vendor.count }} ventas</p>
+                <div class="h-8 w-8 shrink-0 rounded-lg flex items-center justify-center font-bold text-sm" [ngClass]="{
+                  'bg-white/20 dark:bg-black/10': i === 0,
+                  'bg-stone-200 dark:bg-stone-700': i > 0
+                }">
+                  #{{ i + 1 }}
+                </div>
+                <div class="min-w-0">
+                  <p class="font-bold text-sm truncate leading-tight">{{ vendor.name }}</p>
+                  <p class="text-xs font-medium opacity-80 truncate mt-0.5">S/ {{ vendor.revenue | number:'1.0-0' }}</p>
+                </div>
               </div>
             }
           </div>

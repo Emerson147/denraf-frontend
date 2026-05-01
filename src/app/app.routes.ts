@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { MainLayoutComponent } from './layout/main-layout.component';
 import { authGuard } from './core/auth/auth.guard';
+import { adminGuard } from './core/auth/admin.guard';
 
 export const routes: Routes = [
     // Ruta publica  (Login) - Fuera del Layout
@@ -18,9 +19,10 @@ export const routes: Routes = [
       {path: '', redirectTo: 'dashboard', pathMatch: 'full'},
       // Aquí cargaremos tus páginas luego. Por ahora, un placeholder.
       { 
-        path: 'dashboard', // dashboard(home)
+        path: 'dashboard',
         loadComponent: () => import('./features/dashboard/dashboard-page.component').then(m => m.DashboardPageComponent),
-        data: { preload: true, preloadDelay: 0 } // 🚀 Precarga inmediata (high priority)
+        canActivate: [adminGuard],
+        data: { preload: true, preloadDelay: 0 }
       },
       {
         path: 'inventario',
@@ -32,10 +34,12 @@ export const routes: Routes = [
           },
           {
             path: 'analisis',
+            canActivate: [adminGuard],
             loadComponent: () => import('./features/inventory/analisis-page/analisis-page.component').then(m => m.AnalisisPageComponent)
           },
           {
             path: 'compras',
+            canActivate: [adminGuard],
             loadComponent: () => import('./features/inventory/inventory-movements/inventory-movements.component').then(m => m.InventoryMovementsComponent)
           },
           {
@@ -55,25 +59,34 @@ export const routes: Routes = [
         loadComponent: () => import('./features/clients/clients-page.component').then(m => m.ClientsPageComponent)
       },
       {
-        path: 'reports', // reportes
+        path: 'reports',
+        canActivate: [adminGuard],
         loadComponent: () => import('./features/reports/reports-page.component').then(m => m.ReportsPageComponent),
-        data: { preload: true, preloadDelay: 5000 } // 🚀 Precarga en 5s (medium priority)
+        data: { preload: true, preloadDelay: 5000 }
       },
       {
-        path: 'sales', // historial de ventas
+        path: 'sales',
+        canActivate: [adminGuard],
         loadComponent: () => import('./features/sales/sales-history/sales-history.component').then(m => m.SalesHistoryComponent)
       },
       {
-        path: 'goals', // metas y logros
+        path: 'goals',
+        canActivate: [adminGuard],
         loadComponent: () => import('./features/goals/goals-page.component').then(m => m.GoalsPageComponent)
       },
       {
-        path: 'users', // gestión de usuarios (solo admin)
+        path: 'users',
+        canActivate: [adminGuard],
         loadComponent: () => import('./features/users/users-page.component').then(m => m.UsersPageComponent)
       },
       {
         path: 'notifications', // centro de notificaciones
         loadComponent: () => import('./features/notifications/notifications-page.component').then(m => m.NotificationsPageComponent)
+      },
+      {
+        path: 'settings',
+        canActivate: [adminGuard],
+        loadComponent: () => import('./features/settings/settings-page.component').then(m => m.SettingsPageComponent)
       }           
     ]
   },

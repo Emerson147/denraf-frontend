@@ -35,20 +35,19 @@ import { UiPageHeaderComponent } from '../../shared/ui/ui-page-header/ui-page-he
         </div>
 
         <!-- ══════════════════════════════════════════ -->
-        <!-- ROW 1 — 4 KPI Pills                        -->
-        <!-- Mismo patrón exacto que Reportes           -->
+        <!-- ROW 1 — 4 KPI Pills (ZEN ENTERPRISE)       -->
         <!-- ══════════════════════════════════════════ -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
 
           <!-- Nivel actual -->
-          <div class="bg-white dark:bg-stone-900 border border-stone-200/60 dark:border-stone-800 rounded-3xl p-4 flex items-center gap-4 hover:border-stone-300 dark:hover:border-stone-700 transition-colors">
-            <div class="w-10 h-10 rounded-full bg-stone-100 dark:bg-stone-800 flex items-center justify-center text-stone-600 dark:text-stone-400">
-              <span class="material-symbols-outlined text-lg">military_tech</span>
+          <div class="bg-white/80 dark:bg-stone-900/80 backdrop-blur-xl border border-stone-200/60 dark:border-stone-800 rounded-[2rem] p-5 flex items-center gap-4 hover:border-stone-300 dark:hover:border-stone-700 transition-colors shadow-xl shadow-stone-200/20 dark:shadow-none group">
+            <div class="w-12 h-12 rounded-2xl bg-stone-100 dark:bg-stone-800 flex items-center justify-center text-stone-600 dark:text-stone-400 group-hover:scale-105 transition-transform shrink-0">
+              <span class="material-symbols-outlined text-xl">military_tech</span>
             </div>
-            <div class="flex-1">
-              <p class="text-xs text-stone-500 font-medium">Nivel actual</p>
-              <p class="text-lg font-bold text-stone-900 dark:text-stone-100">{{ gamification.currentLevel() }}</p>
-              <div class="w-full bg-stone-100 dark:bg-stone-800 h-1 rounded-full overflow-hidden mt-1">
+            <div class="flex-1 min-w-0">
+              <p class="text-[10px] uppercase tracking-widest font-black text-stone-500 dark:text-stone-400 truncate">Nivel actual</p>
+              <p class="text-2xl font-black text-stone-900 dark:text-stone-100 mt-0.5 tracking-tight leading-none mb-1.5">{{ gamification.currentLevel() }}</p>
+              <div class="w-full bg-stone-100 dark:bg-stone-800 h-1.5 rounded-full overflow-hidden">
                 <div class="h-full bg-stone-900 dark:bg-stone-200 rounded-full transition-all duration-1000"
                   [style.width.%]="levelProgress()"></div>
               </div>
@@ -56,62 +55,51 @@ import { UiPageHeaderComponent } from '../../shared/ui/ui-page-header/ui-page-he
           </div>
 
           <!-- Puntos totales -->
-          <div class="bg-white dark:bg-stone-900 border border-stone-200/60 dark:border-stone-800 rounded-3xl p-4 flex items-center gap-4 hover:border-stone-300 dark:hover:border-stone-700 transition-colors">
-            <div class="w-10 h-10 rounded-full bg-stone-100 dark:bg-stone-800 flex items-center justify-center text-stone-600 dark:text-stone-400">
-              <span class="material-symbols-outlined text-lg">stars</span>
+          <div class="bg-white/80 dark:bg-stone-900/80 backdrop-blur-xl border border-stone-200/60 dark:border-stone-800 rounded-[2rem] p-5 flex items-center gap-4 hover:border-stone-300 dark:hover:border-stone-700 transition-colors shadow-xl shadow-stone-200/20 dark:shadow-none group">
+            <div class="w-12 h-12 rounded-2xl bg-stone-100 dark:bg-stone-800 flex items-center justify-center text-stone-600 dark:text-stone-400 group-hover:scale-105 transition-transform shrink-0">
+              <span class="material-symbols-outlined text-xl">stars</span>
             </div>
-            <div class="flex-1">
-              <p class="text-xs text-stone-500 font-medium">Puntos totales</p>
-              <p class="text-lg font-bold text-stone-900 dark:text-stone-100">{{ gamification.stats().totalPoints | number }}</p>
-              <div class="flex items-center gap-2 mt-1">
-                <div class="flex-1 bg-stone-100 dark:bg-stone-800 h-1 rounded-full overflow-hidden">
-                  <div class="h-full bg-stone-900 dark:bg-stone-200 rounded-full transition-all duration-1000"
-                    [style.width.%]="levelProgress()"></div>
-                </div>
-                <span class="text-[11px] text-stone-400">{{ levelProgress() | number:'1.0-0' }}%</span>
-              </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-[10px] uppercase tracking-widest font-black text-stone-500 dark:text-stone-400 truncate">Puntos totales</p>
+              <p class="text-2xl font-black text-stone-900 dark:text-stone-100 mt-0.5 tracking-tight leading-none truncate">{{ gamification.stats().totalPoints | number }}</p>
             </div>
           </div>
 
           <!-- Racha activa -->
-          <div class="bg-white dark:bg-stone-900 border border-stone-200/60 dark:border-stone-800 rounded-3xl p-4 flex items-center gap-4 hover:border-stone-300 dark:hover:border-stone-700 transition-colors">
-            <div class="w-10 h-10 rounded-full flex items-center justify-center transition-colors"
-              [class.bg-orange-100]="gamification.stats().currentStreak > 0"
-              [class.dark:bg-orange-900/30]="gamification.stats().currentStreak > 0"
-              [class.text-orange-500]="gamification.stats().currentStreak > 0"
+          <div class="bg-white/80 dark:bg-stone-900/80 backdrop-blur-xl border border-stone-200/60 dark:border-stone-800 rounded-[2rem] p-5 flex items-center gap-4 hover:border-stone-300 dark:hover:border-stone-700 transition-colors shadow-xl shadow-stone-200/20 dark:shadow-none group">
+            <div class="w-12 h-12 rounded-2xl flex items-center justify-center transition-colors group-hover:scale-105 shrink-0"
+              [class.bg-stone-900]="gamification.stats().currentStreak > 0"
+              [class.text-white]="gamification.stats().currentStreak > 0"
               [class.bg-stone-100]="gamification.stats().currentStreak === 0"
               [class.dark:bg-stone-800]="gamification.stats().currentStreak === 0"
               [class.text-stone-400]="gamification.stats().currentStreak === 0">
-              <span class="material-symbols-outlined text-lg">local_fire_department</span>
+              <span class="material-symbols-outlined text-xl">local_fire_department</span>
             </div>
-            <div>
-              <p class="text-xs font-medium"
-                [class.text-orange-600/80]="gamification.stats().currentStreak > 0"
-                [class.dark:text-orange-500]="gamification.stats().currentStreak > 0"
+            <div class="min-w-0">
+              <p class="text-[10px] uppercase tracking-widest font-black truncate"
+                [class.text-stone-900]="gamification.stats().currentStreak > 0"
+                [class.dark:text-stone-100]="gamification.stats().currentStreak > 0"
                 [class.text-stone-500]="gamification.stats().currentStreak === 0">
                 Racha activa
               </p>
-              <p class="text-lg font-bold"
-                [class.text-orange-600]="gamification.stats().currentStreak > 0"
-                [class.dark:text-orange-400]="gamification.stats().currentStreak > 0"
-                [class.text-stone-900]="gamification.stats().currentStreak === 0"
-                [class.dark:text-stone-100]="gamification.stats().currentStreak === 0">
+              <p class="text-2xl font-black mt-0.5 tracking-tight leading-none"
+                [class.text-stone-900]="gamification.stats().currentStreak > 0"
+                [class.dark:text-stone-100]="gamification.stats().currentStreak > 0"
+                [class.text-stone-400]="gamification.stats().currentStreak === 0">
                 {{ gamification.stats().currentStreak }}
-                <span class="text-sm font-medium opacity-60">días</span>
               </p>
             </div>
           </div>
 
           <!-- Galardones -->
-          <div class="bg-white dark:bg-stone-900 border border-stone-200/60 dark:border-stone-800 rounded-3xl p-4 flex items-center gap-4 hover:border-stone-300 dark:hover:border-stone-700 transition-colors">
-            <div class="w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center text-amber-600 dark:text-amber-400">
-              <span class="material-symbols-outlined text-lg">emoji_events</span>
+          <div class="bg-white/80 dark:bg-stone-900/80 backdrop-blur-xl border border-stone-200/60 dark:border-stone-800 rounded-[2rem] p-5 flex items-center gap-4 hover:border-stone-300 dark:hover:border-stone-700 transition-colors shadow-xl shadow-stone-200/20 dark:shadow-none group">
+            <div class="w-12 h-12 rounded-2xl bg-amber-50 dark:bg-amber-900/20 flex items-center justify-center text-amber-500 dark:text-amber-400 group-hover:scale-105 transition-transform shrink-0">
+              <span class="material-symbols-outlined text-xl">emoji_events</span>
             </div>
-            <div>
-              <p class="text-xs text-amber-600/80 dark:text-amber-500 font-medium">Galardones</p>
-              <p class="text-lg font-bold text-stone-900 dark:text-stone-100">
-                {{ unlockedAchievements() }}
-                <span class="text-sm font-medium text-stone-400">/ {{ gamification.allAchievements().length }}</span>
+            <div class="min-w-0">
+              <p class="text-[10px] uppercase tracking-widest font-black text-amber-600/80 dark:text-amber-500 truncate">Galardones</p>
+              <p class="text-2xl font-black text-stone-900 dark:text-stone-100 mt-0.5 tracking-tight leading-none truncate">
+                {{ unlockedAchievements() }}<span class="text-sm text-stone-400">/{{ gamification.allAchievements().length }}</span>
               </p>
             </div>
           </div>
@@ -311,53 +299,67 @@ import { UiPageHeaderComponent } from '../../shared/ui/ui-page-header/ui-page-he
               </div>
             </div>
 
-            <!-- Entries ranking con sub-boxes como Ferias -->
+            <!-- Entries ranking con sub-boxes -->
             <div class="relative z-10 flex flex-col gap-3 flex-1">
               @for (entry of gamification.allLeaderboard(); track entry.userId; let i = $index) {
-                <div class="flex items-center gap-3 rounded-2xl p-4 border transition-all"
-                  [class.bg-amber-500/10]="entry.rank === 1"
-                  [class.border-amber-500/20]="entry.rank === 1"
-                  [class.bg-stone-300/10]="entry.rank === 2"
-                  [class.border-stone-300/20]="entry.rank === 2"
-                  [class.bg-orange-600/10]="entry.rank === 3"
-                  [class.border-orange-600/20]="entry.rank === 3"
+                <div class="flex items-center gap-3 rounded-2xl p-4 transition-all"
+                  [class.bg-white]="entry.rank === 1"
+                  [class.text-stone-900]="entry.rank === 1"
+                  [class.shadow-xl]="entry.rank === 1"
+                  [class.bg-stone-800]="entry.rank === 2 || entry.rank === 3"
+                  [class.text-white]="entry.rank !== 1"
                   [class.bg-transparent]="entry.rank > 3"
-                  [class.border-transparent]="entry.rank > 3"
                   [class.opacity-50]="entry.rank > 3">
-                  <span class="w-5 text-center text-xs font-semibold"
-                    [class.text-amber-500]="entry.rank === 1"
-                    [class.text-stone-400]="entry.rank === 2"
-                    [class.text-orange-600]="entry.rank === 3"
-                    [class.text-stone-500]="entry.rank > 3">
-                    {{ entry.rank }}
+                  
+                  <span class="w-5 text-center text-xs font-black"
+                    [class.text-stone-400]="entry.rank === 1"
+                    [class.text-stone-500]="entry.rank !== 1">
+                    #{{ entry.rank }}
                   </span>
-                  <div class="w-9 h-9 rounded-full flex items-center justify-center text-[12px] font-bold shrink-0"
-                    [class.bg-amber-500]="entry.rank === 1"
-                    [class.text-stone-900]="entry.rank === 1"
-                    [class.bg-stone-300]="entry.rank === 2"
-                    [class.text-stone-900]="entry.rank === 2"
-                    [class.bg-orange-600]="entry.rank === 3"
-                    [class.text-white]="entry.rank === 3"
+                  
+                  <div class="w-10 h-10 rounded-xl flex items-center justify-center text-[12px] font-black shrink-0"
+                    [class.bg-stone-900]="entry.rank === 1"
+                    [class.text-white]="entry.rank === 1"
+                    [class.bg-stone-700]="entry.rank === 2 || entry.rank === 3"
+                    [class.text-stone-200]="entry.rank === 2 || entry.rank === 3"
                     [class.bg-white/10]="entry.rank > 3"
                     [class.text-white]="entry.rank > 3">
                     {{ entry.userName.charAt(0).toUpperCase() }}
                   </div>
+                  
                   <div class="flex-1 min-w-0">
                     <div class="flex items-center gap-1.5">
-                      <p class="text-[13px] font-semibold text-white truncate">{{ entry.userName }}</p>
+                      <p class="text-[14px] font-black truncate leading-tight"
+                         [class.text-stone-900]="entry.rank === 1"
+                         [class.text-white]="entry.rank !== 1">
+                         {{ entry.userName }}
+                      </p>
                       @if (entry.streak > 2) {
-                        <span class="material-symbols-outlined text-orange-400 text-sm">local_fire_department</span>
+                        <span class="material-symbols-outlined text-stone-900 text-sm">local_fire_department</span>
                       }
                     </div>
-                    <p class="text-[11px] text-stone-400">{{ entry.totalSales }} ventas</p>
+                    <p class="text-[11px] font-medium"
+                       [class.text-stone-500]="entry.rank === 1"
+                       [class.text-stone-400]="entry.rank !== 1">
+                       {{ entry.totalSales }} ventas
+                    </p>
                   </div>
+                  
                   <div class="text-right">
-                    <p class="text-[13px] font-bold text-white">{{ entry.points }}</p>
-                    <p class="text-[10px] text-stone-500">pts</p>
+                    <p class="text-lg font-black tracking-tight leading-none"
+                       [class.text-stone-900]="entry.rank === 1"
+                       [class.text-white]="entry.rank !== 1">
+                       {{ entry.points }}
+                    </p>
+                    <p class="text-[9px] uppercase tracking-widest font-bold mt-1"
+                       [class.text-stone-400]="entry.rank === 1"
+                       [class.text-stone-500]="entry.rank !== 1">
+                       pts
+                    </p>
                   </div>
                 </div>
               } @empty {
-                <p class="text-center text-sm text-stone-500 py-6">Aún no hay participantes.</p>
+                <p class="text-center text-sm text-stone-500 py-6 font-bold uppercase tracking-widest">Sin participantes</p>
               }
             </div>
 
@@ -400,36 +402,65 @@ import { UiPageHeaderComponent } from '../../shared/ui/ui-page-header/ui-page-he
             </h2>
 
             <div class="space-y-4">
-              <!-- Vendedor -->
+              <!-- Vendedor (Tap-Selector) -->
               <div>
-                <label class="block text-[11px] font-bold text-stone-500 dark:text-stone-400 uppercase tracking-widest mb-1.5">Vendedor a evaluar</label>
-                <select [(ngModel)]="newGoal.userId" class="w-full bg-stone-50 dark:bg-stone-800 border border-stone-200/60 dark:border-stone-700/50 rounded-xl px-4 py-3 text-sm font-semibold text-stone-800 dark:text-stone-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/50">
-                  <option value="" disabled selected>Seleccione un asesor...</option>
+                <label class="block text-[11px] font-bold text-stone-500 dark:text-stone-400 uppercase tracking-widest mb-2">Vendedor a evaluar</label>
+                <div class="flex flex-wrap gap-2">
                   @for (entry of gamification.allLeaderboard(); track entry.userId) {
-                    <option [value]="entry.userId">{{ entry.userName }}</option>
+                    <button (click)="newGoal.userId = entry.userId"
+                      class="px-4 py-2 rounded-xl text-xs font-bold transition-all border border-transparent"
+                      [class.bg-stone-900]="newGoal.userId === entry.userId"
+                      [class.text-white]="newGoal.userId === entry.userId"
+                      [class.dark:bg-white]="newGoal.userId === entry.userId"
+                      [class.dark:text-stone-900]="newGoal.userId === entry.userId"
+                      [class.bg-stone-100]="newGoal.userId !== entry.userId"
+                      [class.text-stone-600]="newGoal.userId !== entry.userId"
+                      [class.dark:bg-stone-800]="newGoal.userId !== entry.userId"
+                      [class.dark:text-stone-400]="newGoal.userId !== entry.userId"
+                      [class.hover:border-stone-300]="newGoal.userId !== entry.userId">
+                      {{ entry.userName }}
+                    </button>
                   }
-                </select>
+                </div>
               </div>
 
               <!-- Título -->
               <div>
                 <label class="block text-[11px] font-bold text-stone-500 dark:text-stone-400 uppercase tracking-widest mb-1.5">Descripción de la meta</label>
-                <input [(ngModel)]="newGoal.title" type="text" placeholder="Ej: Bono de Verano, Vender 50 jeans" class="w-full bg-stone-50 dark:bg-stone-800 border border-stone-200/60 dark:border-stone-700/50 rounded-xl px-4 py-3 text-sm font-semibold text-stone-800 dark:text-stone-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 placeholder:font-normal placeholder:opacity-50">
+                <input [(ngModel)]="newGoal.title" type="text" placeholder="Ej: Bono de Verano, Vender 50 jeans" class="w-full bg-stone-50 dark:bg-stone-800 border border-stone-200/60 dark:border-stone-700/50 rounded-xl px-4 py-3 text-sm font-semibold text-stone-800 dark:text-stone-200 focus:outline-none focus:ring-2 focus:ring-stone-500/50 placeholder:font-normal placeholder:opacity-50 transition-shadow">
               </div>
 
-              <div class="grid grid-cols-2 gap-4">
-                 <!-- Métrica -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                 <!-- Métrica (Tap-Selector) -->
                 <div>
-                  <label class="block text-[11px] font-bold text-stone-500 dark:text-stone-400 uppercase tracking-widest mb-1.5">Tipo (Métrica)</label>
-                  <select [(ngModel)]="newGoal.metric" class="w-full bg-stone-50 dark:bg-stone-800 border border-stone-200/60 dark:border-stone-700/50 rounded-xl px-4 py-3 text-sm font-semibold text-stone-800 dark:text-stone-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/50">
-                    <option value="sales_count">Cant. de Ventas</option>
-                    <option value="revenue">Dinero Ingresado</option>
-                  </select>
+                  <label class="block text-[11px] font-bold text-stone-500 dark:text-stone-400 uppercase tracking-widest mb-2">Métrica</label>
+                  <div class="flex bg-stone-100 dark:bg-stone-800 rounded-xl p-1">
+                    <button (click)="newGoal.metric = 'sales_count'"
+                      class="flex-1 py-2 text-xs font-bold rounded-lg transition-all"
+                      [class.bg-white]="newGoal.metric === 'sales_count'"
+                      [class.dark:bg-stone-700]="newGoal.metric === 'sales_count'"
+                      [class.shadow-sm]="newGoal.metric === 'sales_count'"
+                      [class.text-stone-900]="newGoal.metric === 'sales_count'"
+                      [class.dark:text-white]="newGoal.metric === 'sales_count'"
+                      [class.text-stone-500]="newGoal.metric !== 'sales_count'">
+                      Ventas
+                    </button>
+                    <button (click)="newGoal.metric = 'revenue'"
+                      class="flex-1 py-2 text-xs font-bold rounded-lg transition-all"
+                      [class.bg-white]="newGoal.metric === 'revenue'"
+                      [class.dark:bg-stone-700]="newGoal.metric === 'revenue'"
+                      [class.shadow-sm]="newGoal.metric === 'revenue'"
+                      [class.text-stone-900]="newGoal.metric === 'revenue'"
+                      [class.dark:text-white]="newGoal.metric === 'revenue'"
+                      [class.text-stone-500]="newGoal.metric !== 'revenue'">
+                      Dinero
+                    </button>
+                  </div>
                 </div>
                 <!-- Objetivo -->
                 <div>
                   <label class="block text-[11px] font-bold text-stone-500 dark:text-stone-400 uppercase tracking-widest mb-1.5">Objetivo (Num)</label>
-                  <input [(ngModel)]="newGoal.target" type="number" min="1" class="w-full bg-stone-50 dark:bg-stone-800 border border-stone-200/60 dark:border-stone-700/50 rounded-xl px-4 py-3 text-sm font-bold text-stone-800 dark:text-stone-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/50">
+                  <input [(ngModel)]="newGoal.target" type="number" min="1" class="w-full bg-stone-50 dark:bg-stone-800 border border-stone-200/60 dark:border-stone-700/50 rounded-xl px-4 py-3 text-sm font-bold text-stone-800 dark:text-stone-200 focus:outline-none focus:ring-2 focus:ring-stone-500/50 transition-shadow">
                 </div>
               </div>
             </div>

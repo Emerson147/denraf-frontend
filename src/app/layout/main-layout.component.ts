@@ -67,14 +67,14 @@ export class MainLayoutComponent {
     {
       title: 'Principal',
       items: [
-        { label: 'Dashboard', icon: 'dashboard', route: '/', exact: true, tooltip: 'Dashboard' },
+        { label: 'Dashboard',      icon: 'dashboard',      route: '/',         exact: true, tooltip: 'Dashboard', adminOnly: true },
       ]
     },
     {
       title: 'Operaciones',
       items: [
-        { label: 'Punto de Venta', icon: 'point_of_sale', route: '/pos', tooltip: 'Punto de Venta' },
-        { label: 'Historial', icon: 'receipt_long', route: '/sales', tooltip: 'Historial de Ventas' },
+        { label: 'Punto de Venta', icon: 'point_of_sale',  route: '/pos',      tooltip: 'Punto de Venta' },
+        { label: 'Historial',      icon: 'receipt_long',   route: '/sales',    tooltip: 'Historial de Ventas', adminOnly: true },
       ]
     },
     {
@@ -83,9 +83,9 @@ export class MainLayoutComponent {
         {
           label: 'Inventario', icon: 'checkroom', route: '/inventario', tooltip: 'Inventario',
           children: [
-            { label: 'Productos', icon: 'inventory_2', route: '/inventario/productos' },
-            { label: 'Análisis', icon: 'analytics', route: '/inventario/analisis' },
-            { label: 'Compras', icon: 'shopping_cart', route: '/inventario/compras', tooltip: 'Compras de Inventario' },
+            { label: 'Productos', icon: 'inventory_2',    route: '/inventario/productos' },
+            { label: 'Análisis',  icon: 'analytics',      route: '/inventario/analisis', adminOnly: true },
+            { label: 'Compras',   icon: 'shopping_cart',  route: '/inventario/compras',   tooltip: 'Compras de Inventario', adminOnly: true },
           ]
         },
         { label: 'Clientes', icon: 'person_search', route: '/clients', tooltip: 'Clientes' },
@@ -94,14 +94,15 @@ export class MainLayoutComponent {
     {
       title: 'Análisis',
       items: [
-        { label: 'Reportes', icon: 'bar_chart', route: '/reports', tooltip: 'Reportes' },
-        { label: 'Metas', icon: 'emoji_events', route: '/goals', tooltip: 'Metas y Logros' },
+        { label: 'Reportes', icon: 'bar_chart',    route: '/reports', tooltip: 'Reportes',       adminOnly: true },
+        { label: 'Metas',    icon: 'emoji_events', route: '/goals',   tooltip: 'Metas y Logros', adminOnly: true },
       ]
     },
     {
       title: 'Administración',
       items: [
-        { label: 'Usuarios', icon: 'manage_accounts', route: '/users', tooltip: 'Gestión de Usuarios', adminOnly: true },
+        { label: 'Usuarios', icon: 'manage_accounts', route: '/users',    tooltip: 'Gestión de Usuarios', adminOnly: true },
+        { label: 'Ajustes',  icon: 'settings',         route: '/settings', tooltip: 'Configuración',       adminOnly: true },
       ]
     }
   ];
@@ -130,7 +131,8 @@ export class MainLayoutComponent {
     return items;
   });
 
-  // ─── Computed ───────────────────────────────────────────────
+  isAdmin = computed(() => this.authService.currentUser()?.rol === 'ADMIN');
+
   /** Filter sections based on user role */
   visibleSections = computed(() => {
     const isAdmin = this.authService.currentUser()?.rol === 'ADMIN';

@@ -1,0 +1,427 @@
+<div class="h-full bg-stone-50 dark:bg-stone-950 p-4 sm:p-6 lg:p-8 transition-colors duration-300 overflow-y-auto">
+  <div class="w-full max-w-6xl mx-auto space-y-6">
+
+    <!-- ── HEADER ── -->
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-12 h-12 rounded-2xl bg-stone-900 dark:bg-stone-100 flex items-center justify-center shadow-lg">
+          <span class="material-symbols-outlined text-2xl text-white dark:text-stone-900">settings</span>
+        </div>
+        <div>
+          <h1 class="text-2xl sm:text-3xl font-black text-stone-900 dark:text-stone-100 tracking-tight">Ajustes del Sistema</h1>
+          <p class="text-sm text-stone-400 mt-0.5">Configuración persistente en Base de Datos</p>
+        </div>
+      </div>
+      <app-ui-button (onClick)="saveSettings()" [disabled]="isSaving()">
+        <span class="flex items-center gap-2 px-2">
+          @if (isSaving()) {
+            <span class="material-symbols-outlined text-sm animate-spin">refresh</span>
+            Guardando...
+          } @else {
+            <span class="material-symbols-outlined text-sm">cloud_upload</span>
+            Guardar Cambios
+          }
+        </span>
+      </app-ui-button>
+    </div>
+
+    <!-- ── BENTO GRID: Sidebar + Content ── -->
+    <div class="bg-white dark:bg-stone-900 rounded-[2.5rem] border border-stone-100 dark:border-stone-800 shadow-xl overflow-hidden flex flex-col md:flex-row min-h-[680px]">
+
+      <!-- SIDEBAR (TABS) -->
+      <div class="w-full md:w-64 shrink-0 bg-stone-50/60 dark:bg-stone-800/20 border-b md:border-b-0 md:border-r border-stone-100 dark:border-stone-800 p-5 flex flex-col gap-1">
+        <p class="text-[9px] font-black uppercase tracking-widest text-stone-400 mb-3 px-2">Categorías</p>
+
+        @for (tab of tabs; track tab.id) {
+          <button (click)="activeTab.set(tab.id)"
+            class="flex items-center gap-3 w-full px-4 py-3 rounded-2xl text-sm font-bold transition-all duration-200 text-left"
+            [class.bg-stone-900]="activeTab() === tab.id"
+            [class.text-white]="activeTab() === tab.id"
+            [class.dark:bg-stone-100]="activeTab() === tab.id"
+            [class.dark:text-stone-900]="activeTab() === tab.id"
+            [class.shadow-md]="activeTab() === tab.id"
+            [class.text-stone-500]="activeTab() !== tab.id"
+            [class.dark:text-stone-400]="activeTab() !== tab.id"
+            [class.hover:bg-stone-100]="activeTab() !== tab.id"
+            [class.dark:hover:bg-stone-800]="activeTab() !== tab.id">
+            <span class="material-symbols-outlined text-xl">{{ tab.icon }}</span>
+            <span class="flex-1">{{ tab.label }}</span>
+            @if (tab.badge) {
+              <span class="text-[9px] font-black px-2 py-0.5 rounded-full"
+                [class.bg-stone-700]="activeTab() === tab.id"
+                [class.text-stone-300]="activeTab() === tab.id"
+                [class.bg-stone-200]="activeTab() !== tab.id"
+                [class.text-stone-500]="activeTab() !== tab.id">
+                {{ tab.badge }}
+              </span>
+            }
+          </button>
+        }
+      </div>
+
+      <!-- CONTENT AREA -->
+      <div class="flex-1 p-6 sm:p-10 overflow-y-auto">
+
+        <!-- ╔═══════════════════════════╗ -->
+        <!-- ║  TAB: EMPRESA             ║ -->
+        <!-- ╚═══════════════════════════╝ -->
+        @if (activeTab() === 'business') {
+          <div class="animate-in fade-in slide-in-from-bottom-3 duration-400 space-y-8">
+            <div>
+              <h2 class="text-xl font-black text-stone-900 dark:text-stone-100 flex items-center gap-2 mb-1">
+                <span class="material-symbols-outlined text-stone-400">store</span> Perfil del Negocio
+              </h2>
+              <p class="text-xs text-stone-400">Esta información aparece en el encabezado del ticket impreso.</p>
+            </div>
+
+            <!-- Logo URL -->
+            <div class="p-5 rounded-2xl border border-dashed border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800/30 space-y-3">
+              <div class="flex items-center gap-3">
+                @if (form().logoUrl) {
+                  <img [src]="form().logoUrl" alt="Logo" class="w-14 h-14 rounded-xl object-cover border border-stone-200">
+                } @else {
+                  <div class="w-14 h-14 rounded-xl bg-stone-200 dark:bg-stone-700 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-2xl text-stone-400">image</span>
+                  </div>
+                }
+                <div class="flex-1">
+                  <p class="font-bold text-stone-900 dark:text-stone-100 text-sm">Logo del Negocio</p>
+                  <p class="text-xs text-stone-400 mt-0.5">Pega la URL pública del logo (Cloudinary, Drive, etc.)</p>
+                </div>
+              </div>
+              <app-ui-input [(ngModel)]="form().logoUrl" placeholder="https://res.cloudinary.com/..."></app-ui-input>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div class="space-y-1">
+                <app-ui-label>Nombre Comercial</app-ui-label>
+                <app-ui-input [(ngModel)]="form().businessName" placeholder="Ej: Importaciones DenRaf"></app-ui-input>
+              </div>
+              <div class="space-y-1">
+                <app-ui-label>RUC / NIT</app-ui-label>
+                <app-ui-input [(ngModel)]="form().ruc" placeholder="20123456789"></app-ui-input>
+              </div>
+              <div class="space-y-1">
+                <app-ui-label>Teléfono</app-ui-label>
+                <app-ui-input [(ngModel)]="form().phone" placeholder="+51 987 654 321"></app-ui-input>
+              </div>
+              <div class="space-y-1">
+                <app-ui-label>IGV / Impuesto (%)</app-ui-label>
+                <app-ui-input [(ngModel)]="form().taxPercent" type="number"></app-ui-input>
+              </div>
+            </div>
+
+            <div class="space-y-1">
+              <app-ui-label>Dirección Fiscal</app-ui-label>
+              <app-ui-input [(ngModel)]="form().address" placeholder="Av. Siempre Viva 123, Lima"></app-ui-input>
+            </div>
+
+            <!-- Moneda -->
+            <div class="space-y-2">
+              <app-ui-label>Moneda Principal</app-ui-label>
+              <div class="flex gap-2 bg-stone-100 dark:bg-stone-800 rounded-2xl p-1.5">
+                <button (click)="setCurrency('PEN')" class="flex-1 py-2.5 text-xs font-bold rounded-xl transition-all"
+                  [class.bg-white]="form().currency === 'PEN'" [class.shadow-md]="form().currency === 'PEN'"
+                  [class.text-stone-900]="form().currency === 'PEN'" [class.dark:bg-stone-700]="form().currency === 'PEN'"
+                  [class.dark:text-white]="form().currency === 'PEN'" [class.text-stone-400]="form().currency !== 'PEN'">
+                  🇵🇪 Soles (PEN)
+                </button>
+                <button (click)="setCurrency('USD')" class="flex-1 py-2.5 text-xs font-bold rounded-xl transition-all"
+                  [class.bg-white]="form().currency === 'USD'" [class.shadow-md]="form().currency === 'USD'"
+                  [class.text-stone-900]="form().currency === 'USD'" [class.dark:bg-stone-700]="form().currency === 'USD'"
+                  [class.dark:text-white]="form().currency === 'USD'" [class.text-stone-400]="form().currency !== 'USD'">
+                  🇺🇸 Dólares (USD)
+                </button>
+              </div>
+            </div>
+
+            <!-- Pie de ticket -->
+            <div class="space-y-1">
+              <app-ui-label>Mensaje Pie de Ticket</app-ui-label>
+              <app-ui-input [(ngModel)]="form().ticketFooterMessage" placeholder="¡Gracias por su preferencia! No se aceptan devoluciones..."></app-ui-input>
+              <p class="text-xs text-stone-400 mt-1">Aparece al final del comprobante impreso.</p>
+            </div>
+          </div>
+        }
+
+        <!-- ╔═══════════════════════════╗ -->
+        <!-- ║  TAB: POS & IMPRESIÓN     ║ -->
+        <!-- ╚═══════════════════════════╝ -->
+        @if (activeTab() === 'pos') {
+          <div class="animate-in fade-in slide-in-from-bottom-3 duration-400 space-y-8">
+            <div>
+              <h2 class="text-xl font-black text-stone-900 dark:text-stone-100 flex items-center gap-2 mb-1">
+                <span class="material-symbols-outlined text-stone-400">point_of_sale</span> POS & Impresión
+              </h2>
+              <p class="text-xs text-stone-400">Preferencias de hardware y reglas de venta.</p>
+            </div>
+
+            <div class="space-y-1">
+              <app-ui-label>Impresora Predeterminada</app-ui-label>
+              <app-ui-input [(ngModel)]="form().ticketPrinter" placeholder="Ej: EPSON TM-T20III"></app-ui-input>
+            </div>
+
+            <!-- Toggles -->
+            <div class="space-y-3">
+              @for (t of posToggles; track t.field) {
+                <div class="flex items-center justify-between p-5 rounded-2xl bg-stone-50 dark:bg-stone-800/50 border border-stone-100 dark:border-stone-800">
+                  <div>
+                    <p class="font-bold text-stone-900 dark:text-stone-100 text-sm">{{ t.label }}</p>
+                    <p class="text-xs text-stone-400 mt-0.5">{{ t.description }}</p>
+                  </div>
+                  <button (click)="toggleField($any(t.field))"
+                    class="w-12 h-6 rounded-full relative transition-colors duration-300 shrink-0"
+                    [class.bg-emerald-500]="getFormBool($any(t.field))"
+                    [class.bg-stone-300]="!getFormBool($any(t.field))"
+                    [class.dark:bg-stone-600]="!getFormBool($any(t.field))">
+                    <div class="absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 shadow-sm"
+                         [class.translate-x-6]="getFormBool($any(t.field))"></div>
+                  </button>
+                </div>
+              }
+            </div>
+
+            <!-- Umbral de stock bajo -->
+            <div class="grid grid-cols-2 gap-4">
+              <div class="space-y-1">
+                <app-ui-label>Umbral Stock Bajo (unidades)</app-ui-label>
+                <app-ui-input [(ngModel)]="form().lowStockThreshold" type="number"></app-ui-input>
+              </div>
+            </div>
+          </div>
+        }
+
+        <!-- ╔═══════════════════════════╗ -->
+        <!-- ║  TAB: PAGOS QR            ║ -->
+        <!-- ╚═══════════════════════════╝ -->
+        @if (activeTab() === 'payments') {
+          <div class="animate-in fade-in slide-in-from-bottom-3 duration-400 space-y-8">
+            <div>
+              <h2 class="text-xl font-black text-stone-900 dark:text-stone-100 flex items-center gap-2 mb-1">
+                <span class="material-symbols-outlined text-stone-400">qr_code_scanner</span> Pasarelas de Pago QR
+              </h2>
+              <p class="text-xs text-stone-400">Configura los QR de Yape y Plin. Se mostrarán en el POS al seleccionar ese método de pago.</p>
+            </div>
+
+            <!-- YAPE -->
+            <div class="p-6 rounded-2xl border border-stone-100 dark:border-stone-800 space-y-4">
+              <div class="flex items-center gap-3 mb-2">
+                <div class="w-10 h-10 rounded-xl bg-[#6b2d8b] flex items-center justify-center text-white font-black text-sm">Y</div>
+                <div>
+                  <p class="font-bold text-stone-900 dark:text-stone-100">Yape</p>
+                  <p class="text-xs text-stone-400">Pagos QR para Banco BCP</p>
+                </div>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="space-y-1">
+                  <app-ui-label>Teléfono Yape</app-ui-label>
+                  <app-ui-input [(ngModel)]="form().yapePhone" placeholder="+51 987 654 321"></app-ui-input>
+                </div>
+                <div class="space-y-1">
+                  <app-ui-label>URL de imagen QR</app-ui-label>
+                  <app-ui-input [(ngModel)]="form().yapeQrUrl" placeholder="https://..."></app-ui-input>
+                </div>
+              </div>
+              @if (form().yapeQrUrl) {
+                <div class="flex justify-center mt-2">
+                  <img [src]="form().yapeQrUrl" alt="QR Yape" class="w-32 h-32 rounded-2xl border-2 border-[#6b2d8b]/30 object-contain bg-white p-1">
+                </div>
+              }
+            </div>
+
+            <!-- PLIN -->
+            <div class="p-6 rounded-2xl border border-stone-100 dark:border-stone-800 space-y-4">
+              <div class="flex items-center gap-3 mb-2">
+                <div class="w-10 h-10 rounded-xl bg-[#00a859] flex items-center justify-center text-white font-black text-sm">P</div>
+                <div>
+                  <p class="font-bold text-stone-900 dark:text-stone-100">Plin</p>
+                  <p class="text-xs text-stone-400">Pagos QR para Scotiabank / BBVA / Interbank</p>
+                </div>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="space-y-1">
+                  <app-ui-label>Teléfono Plin</app-ui-label>
+                  <app-ui-input [(ngModel)]="form().plinPhone" placeholder="+51 987 654 321"></app-ui-input>
+                </div>
+                <div class="space-y-1">
+                  <app-ui-label>URL de imagen QR</app-ui-label>
+                  <app-ui-input [(ngModel)]="form().plinQrUrl" placeholder="https://..."></app-ui-input>
+                </div>
+              </div>
+              @if (form().plinQrUrl) {
+                <div class="flex justify-center mt-2">
+                  <img [src]="form().plinQrUrl" alt="QR Plin" class="w-32 h-32 rounded-2xl border-2 border-[#00a859]/30 object-contain bg-white p-1">
+                </div>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- ╔═══════════════════════════╗ -->
+        <!-- ║  TAB: MULTI-MONEDA        ║ -->
+        <!-- ╚═══════════════════════════╝ -->
+        @if (activeTab() === 'currency') {
+          <div class="animate-in fade-in slide-in-from-bottom-3 duration-400 space-y-8">
+            <div>
+              <h2 class="text-xl font-black text-stone-900 dark:text-stone-100 flex items-center gap-2 mb-1">
+                <span class="material-symbols-outlined text-stone-400">currency_exchange</span> Tipo de Cambio
+              </h2>
+              <p class="text-xs text-stone-400">Actualiza el tipo de cambio diariamente para conversiones automáticas en el POS.</p>
+            </div>
+
+            <!-- Vista previa -->
+            <div class="grid grid-cols-2 gap-4">
+              <div class="p-5 rounded-2xl bg-stone-900 dark:bg-stone-100 text-center space-y-1">
+                <p class="text-[10px] font-black uppercase tracking-widest text-stone-400 dark:text-stone-500">Dólar (USD)</p>
+                <p class="text-3xl font-black text-white dark:text-stone-900">S/ {{ form().exchangeRateUSD | number:'1.2-2' }}</p>
+                <p class="text-xs text-stone-400 dark:text-stone-500">1 USD = X soles</p>
+              </div>
+              <div class="p-5 rounded-2xl bg-stone-100 dark:bg-stone-800 text-center space-y-1">
+                <p class="text-[10px] font-black uppercase tracking-widest text-stone-400">Euro (EUR)</p>
+                <p class="text-3xl font-black text-stone-900 dark:text-stone-100">S/ {{ form().exchangeRateEUR | number:'1.2-2' }}</p>
+                <p class="text-xs text-stone-400">1 EUR = X soles</p>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div class="space-y-1">
+                <app-ui-label>Tipo de Cambio USD → PEN</app-ui-label>
+                <app-ui-input [(ngModel)]="form().exchangeRateUSD" type="number"></app-ui-input>
+              </div>
+              <div class="space-y-1">
+                <app-ui-label>Tipo de Cambio EUR → PEN</app-ui-label>
+                <app-ui-input [(ngModel)]="form().exchangeRateEUR" type="number"></app-ui-input>
+              </div>
+            </div>
+
+            <div class="p-4 rounded-2xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/50">
+              <p class="text-xs font-bold text-amber-700 dark:text-amber-400 flex items-center gap-2">
+                <span class="material-symbols-outlined text-base">info</span>
+                Recuerda actualizar estos valores cada día para una conversión precisa en el POS.
+              </p>
+            </div>
+          </div>
+        }
+
+        <!-- ╔═══════════════════════════╗ -->
+        <!-- ║  TAB: MÓDULOS             ║ -->
+        <!-- ╚═══════════════════════════╝ -->
+        @if (activeTab() === 'modules') {
+          <div class="animate-in fade-in slide-in-from-bottom-3 duration-400 space-y-8">
+            <div>
+              <h2 class="text-xl font-black text-stone-900 dark:text-stone-100 flex items-center gap-2 mb-1">
+                <span class="material-symbols-outlined text-stone-400">toggle_on</span> Módulos del Sistema
+              </h2>
+              <p class="text-xs text-stone-400">Activa o desactiva campos de producto según el tipo de negocio. Los cambios afectan el formulario de creación de productos.</p>
+            </div>
+
+            <div class="space-y-3">
+              @for (mod of moduleToggles; track mod.field) {
+                <div class="flex items-center justify-between p-5 rounded-2xl border transition-all"
+                  [class.border-stone-900]="getFormBool($any(mod.field))"
+                  [class.bg-stone-50]="getFormBool($any(mod.field))"
+                  [class.dark:bg-stone-800/50]="getFormBool($any(mod.field))"
+                  [class.dark:border-stone-600]="getFormBool($any(mod.field))"
+                  [class.border-stone-100]="!getFormBool($any(mod.field))"
+                  [class.dark:border-stone-800]="!getFormBool($any(mod.field))">
+                  <div class="flex items-center gap-4">
+                    <span class="material-symbols-outlined text-2xl text-stone-500">{{ mod.icon }}</span>
+                    <div>
+                      <p class="font-bold text-stone-900 dark:text-stone-100 text-sm">{{ mod.label }}</p>
+                      <p class="text-xs text-stone-400 mt-0.5">{{ mod.description }}</p>
+                    </div>
+                  </div>
+                  <button (click)="toggleField($any(mod.field))"
+                    class="w-12 h-6 rounded-full relative transition-colors duration-300 shrink-0"
+                    [class.bg-stone-900]="getFormBool($any(mod.field))"
+                    [class.dark:bg-stone-100]="getFormBool($any(mod.field))"
+                    [class.bg-stone-200]="!getFormBool($any(mod.field))"
+                    [class.dark:bg-stone-700]="!getFormBool($any(mod.field))">
+                    <div class="absolute top-1 left-1 w-4 h-4 rounded-full transition-transform duration-300 shadow-sm"
+                         [class.bg-white]="getFormBool($any(mod.field))"
+                         [class.dark:bg-stone-900]="getFormBool($any(mod.field))"
+                         [class.bg-stone-400]="!getFormBool($any(mod.field))"
+                         [class.translate-x-6]="getFormBool($any(mod.field))"></div>
+                  </button>
+                </div>
+              }
+            </div>
+
+            <div class="p-4 rounded-2xl bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800/50">
+              <p class="text-xs font-bold text-blue-700 dark:text-blue-400 flex items-start gap-2">
+                <span class="material-symbols-outlined text-base shrink-0">lightbulb</span>
+                Estos flags controlan qué campos aparecen al crear productos. Por ejemplo, si es una Farmacia activa "Vencimiento" pero desactiva "Tallas".
+              </p>
+            </div>
+          </div>
+        }
+
+        <!-- ╔═══════════════════════════╗ -->
+        <!-- ║  TAB: APARIENCIA          ║ -->
+        <!-- ╚═══════════════════════════╝ -->
+        @if (activeTab() === 'appearance') {
+          <div class="animate-in fade-in slide-in-from-bottom-3 duration-400 space-y-8">
+            <div>
+              <h2 class="text-xl font-black text-stone-900 dark:text-stone-100 flex items-center gap-2 mb-1">
+                <span class="material-symbols-outlined text-stone-400">palette</span> Estética del Sistema
+              </h2>
+              <p class="text-xs text-stone-400">Preferencia de tema visual. Se guarda localmente en este dispositivo.</p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+              <!-- Modo Luz -->
+              <div (click)="themeService.darkMode.set(false)"
+                class="cursor-pointer border-2 rounded-[2rem] p-8 flex flex-col items-center gap-4 transition-all duration-300"
+                [class.border-stone-900]="!themeService.darkMode()"
+                [class.bg-white]="!themeService.darkMode()"
+                [class.shadow-2xl]="!themeService.darkMode()"
+                [class.scale-105]="!themeService.darkMode()"
+                [class.border-stone-200]="themeService.darkMode()"
+                [class.bg-stone-50]="themeService.darkMode()">
+                <div class="w-16 h-16 rounded-2xl bg-amber-50 flex items-center justify-center">
+                  <span class="material-symbols-outlined text-3xl text-amber-500">light_mode</span>
+                </div>
+                <div class="text-center">
+                  <p class="font-black text-stone-900">Modo Luz</p>
+                  <p class="text-xs text-stone-400 mt-0.5">Interfaz clara y minimalista</p>
+                </div>
+                @if (!themeService.darkMode()) {
+                  <div class="w-5 h-5 rounded-full bg-stone-900 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-white text-xs">check</span>
+                  </div>
+                }
+              </div>
+
+              <!-- Modo Oscuro -->
+              <div (click)="themeService.darkMode.set(true)"
+                class="cursor-pointer border-2 rounded-[2rem] p-8 flex flex-col items-center gap-4 transition-all duration-300"
+                [class.border-stone-600]="themeService.darkMode()"
+                [class.bg-stone-800]="themeService.darkMode()"
+                [class.shadow-2xl]="themeService.darkMode()"
+                [class.scale-105]="themeService.darkMode()"
+                [class.border-stone-800]="!themeService.darkMode()"
+                [class.bg-stone-900]="!themeService.darkMode()">
+                <div class="w-16 h-16 rounded-2xl bg-indigo-900/50 flex items-center justify-center">
+                  <span class="material-symbols-outlined text-3xl text-indigo-400">dark_mode</span>
+                </div>
+                <div class="text-center">
+                  <p class="font-black text-white">Modo Oscuro</p>
+                  <p class="text-xs text-stone-400 mt-0.5">Zen Enterprise Dark Theme</p>
+                </div>
+                @if (themeService.darkMode()) {
+                  <div class="w-5 h-5 rounded-full bg-stone-100 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-stone-900 text-xs">check</span>
+                  </div>
+                }
+              </div>
+            </div>
+
+            <p class="text-xs text-stone-400 text-center font-medium mt-4">El tema se adapta automáticamente a la preferencia del sistema operativo, pero puedes forzar uno aquí.</p>
+          </div>
+        }
+
+      </div><!-- /CONTENT -->
+    </div><!-- /BENTO GRID -->
+
+  </div>
+</div>

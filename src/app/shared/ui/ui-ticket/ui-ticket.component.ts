@@ -10,6 +10,8 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import QRCode from 'qrcode';
+import { SettingsService } from '../../../core/services/settings.service';
+import { inject } from '@angular/core';
 
 export interface CartItem {
   product: {
@@ -82,10 +84,10 @@ export interface CartItem {
               D
             </div>
             <h2 class="text-xl font-bold text-stone-900 dark:text-white uppercase tracking-widest">
-              DENFAR
+              {{ settingsService.config()?.businessName || 'DENFAR' }}
             </h2>
-            <p class="text-xs text-stone-500 mt-1">RUC: 20123456789</p>
-            <p class="text-xs text-stone-500">Jr. La Moda 123, Huancayo</p>
+            <p class="text-xs text-stone-500 mt-1">RUC: {{ settingsService.config()?.ruc || '20123456789' }}</p>
+            <p class="text-xs text-stone-500">{{ settingsService.config()?.address || 'Jr. La Moda 123, Huancayo' }}</p>
             <div
               class="mt-5 inline-flex items-center gap-2 px-3 py-1.5 bg-stone-50 dark:bg-stone-900 rounded-lg"
             >
@@ -166,7 +168,7 @@ export interface CartItem {
               <div
                 class="flex justify-between text-xs text-stone-500 dark:text-stone-400 font-medium"
               >
-                <span>IGV (18%)</span>
+                <span>IGV ({{ settingsService.config()?.taxPercent || 18 }}%)</span>
                 <span>S/ {{ tax | number: '1.2-2' }}</span>
               </div>
               <div
@@ -378,14 +380,20 @@ export class UiTicketComponent implements OnInit, OnChanges {
   @Output() ticketPrinted = new EventEmitter<void>();
   @Output() ticketSent = new EventEmitter<void>();
 
+  settingsService = inject(SettingsService);
+
   date = new Date();
   showSuccess = false;
   successMessage = '';
   qrCode = '';
 
   // Calculados
+  get taxRate(): number {
+    return (this.settingsService.config()?.taxPercent || 18) / 100;
+  }
+
   get subtotal(): number {
-    return this.total / 1.18;
+    return this.total / (1 + this.taxRate);
   }
 
   get tax(): number {
@@ -441,9 +449,13 @@ export class UiTicketComponent implements OnInit, OnChanges {
       return;
     }
 
+    const businessName = this.settingsService.config()?.businessName || 'DENFAR';
+    const address = this.settingsService.config()?.address || 'Jr. La Moda 123, Huancayo';
+    const taxPercent = this.settingsService.config()?.taxPercent || 18;
+
     // Construir mensaje formateado
     let message = `¡Hola *${this.clientName}*! 🧥✨\n\n`;
-    message += `Gracias por tu compra en *DENFAR*\n\n`;
+    message += `Gracias por tu compra en *${businessName}*\n\n`;
     message += `📋 *Ticket #${this.ticketNumber.toString().padStart(6, '0')}*\n`;
     message += `📅 ${this.date.toLocaleDateString('es-PE', {
       day: '2-digit',
@@ -464,7 +476,7 @@ export class UiTicketComponent implements OnInit, OnChanges {
 
     message += `━━━━━━━━━━━━━━━\n\n`;
     message += `Subtotal: S/ ${this.subtotal.toFixed(2)}\n`;
-    message += `IGV (18%): S/ ${this.tax.toFixed(2)}\n`;
+    message += `IGV (${taxPercent}%): S/ ${this.tax.toFixed(2)}\n`;
     message += `💰 *TOTAL: S/ ${this.total.toFixed(2)}*\n\n`;
 
     if (this.paymentMethod && this.amountPaid > 0) {
@@ -476,7 +488,7 @@ export class UiTicketComponent implements OnInit, OnChanges {
     }
 
     message += `¡Esperamos verte pronto! 🙏\n`;
-    message += `_Jr. La Moda 123, Huancayo_`;
+    message += `_${address}_`;
 
     // Limpiar el número de teléfono (solo dígitos)
     const cleanPhone = this.clientPhone.replace(/\D/g, '');
@@ -506,9 +518,10 @@ export class UiTicketComponent implements OnInit, OnChanges {
     try {
       // QR simple y corto para fácil escaneo
       const ticketId = this.ticketNumber.toString().padStart(6, '0');
+      const businessName = this.settingsService.config()?.businessName || 'DENFAR';
 
       // Contenido mínimo = QR más simple y escaneable
-      const qrContent = `DENFAR #${ticketId}\nTotal: S/${this.total.toFixed(2)}\n${this.items.length} items`;
+      const qrContent = `${businessName} #${ticketId}\nTotal: S/${this.total.toFixed(2)}\n${this.items.length} items`;
 
       this.qrCode = await QRCode.toDataURL(qrContent, {
         width: 150,

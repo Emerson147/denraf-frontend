@@ -32,6 +32,7 @@ export class UsersPageComponent implements OnInit {
   // Modal state
   isModalOpen = signal(false);
   editingUser = signal<UserDTO | null>(null);
+  confirmDeleteId = signal<string | null>(null);
   
   // Form state
   formData = signal({
@@ -46,6 +47,15 @@ export class UsersPageComponent implements OnInit {
   
   // Computed
   isEditing = computed(() => this.editingUser() !== null);
+  adminUsers = computed(() => this.users().filter(u => u.rol === 'ADMIN').length);
+  sellerUsers = computed(() => this.users().filter(u => u.rol === 'VENDEDOR').length);
+
+  // Lista de permisos del Admin (para mostrar en el modal)
+  adminPerms = [
+    'Dashboard General', 'Punto de Venta', 'Ver Productos', 'Gestionar Clientes',
+    'Historial Ventas', 'Reportes & Métricas', 'Metas & Logros', 'Análisis Stock',
+    'Compras & Movimientos', 'Gestión Usuarios', 'Ajustes del Sistema', 'Acceso Total',
+  ];
   
   ngOnInit() {
     this.loadUsers();
@@ -167,22 +177,32 @@ export class UsersPageComponent implements OnInit {
     }
   }
   
-  deleteUser(userId: string) {
+  confirmDelete(userId: string) {
     if (userId === this.authService.currentUser()?.id) {
        this.toast.error("No puedes inhabilitar tu propia cuenta actual.");
        return;
     }
+    this.confirmDeleteId.set(userId);
+  }
 
-    if (confirm('¿Estás seguro de inhabilitar permanentemente a este usuario?')) {
-      this.authService.deleteUser(userId).subscribe({
-         next: () => {
-            this.toast.info("Usuario inhabilitado correctamente.");
-            this.loadUsers();
-         },
-         error: (err) => {
-            this.toast.error("Hubo un error al inhabilitar al usuario.");
-         }
-      })
-    }
+  cancelDelete() {
+    this.confirmDeleteId.set(null);
+  }
+
+  executeDelete() {
+    const userId = this.confirmDeleteId();
+    if (!userId) return;
+
+    this.authService.deleteUser(userId).subscribe({
+       next: () => {
+          this.toast.info("Usuario inhabilitado correctamente.");
+          this.loadUsers();
+          this.confirmDeleteId.set(null);
+       },
+       error: (err) => {
+          this.toast.error("Hubo un error al inhabilitar al usuario.");
+          this.confirmDeleteId.set(null);
+       }
+    });
   }
 }

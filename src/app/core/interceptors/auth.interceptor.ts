@@ -3,15 +3,15 @@ import { inject } from "@angular/core";
 import { Router } from "@angular/router";
 import { catchError, throwError } from "rxjs";
 
+import { environment } from "../../../environments/environment";
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
   const router = inject(Router);
   const token = localStorage.getItem('denraf_token');
 
-  //Solo agrega token en llamadas al backend de spring boot
-  const isBackendUrl = req.url.startsWith('http://localhost:8080') ||
-        req.url.includes('161.35.96.206');
+  // Solo agrega token en llamadas al backend usando la URL configurada
+  const isBackendUrl = req.url.startsWith(environment.apiUrl);
         
   const isAuthUrl = req.url.includes('/api/auth/');
 

@@ -8,7 +8,7 @@
           <span class="material-symbols-outlined text-2xl text-white dark:text-stone-900">settings</span>
         </div>
         <div>
-          <h1 class="text-2xl sm:text-3xl font-black text-stone-900 dark:text-stone-100 tracking-tight">Ajustes del Sistema</h1>
+          <h1 class="text-2xl sm:text-3xl font-display font-semibold tracking-tight text-stone-900 dark:text-stone-100">Ajustes del Sistema</h1>
           <p class="text-sm text-stone-400 mt-0.5">Configuración persistente en Base de Datos</p>
         </div>
       </div>
@@ -273,12 +273,12 @@
             <div class="grid grid-cols-2 gap-4">
               <div class="p-5 rounded-2xl bg-stone-900 dark:bg-stone-100 text-center space-y-1">
                 <p class="text-[10px] font-black uppercase tracking-widest text-stone-400 dark:text-stone-500">Dólar (USD)</p>
-                <p class="text-3xl font-black text-white dark:text-stone-900">S/ {{ form().exchangeRateUSD | number:'1.2-2' }}</p>
+                <p class="text-3xl font-display font-semibold tracking-tight text-white dark:text-stone-900">S/ {{ form().exchangeRateUSD | number:'1.2-2' }}</p>
                 <p class="text-xs text-stone-400 dark:text-stone-500">1 USD = X soles</p>
               </div>
               <div class="p-5 rounded-2xl bg-stone-100 dark:bg-stone-800 text-center space-y-1">
                 <p class="text-[10px] font-black uppercase tracking-widest text-stone-400">Euro (EUR)</p>
-                <p class="text-3xl font-black text-stone-900 dark:text-stone-100">S/ {{ form().exchangeRateEUR | number:'1.2-2' }}</p>
+                <p class="text-3xl font-display font-semibold tracking-tight text-stone-900 dark:text-stone-100">S/ {{ form().exchangeRateEUR | number:'1.2-2' }}</p>
                 <p class="text-xs text-stone-400">1 EUR = X soles</p>
               </div>
             </div>

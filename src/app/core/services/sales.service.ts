@@ -85,6 +85,15 @@ export class SalesService {
         const res: any = await firstValueFrom(this.http.get(url));
         const isArray = Array.isArray(res);
         this.fullFilteredSales = isArray ? res : (res.content || []);
+        
+        // 🔄 Forzar ordenamiento local descendente (Más recientes primero)
+        // Por si el backend ignora el sortDir=desc
+        this.fullFilteredSales?.sort((a: any, b: any) => {
+          const dateA = new Date(a.createdAt || 0).getTime();
+          const dateB = new Date(b.createdAt || 0).getTime();
+          return dateB - dateA;
+        });
+
       } catch (err) {
         console.error('❌ [Sales] Error fetching sales from backend:', err);
         this.fullFilteredSales = [];
@@ -105,14 +114,18 @@ export class SalesService {
 
     // Mapear los items al formato "Sale" que usaba Frontend
     const mappedSales: Sale[] = pagedContent.map((raw: any) => {
+        const totalFinal = raw.total ?? 0;
+        const baseImponible = totalFinal / 1.18;
+        const igv = totalFinal - baseImponible;
+
       return {
         id: raw.id,
         saleNumber: raw.saleNumber,
         date: raw.createdAt || new Date().toISOString(),
-        total: raw.total ?? 0,
-        subtotal: raw.subtotal ?? 0,
+        total: totalFinal,
+        subtotal: baseImponible,
         discount: raw.discount ?? 0,
-        tax: raw.tax ?? 0,
+        tax: igv,
         paymentMethod: raw.paymentMethod || 'Efectivo',
         items: (raw.items || []).map((i: any) => ({
           productId: i.productId,
@@ -227,6 +240,9 @@ export class SalesService {
       // Resincronizar de fondo para asegurar precisión exacta con el backend
       this.productService.forceSync().catch(err => console.error('Error auto-sync tras venta:', err));
       
+      // 🔄 Refrescar historial de ventas para UI en tiempo real
+      this.forceSync().catch(err => console.error('Error auto-sync ventas:', err));
+
       // 🌟 Reflejar los puntos en metas y goals en tiempo real
       this.gamificationService.loadData();
 

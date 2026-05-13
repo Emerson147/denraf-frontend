@@ -23,7 +23,7 @@ import { CommonModule } from '@angular/common';
         <div class="text-3xl sm:text-4xl shrink-0">{{ icon() }}</div>
         }
         <div>
-          <h1 class="text-2xl sm:text-3xl font-serif font-bold text-stone-800 dark:text-stone-100">
+          <h1 class="text-2xl sm:text-3xl font-display font-semibold tracking-tight text-stone-800 dark:text-stone-100">
             {{ title() }}
           </h1>
           @if (subtitle()) {

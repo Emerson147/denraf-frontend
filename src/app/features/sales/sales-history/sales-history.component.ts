@@ -73,11 +73,18 @@ export class SalesHistoryComponent {
         let filters: any = {};
         const now = new Date();
 
+        // Evitar toISOString() puro porque convierte a UTC y causa desfase de 5 horas (Perú)
+        // Ocultando las ventas hechas en la madrugada (antes de las 5 AM).
+        const toLocalISOString = (date: Date) => {
+          const pad = (n: number) => n < 10 ? '0' + n : n;
+          return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+        };
+
         if (period === 'today') {
           const start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
           const end = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
-          filters.desde = start.toISOString();
-          filters.hasta = end.toISOString();
+          filters.desde = toLocalISOString(start);
+          filters.hasta = toLocalISOString(end);
         } else if (period === 'week') {
           const start = new Date(now);
           start.setDate(now.getDate() - now.getDay() + (now.getDay() === 0 ? -6 : 1)); // Lunes como inicio
@@ -85,13 +92,13 @@ export class SalesHistoryComponent {
           const end = new Date(start);
           end.setDate(start.getDate() + 6);
           end.setHours(23, 59, 59, 999);
-          filters.desde = start.toISOString();
-          filters.hasta = end.toISOString();
+          filters.desde = toLocalISOString(start);
+          filters.hasta = toLocalISOString(end);
         } else if (period === 'month') {
           const start = new Date(now.getFullYear(), now.getMonth(), 1);
           const end = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
-          filters.desde = start.toISOString();
-          filters.hasta = end.toISOString();
+          filters.desde = toLocalISOString(start);
+          filters.hasta = toLocalISOString(end);
         }
 
         // Para UX fluída pasaremos 0 page siempre que cambiemos filtro

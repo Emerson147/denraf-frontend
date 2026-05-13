@@ -6,6 +6,11 @@ module.exports = {
   darkMode: 'class',
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['Geist', 'sans-serif'],
+        display: ['Clash Display', 'sans-serif'],
+        mono: ['Geist Mono', 'monospace'],
+      },
       animation: {
         slideDown: 'slideDown 0.2s ease-out',
         slideUp: 'slideUp 0.2s ease-out',

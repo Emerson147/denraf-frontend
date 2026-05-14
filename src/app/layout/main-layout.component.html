@@ -25,7 +25,7 @@
       <div class="mb-6 h-10 flex items-center w-full relative" [ngClass]="sidebarCollapsed() ? 'justify-center px-0' : 'justify-between px-4'">
         <div class="flex items-center gap-3 overflow-hidden ml-1 transition-all duration-300">
           <div
-            class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 font-serif italic text-lg shadow-lg"
+            class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 font-display font-semibold text-lg shadow-lg tracking-tighter"
           >
             D
           </div>
@@ -304,7 +304,7 @@
       >
         <div class="flex items-center gap-2.5">
           <div
-            class="flex h-8 w-8 items-center justify-center rounded-lg bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 font-serif italic text-sm shadow-md"
+            class="flex h-8 w-8 items-center justify-center rounded-lg bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 font-display font-semibold text-sm shadow-md tracking-tighter"
           >
             D
           </div>
@@ -318,7 +318,7 @@
       </header>
 
       <!-- Scrollable Content Area — bottom padding for tab bar on mobile -->
-      <div class="flex-1 overflow-y-auto pb-[4.5rem] md:pb-0">
+      <div class="flex-1 overflow-y-auto pb-[4.5rem] md:pb-0" style="view-transition-name: page-content">
         <router-outlet></router-outlet>
       </div>
     </main>

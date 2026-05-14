@@ -1,7 +1,7 @@
 <div class="min-h-screen bg-stone-50 dark:bg-stone-950 p-4 sm:p-6 lg:p-8 transition-colors duration-300 ease-out">
   <div class="w-full space-y-6">
     <!-- Header -->
-    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 animate-in fade-in slide-in-from-bottom-3 duration-500 fill-mode-both" style="animation-delay: 0ms">
       <app-ui-page-header title="Dashboard" subtitle="DenRaf • Inteligencia de Negocios" materialIcon="dashboard" />
       <div class="flex items-center gap-3 w-full sm:w-auto">
         <app-period-selector class="flex-1 sm:flex-initial" (periodChange)="onPeriodChange($event)" />
@@ -20,7 +20,7 @@
     } @else {
     
     <!-- MÓDULO 1: CORE BENTO BOX GRID -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style="animation-delay: 80ms">
       
       <!-- Big Box: Chart (Col 1-8) -->
       <div class="lg:col-span-8 bg-white dark:bg-stone-900 rounded-3xl border border-stone-200/60 dark:border-stone-800 shadow-sm p-6 lg:p-8 relative overflow-hidden group">
@@ -41,7 +41,7 @@
                   'text-stone-600 dark:text-stone-400': (dashboardData()?.crecimientoSemanal || 0) === 0
                 }">
                 <span class="material-symbols-outlined text-sm">{{ (dashboardData()?.crecimientoSemanal || 0) >= 0 ? 'trending_up' : 'trending_down' }}</span>
-                <span class="font-bold text-sm">{{ (dashboardData()?.crecimientoSemanal || 0) > 0 ? '+' : ''}}{{ (dashboardData()?.crecimientoSemanal || 0) | number : '1.1-1' }}%</span>
+                <span class="font-bold text-sm tabular-nums">{{ (dashboardData()?.crecimientoSemanal || 0) > 0 ? '+' : ''}}{{ (dashboardData()?.crecimientoSemanal || 0) | number : '1.1-1' }}%</span>
               </div>
             </div>
           </div>
@@ -75,7 +75,7 @@
               <span class="material-symbols-outlined text-sm">attach_money</span>
               <span class="text-xs uppercase tracking-widest font-semibold">Total Ingresos</span>
             </div>
-            <p class="text-4xl lg:text-5xl font-bold text-white tracking-tight">S/ {{ (dashboardData()?.ingresosSemana || 0) | number : '1.0-0' }}</p>
+            <p class="text-4xl lg:text-5xl font-bold text-white tracking-tight tabular-nums">S/ {{ (dashboardData()?.ingresosSemana || 0) | number : '1.0-0' }}</p>
           </div>
           <div class="relative z-10 mt-6 pt-6 border-t border-white/10 flex items-center justify-between">
             <p class="text-sm text-stone-400">Ventas totales: <span class="text-white font-medium">{{ dashboardData()?.ventasHoy || 0 }} (Hoy)</span></p>
@@ -91,12 +91,12 @@
                 <span class="text-xs uppercase tracking-widest font-semibold">Ganancia Neta</span>
               </div>
             </div>
-            <p class="text-3xl lg:text-4xl font-bold text-emerald-600 dark:text-emerald-500 tracking-tight">S/ {{ (dashboardData()?.gananciaNeta || 0) | number : '1.0-0' }}</p>
+            <p class="text-3xl lg:text-4xl font-bold text-emerald-600 dark:text-emerald-500 tracking-tight tabular-nums">S/ {{ (dashboardData()?.gananciaNeta || 0) | number : '1.0-0' }}</p>
           </div>
           <div class="mt-4 pt-4 border-t border-stone-100 dark:border-stone-800">
             <div class="flex items-center justify-between text-sm">
               <span class="text-stone-500">Inversión actual</span>
-              <span class="font-bold text-stone-800 dark:text-stone-200">S/ {{ (dashboardData()?.inversionTotal || 0) | number : '1.0-0' }}</span>
+              <span class="font-bold text-stone-800 dark:text-stone-200 tabular-nums">S/ {{ (dashboardData()?.inversionTotal || 0) | number : '1.0-0' }}</span>
             </div>
           </div>
         </div>
@@ -104,39 +104,39 @@
     </div>
 
     <!-- MÓDULO 2: MICRO-METRICAS (PILLS) -->
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-      <div class="bg-white dark:bg-stone-900 border border-stone-200/60 dark:border-stone-800 rounded-2xl p-4 flex items-center gap-4 hover:border-stone-300 dark:hover:border-stone-700 transition-colors">
-        <div class="w-10 h-10 rounded-full bg-stone-100 dark:bg-stone-800 flex items-center justify-center text-stone-600 dark:text-stone-400">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style="animation-delay: 160ms">
+      <div class="bg-white dark:bg-stone-900 border border-stone-200/60 dark:border-stone-800 rounded-2xl p-4 flex items-center gap-4 hover:border-stone-300 dark:hover:border-stone-700 transition-colors group">
+        <div class="w-10 h-10 rounded-xl bg-stone-100 dark:bg-stone-800 flex items-center justify-center text-stone-600 dark:text-stone-400 group-hover:scale-105 transition-transform shrink-0">
           <span class="material-symbols-outlined text-lg">pie_chart</span>
         </div>
         <div>
           <p class="text-xs text-stone-500 font-medium">Margen Global</p>
-          <p class="text-lg font-bold text-stone-900 dark:text-stone-100">{{ (dashboardData()?.margenRentabilidad || 0) | number: '1.1-1' }}%</p>
+          <p class="text-lg font-bold text-stone-900 dark:text-stone-100 tabular-nums">{{ (dashboardData()?.margenRentabilidad || 0) | number: '1.1-1' }}%</p>
         </div>
       </div>
 
-      <div class="bg-white dark:bg-stone-900 border border-stone-200/60 dark:border-stone-800 rounded-2xl p-4 flex items-center gap-4 hover:border-stone-300 dark:hover:border-stone-700 transition-colors">
-        <div class="w-10 h-10 rounded-full bg-stone-100 dark:bg-stone-800 flex items-center justify-center text-stone-600 dark:text-stone-400">
+      <div class="bg-white dark:bg-stone-900 border border-stone-200/60 dark:border-stone-800 rounded-2xl p-4 flex items-center gap-4 hover:border-stone-300 dark:hover:border-stone-700 transition-colors group">
+        <div class="w-10 h-10 rounded-xl bg-stone-100 dark:bg-stone-800 flex items-center justify-center text-stone-600 dark:text-stone-400 group-hover:scale-105 transition-transform shrink-0">
           <span class="material-symbols-outlined text-lg">rocket_launch</span>
         </div>
         <div>
           <p class="text-xs text-stone-500 font-medium">ROI Estimado</p>
-          <p class="text-lg font-bold text-stone-900 dark:text-stone-100">{{ (dashboardData()?.roi || 0) | number: '1.0-0' }}%</p>
+          <p class="text-lg font-bold text-stone-900 dark:text-stone-100 tabular-nums">{{ (dashboardData()?.roi || 0) | number: '1.0-0' }}%</p>
         </div>
       </div>
 
-      <div class="bg-white dark:bg-stone-900 border border-stone-200/60 dark:border-stone-800 rounded-2xl p-4 flex items-center gap-4 hover:border-stone-300 dark:hover:border-stone-700 transition-colors">
-        <div class="w-10 h-10 rounded-full bg-stone-100 dark:bg-stone-800 flex items-center justify-center text-stone-600 dark:text-stone-400">
+      <div class="bg-white dark:bg-stone-900 border border-stone-200/60 dark:border-stone-800 rounded-2xl p-4 flex items-center gap-4 hover:border-stone-300 dark:hover:border-stone-700 transition-colors group">
+        <div class="w-10 h-10 rounded-xl bg-stone-100 dark:bg-stone-800 flex items-center justify-center text-stone-600 dark:text-stone-400 group-hover:scale-105 transition-transform shrink-0">
           <span class="material-symbols-outlined text-lg">receipt</span>
         </div>
         <div>
           <p class="text-xs text-stone-500 font-medium">Ticket Promedio</p>
-          <p class="text-lg font-bold text-stone-900 dark:text-stone-100">S/ {{ (dashboardData()?.ticketPromedio || 0) | number: '1.2-2' }}</p>
+          <p class="text-lg font-bold text-stone-900 dark:text-stone-100 tabular-nums">S/ {{ (dashboardData()?.ticketPromedio || 0) | number: '1.2-2' }}</p>
         </div>
       </div>
 
-      <div class="bg-white dark:bg-stone-900 border border-stone-200/60 dark:border-stone-800 rounded-2xl p-4 flex items-center gap-4 hover:border-stone-300 dark:hover:border-stone-700 transition-colors">
-        <div class="w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center text-amber-600 dark:text-amber-400">
+      <div class="bg-white dark:bg-stone-900 border border-stone-200/60 dark:border-stone-800 rounded-2xl p-4 flex items-center gap-4 hover:border-stone-300 dark:hover:border-stone-700 transition-colors group">
+        <div class="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center text-amber-600 dark:text-amber-400 group-hover:scale-105 transition-transform shrink-0">
           <span class="material-symbols-outlined text-lg">star</span>
         </div>
         <div>
@@ -147,7 +147,7 @@
     </div>
 
     <!-- MÓDULO 3: BOTTOM SPLIT (ACTIVIDAD Y ACCIONES) -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style="animation-delay: 240ms">
       
       <!-- Actividad Reciente (Col 1-7) -->
       <div class="lg:col-span-7 bg-white dark:bg-stone-900 rounded-3xl border border-stone-200/60 dark:border-stone-800 shadow-sm overflow-hidden flex flex-col h-[500px]">
@@ -170,22 +170,29 @@
               </div>
               <div class="flex justify-between items-center">
                 <div class="flex items-center gap-2 text-xs text-stone-500">
-                  <span>{{ sale.paymentMethod }}</span>
+                  <span>{{ sale.paymentMethod === 'efectivo' ? 'Efectivo' : sale.paymentMethod === 'tarjeta' ? 'Tarjeta' : sale.paymentMethod === 'yape' ? 'Yape' : sale.paymentMethod | titlecase }}</span>
                   <span>•</span>
-                  <span>Ticket #{{ sale.saleNumber.substring(0,8) }}</span>
+                  <span class="font-mono">Ticket #{{ sale.saleNumber.substring(0,8) }}</span>
                 </div>
                 <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full" [ngClass]="{
                   'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400': sale.status === 'completed',
                   'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400': sale.status === 'pending',
                   'bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-400': sale.status === 'cancelled'
-                }">{{ sale.status }}</span>
+                }">{{
+                  sale.status === 'completed' ? 'Completada' :
+                  sale.status === 'pending'   ? 'Pendiente'  :
+                  sale.status === 'cancelled' ? 'Anulada'    : sale.status
+                }}</span>
               </div>
             </div>
           </div>
           } @empty {
             <div class="h-full flex flex-col items-center justify-center text-stone-400 p-8">
-              <span class="material-symbols-outlined text-5xl mb-4 opacity-20">receipt_long</span>
-              <p>No hay actividad registrada en este período</p>
+              <div class="w-16 h-16 rounded-2xl border-2 border-dashed border-stone-200 dark:border-stone-700/80 flex items-center justify-center mb-4">
+                <span class="material-symbols-outlined text-2xl text-stone-300 dark:text-stone-600">receipt_long</span>
+              </div>
+              <h3 class="text-sm font-semibold text-stone-500 dark:text-stone-400 mb-1">Sin transacciones</h3>
+              <p class="text-xs text-stone-400 dark:text-stone-500 text-center">No hay actividad registrada en este período</p>
             </div>
           }
         </div>
@@ -213,12 +220,17 @@
                     <p class="text-xs text-stone-500">{{ product.unidadesVendidas }} u. vendidas</p>
                   </div>
                   <div class="text-right">
-                    <p class="text-sm font-bold text-teal-600 dark:text-teal-400">S/ {{ product.ingresos | number : '1.0-0' }}</p>
+                    <p class="text-sm font-bold text-emerald-600 dark:text-emerald-400 tabular-nums">S/ {{ product.ingresos | number : '1.0-0' }}</p>
                     <p class="text-xs text-stone-400">{{ product.margen | number:'1.0-0' }}% M.G.</p>
                   </div>
                 </div>
               } @empty {
-                <p class="text-center text-sm text-stone-400 mt-10">Sin datos de rentabilidad.</p>
+                <div class="text-center mt-8 flex flex-col items-center">
+                  <div class="w-12 h-12 rounded-2xl border-2 border-dashed border-stone-200 dark:border-stone-700/80 flex items-center justify-center mb-3">
+                    <span class="material-symbols-outlined text-lg text-stone-300 dark:text-stone-600">leaderboard</span>
+                  </div>
+                  <p class="text-sm font-semibold text-stone-400 dark:text-stone-500">Sin datos de rentabilidad</p>
+                </div>
               }
             </div>
           }
@@ -236,9 +248,12 @@
                   <span class="px-3 py-1 bg-rose-100 dark:bg-rose-900/60 text-rose-700 dark:text-rose-400 text-xs font-bold rounded-full">{{ item.stock }} uni.</span>
                 </div>
               } @empty {
-                <div class="text-center mt-10">
-                  <span class="material-symbols-outlined text-4xl text-emerald-400 mb-2">check_circle</span>
-                  <p class="text-sm text-stone-500">Inventario saludable. Ningún stock bajo.</p>
+                <div class="text-center mt-10 flex flex-col items-center">
+                  <div class="w-14 h-14 rounded-2xl border-2 border-dashed border-emerald-200 dark:border-emerald-800/50 flex items-center justify-center mb-3">
+                    <span class="material-symbols-outlined text-xl text-emerald-400 dark:text-emerald-500">check_circle</span>
+                  </div>
+                  <p class="text-sm font-semibold text-stone-500 dark:text-stone-400 mb-0.5">Inventario saludable</p>
+                  <p class="text-xs text-stone-400 dark:text-stone-500">Ningún producto con stock bajo</p>
                 </div>
               }
             </div>

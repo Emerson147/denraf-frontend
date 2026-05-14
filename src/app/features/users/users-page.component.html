@@ -41,7 +41,7 @@
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
       <!-- Total Cuentas -->
       <div
-        class="bg-white dark:bg-stone-900 rounded-[2rem] p-5 border border-stone-200 dark:border-stone-800 shadow-xs transition-colors flex items-center gap-4 group hover:border-stone-300 dark:hover:border-stone-700"
+        class="bg-white dark:bg-stone-900 rounded-3xl p-5 border border-stone-200 dark:border-stone-800 shadow-xs transition-colors flex items-center gap-4 group hover:border-stone-300 dark:hover:border-stone-700"
       >
         <div
           class="w-12 h-12 rounded-2xl bg-stone-100 dark:bg-stone-800 flex items-center justify-center group-hover:scale-105 transition-transform shrink-0"
@@ -72,7 +72,7 @@
 
       <!-- Administradores -->
       <div
-        class="bg-white dark:bg-stone-900 rounded-[2rem] p-5 border border-stone-200 dark:border-stone-800 shadow-xs transition-colors flex items-center gap-4 group hover:border-stone-300 dark:hover:border-stone-700"
+        class="bg-white dark:bg-stone-900 rounded-3xl p-5 border border-stone-200 dark:border-stone-800 shadow-xs transition-colors flex items-center gap-4 group hover:border-stone-300 dark:hover:border-stone-700"
       >
         <div
           class="w-12 h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center group-hover:scale-105 transition-transform shrink-0"
@@ -103,7 +103,7 @@
 
       <!-- Asesores -->
       <div
-        class="bg-white dark:bg-stone-900 rounded-[2rem] p-5 border border-stone-200 dark:border-stone-800 shadow-xs transition-colors flex items-center gap-4 group hover:border-stone-300 dark:hover:border-stone-700"
+        class="bg-white dark:bg-stone-900 rounded-3xl p-5 border border-stone-200 dark:border-stone-800 shadow-xs transition-colors flex items-center gap-4 group hover:border-stone-300 dark:hover:border-stone-700"
       >
         <div
           class="w-12 h-12 rounded-2xl bg-stone-900 dark:bg-stone-100 flex items-center justify-center group-hover:scale-105 transition-transform shrink-0"
@@ -179,9 +179,9 @@
                     class="absolute top-0 right-0 w-40 h-40 bg-gradient-to-bl from-stone-100/50 dark:from-stone-800/30 rounded-full blur-3xl opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-500"
                   ></div>
 
-                  <!-- Action buttons (hover) -->
+                  <!-- Action buttons (visible on mobile, hover on desktop) -->
                   <div
-                    class="absolute top-4 right-4 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-20"
+                    class="absolute top-4 right-4 flex items-center gap-1 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-200 z-20"
                   >
                     <button
                       (click)="openEditModal(user)"

@@ -436,7 +436,7 @@
               <label class="text-sm text-stone-500">Mostrar:</label>
               <select
                 (change)="onPageSizeChange($event)"
-                class="text-sm p-1.5 bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-lg outline-none focus:ring-2 focus:ring-blue-500/30 text-stone-700 dark:text-stone-300 font-medium"
+                class="text-sm p-1.5 bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-lg outline-none focus:ring-2 focus:ring-stone-400/40 dark:focus:ring-stone-500/40 text-stone-700 dark:text-stone-300 font-medium cursor-pointer"
               >
                 <option value="10" [selected]="salesService.pageSize() === 10">10</option>
                 <option value="20" [selected]="salesService.pageSize() === 20">20</option>

@@ -40,7 +40,7 @@ import { UiPageHeaderComponent } from '../../shared/ui/ui-page-header/ui-page-he
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
 
           <!-- Nivel actual -->
-          <div class="bg-white/80 dark:bg-stone-900/80 backdrop-blur-xl border border-stone-200/60 dark:border-stone-800 rounded-[2rem] p-5 flex items-center gap-4 hover:border-stone-300 dark:hover:border-stone-700 transition-colors shadow-xl shadow-stone-200/20 dark:shadow-none group">
+          <div class="bg-white/80 dark:bg-stone-900/80 backdrop-blur-xl border border-stone-200/60 dark:border-stone-800 rounded-3xl p-5 flex items-center gap-4 hover:border-stone-300 dark:hover:border-stone-700 transition-colors shadow-sm group">
             <div class="w-12 h-12 rounded-2xl bg-stone-100 dark:bg-stone-800 flex items-center justify-center text-stone-600 dark:text-stone-400 group-hover:scale-105 transition-transform shrink-0">
               <span class="material-symbols-outlined text-xl">military_tech</span>
             </div>
@@ -55,7 +55,7 @@ import { UiPageHeaderComponent } from '../../shared/ui/ui-page-header/ui-page-he
           </div>
 
           <!-- Puntos totales -->
-          <div class="bg-white/80 dark:bg-stone-900/80 backdrop-blur-xl border border-stone-200/60 dark:border-stone-800 rounded-[2rem] p-5 flex items-center gap-4 hover:border-stone-300 dark:hover:border-stone-700 transition-colors shadow-xl shadow-stone-200/20 dark:shadow-none group">
+          <div class="bg-white/80 dark:bg-stone-900/80 backdrop-blur-xl border border-stone-200/60 dark:border-stone-800 rounded-3xl p-5 flex items-center gap-4 hover:border-stone-300 dark:hover:border-stone-700 transition-colors shadow-sm group">
             <div class="w-12 h-12 rounded-2xl bg-stone-100 dark:bg-stone-800 flex items-center justify-center text-stone-600 dark:text-stone-400 group-hover:scale-105 transition-transform shrink-0">
               <span class="material-symbols-outlined text-xl">stars</span>
             </div>
@@ -66,7 +66,7 @@ import { UiPageHeaderComponent } from '../../shared/ui/ui-page-header/ui-page-he
           </div>
 
           <!-- Racha activa -->
-          <div class="bg-white/80 dark:bg-stone-900/80 backdrop-blur-xl border border-stone-200/60 dark:border-stone-800 rounded-[2rem] p-5 flex items-center gap-4 hover:border-stone-300 dark:hover:border-stone-700 transition-colors shadow-xl shadow-stone-200/20 dark:shadow-none group">
+          <div class="bg-white/80 dark:bg-stone-900/80 backdrop-blur-xl border border-stone-200/60 dark:border-stone-800 rounded-3xl p-5 flex items-center gap-4 hover:border-stone-300 dark:hover:border-stone-700 transition-colors shadow-sm group">
             <div class="w-12 h-12 rounded-2xl flex items-center justify-center transition-colors group-hover:scale-105 shrink-0"
               [class.bg-stone-900]="gamification.stats().currentStreak > 0"
               [class.text-white]="gamification.stats().currentStreak > 0"
@@ -92,7 +92,7 @@ import { UiPageHeaderComponent } from '../../shared/ui/ui-page-header/ui-page-he
           </div>
 
           <!-- Galardones -->
-          <div class="bg-white/80 dark:bg-stone-900/80 backdrop-blur-xl border border-stone-200/60 dark:border-stone-800 rounded-[2rem] p-5 flex items-center gap-4 hover:border-stone-300 dark:hover:border-stone-700 transition-colors shadow-xl shadow-stone-200/20 dark:shadow-none group">
+          <div class="bg-white/80 dark:bg-stone-900/80 backdrop-blur-xl border border-stone-200/60 dark:border-stone-800 rounded-3xl p-5 flex items-center gap-4 hover:border-stone-300 dark:hover:border-stone-700 transition-colors shadow-sm group">
             <div class="w-12 h-12 rounded-2xl bg-amber-50 dark:bg-amber-900/20 flex items-center justify-center text-amber-500 dark:text-amber-400 group-hover:scale-105 transition-transform shrink-0">
               <span class="material-symbols-outlined text-xl">emoji_events</span>
             </div>

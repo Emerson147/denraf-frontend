@@ -218,27 +218,15 @@ export class SalesService {
         this.http.post<VentaResponse>(this.apiUrl, request)
       );
 
-      // Descontar inventario optimista en Frontend
-      const failedItems: string[] = [];
-      request.items.forEach((item) => {
-        const success = this.productService.reduceStock(
-          item.productId,
-          item.quantity,
-          item.varianteId
-        );
-        if (!success) {
-          failedItems.push(item.productId);
-        }
-      });
+      // 🔄 Refrescar inventario directamente desde el backend para tener la verdad absoluta
+      // Esto evita hacer un PUT manual del producto que corrompía las variantes
+      this.productService.forceSync().catch(err => console.error('Error auto-sync tras venta:', err));
       
       this.checkAndNotify({
         ...rawResponse,
         date: rawResponse.createdAt,
         saleType: 'tienda'
       } as any);
-
-      // Resincronizar de fondo para asegurar precisión exacta con el backend
-      this.productService.forceSync().catch(err => console.error('Error auto-sync tras venta:', err));
       
       // 🔄 Refrescar historial de ventas para UI en tiempo real
       this.forceSync().catch(err => console.error('Error auto-sync ventas:', err));

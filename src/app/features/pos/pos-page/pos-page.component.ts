@@ -511,34 +511,38 @@ export class PosPageComponent {
     this.showTicket.set(true);
   }
 
-  onTicketClosed() {
-    // Crear y registrar la venta en el sistema
-    this.completeSale();
+  async onTicketClosed() {
+    // 1. Intentar registrar la venta de manera síncrona
+    try {
+      await this.completeSale();
 
-    // Limpiar estado
-    this.showTicket.set(false);
-    this.cart.set([]);
-    this.clientName = 'Cliente';
-    this.clientPhone = '';
-    this.paymentMethod = '';
-    this.amountPaid = 0;
-    this.discount = 0;
-    this.showClientForm.set(false);
-    this.selectedClient.set(null);
-    this.clientSearchQuery.set('');
-    this.currentTicketNumber++;
+      // 2. Solo si tiene éxito, limpiar el estado y el carrito
+      this.showTicket.set(false);
+      this.cart.set([]);
+      this.clientName = 'Cliente';
+      this.clientPhone = '';
+      this.paymentMethod = '';
+      this.amountPaid = 0;
+      this.discount = 0;
+      this.showClientForm.set(false);
+      this.selectedClient.set(null);
+      this.clientSearchQuery.set('');
+      this.currentTicketNumber++;
 
-    // 🎯 Auto-detectar tipo de venta para la próxima
-    this.autoDetectSaleType();
-    
-    // ⚡ TIEMPO REAL: Sobrescribir LTV del cliente instantáneamente en la interfaz 
-    // sin depender de la latencia de red, para que en la página de Clientes ya se vea la suma al segundo.
-    if (this.selectedClient()?.id) {
-      this.clientService.updateClientLtvLocally(this.selectedClient()!.id, this.total());
+      this.autoDetectSaleType();
+      
+      if (this.selectedClient()?.id) {
+        this.clientService.updateClientLtvLocally(this.selectedClient()!.id, this.total());
+      }
+      this.clientService.forceSync();
+      
+      this.toastService.success('Venta registrada correctamente');
+    } catch (error) {
+      // 3. Si falla, el carrito se mantiene intacto para que el usuario pueda ver el error y corregirlo
+      this.toastService.error('Error registrando la venta. Revisa la consola o intenta de nuevo.');
+      // Mantenemos el ticket abierto o lo cerramos pero NO borramos el carrito
+      this.showTicket.set(false);
     }
-
-    // 🔄 Hacer que el módulo de clientes recargue en background también por seguridad
-    this.clientService.forceSync();
   }
 
   onTicketCancelled() {
@@ -583,6 +587,7 @@ export class PosPageComponent {
       this.logger.log('✅ Venta HTTP registrada en Backend:', ventaResponse);
     } catch (error) {
       this.logger.log('❌ Error registrando venta HTTP:', error);
+      throw error; // Lanzar el error para que onTicketClosed no limpie el carrito
     }
   }
 

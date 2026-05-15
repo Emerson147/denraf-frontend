@@ -1,5 +1,5 @@
-import { Component, Input, Output, EventEmitter, signal, DestroyRef, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, Input, Output, EventEmitter, signal, DestroyRef, inject, ElementRef, OnInit, OnDestroy } from '@angular/core';
+import { CommonModule, DOCUMENT } from '@angular/common';
 
 @Component({
   selector: 'app-ui-animated-dialog',
@@ -52,8 +52,10 @@ import { CommonModule } from '@angular/common';
     `,
   ],
 })
-export class UiAnimatedDialogComponent {
+export class UiAnimatedDialogComponent implements OnInit, OnDestroy {
   private destroyRef = inject(DestroyRef);
+  private document = inject(DOCUMENT);
+  private el = inject(ElementRef);
   private activeTimeouts: number[] = [];
 
   @Input() trigger: HTMLElement | null = null;
@@ -95,6 +97,18 @@ export class UiAnimatedDialogComponent {
   // Signals internas para orquestar la animación
   showModal = signal(false); // Controla el @if (existencia en DOM)
   animateIn = signal(false); // Controla las clases CSS (estado visual)
+
+  ngOnInit() {
+    // Mover el componente al final del body para escapar de cualquier stacking context (ej. view-transitions o sidebars)
+    this.document.body.appendChild(this.el.nativeElement);
+  }
+
+  ngOnDestroy() {
+    // Limpiar el DOM al destruir el componente
+    if (this.el.nativeElement && this.el.nativeElement.parentNode) {
+      this.el.nativeElement.parentNode.removeChild(this.el.nativeElement);
+    }
+  }
 
   close() {
     this.isOpenChange.emit(false);

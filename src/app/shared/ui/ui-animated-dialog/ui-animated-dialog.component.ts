@@ -7,7 +7,7 @@ import { CommonModule, DOCUMENT } from '@angular/common';
   imports: [CommonModule],
   template: `
     @if (showModal()) {
-      <div class="fixed inset-0 z-50 flex items-center justify-center px-4">
+      <div class="fixed inset-0 z-[100] flex items-center justify-center px-4">
         <div
           class="fixed inset-0 bg-stone-900/40 dark:bg-black/60 backdrop-blur-md transition-all duration-400 ease-out"
           [class.opacity-0]="!animateIn()"
@@ -80,6 +80,7 @@ export class UiAnimatedDialogComponent implements OnInit, OnDestroy {
       // AL ABRIR:
       // 1. Lo creamos en el DOM (showModal = true)
       this.showModal.set(true);
+      this.document.body.classList.add('dialog-open');
       // 2. Un tick después, iniciamos la animación de entrada (animateIn = true)
       const openTimeoutId = setTimeout(() => this.animateIn.set(true), 10) as unknown as number;
       this.activeTimeouts.push(openTimeoutId);
@@ -87,6 +88,7 @@ export class UiAnimatedDialogComponent implements OnInit, OnDestroy {
       // AL CERRAR:
       // 1. Iniciamos animación de salida (animateIn = false)
       this.animateIn.set(false);
+      this.document.body.classList.remove('dialog-open');
       // 2. Esperamos a que termine la animación (400ms) y lo sacamos del DOM
       const closeTimeoutId = setTimeout(() => this.showModal.set(false), 400) as unknown as number;
       this.activeTimeouts.push(closeTimeoutId);
@@ -104,6 +106,7 @@ export class UiAnimatedDialogComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.document.body.classList.remove('dialog-open');
     // Limpiar el DOM al destruir el componente
     if (this.el.nativeElement && this.el.nativeElement.parentNode) {
       this.el.nativeElement.parentNode.removeChild(this.el.nativeElement);

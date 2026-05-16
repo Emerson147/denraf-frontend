@@ -35,8 +35,17 @@ export interface ReporteVentas {
 
   promedioMovilJueves: number;
   promedioMovilDomingo: number;
+  tendenciaJueves: string;
+  tendenciaDomingo: string;
   proximaFeria: string;
   prediccionProximaFeria: number;
+  tendenciaProximaFeria: string;
+  confianzaProximaFeria: string;
+
+  ventasAnuladas: number;
+  totalDescuentos: number;
+  ventasPorMetodoPago: Record<string, number>;
+  ventasPorHora: { diaSemana: string; hora: number; cantidadVentas: number; ingresos: number }[];
 
   desde: string;
   hasta: string;

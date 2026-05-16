@@ -5,7 +5,6 @@
       <app-ui-page-header title="Dashboard" subtitle="DenRaf • Inteligencia de Negocios" materialIcon="dashboard" />
       <div class="flex items-center gap-3 w-full sm:w-auto">
         <app-period-selector class="flex-1 sm:flex-initial" (periodChange)="onPeriodChange($event)" />
-        <app-ui-export-menu [data]="exportData()" type="sales" />
       </div>
     </div>
 
@@ -19,7 +18,7 @@
     </div>
     } @else {
     
-    <div [class.opacity-60]="isLoading()" [class.pointer-events-none]="isLoading()" class="transition-opacity duration-300 ease-in-out">
+    <div [class.opacity-60]="isLoading()" [class.pointer-events-none]="isLoading()" class="w-full space-y-6 transition-opacity duration-300 ease-in-out">
     <!-- MÓDULO 1: CORE BENTO BOX GRID -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style="animation-delay: 80ms">
       
@@ -270,8 +269,20 @@
               </div>
 
               <div class="bg-stone-50 dark:bg-stone-800/50 rounded-2xl p-5 mb-4 border border-stone-100 dark:border-stone-700">
-                <p class="text-xs font-bold uppercase text-stone-400 mb-1">Expectativa de Ingresos</p>
-                <p class="text-4xl font-bold text-stone-900 dark:text-stone-100 tabular-nums">S/ {{ (dashboardData()?.proyeccion?.ingresosEstimados || 0) | number : '1.0-0' }}</p>
+                <div class="flex justify-between items-start">
+                  <div>
+                    <p class="text-xs font-bold uppercase text-stone-400 mb-1">Expectativa de Ingresos</p>
+                    <p class="text-4xl font-bold text-stone-900 dark:text-stone-100 tabular-nums">S/ {{ (dashboardData()?.proyeccion?.ingresosEstimados || 0) | number : '1.0-0' }}</p>
+                  </div>
+                  <div class="px-2 py-1 rounded-lg text-xs font-bold border"
+                    [ngClass]="{
+                      'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800/50': (dashboardData()?.proyeccion?.tendencia || '').includes('+'),
+                      'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-900/30 dark:text-rose-400 dark:border-rose-800/50': (dashboardData()?.proyeccion?.tendencia || '').includes('-'),
+                      'bg-stone-100 text-stone-600 border-stone-200 dark:bg-stone-800 dark:text-stone-400 dark:border-stone-700': (dashboardData()?.proyeccion?.tendencia || '') === 'Estable'
+                    }">
+                    {{ dashboardData()?.proyeccion?.tendencia || 'Estable' }}
+                  </div>
+                </div>
                 
                 <div class="flex items-center gap-2 mt-4">
                   <div class="flex-1 h-2 bg-stone-200 dark:bg-stone-700 rounded-full overflow-hidden">

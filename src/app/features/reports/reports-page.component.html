@@ -42,7 +42,7 @@
         <app-ui-skeleton variant="card" class="h-24" />
       </div>
     } @else {
-      <div [class.opacity-60]="loading()" [class.pointer-events-none]="loading()" class="transition-opacity duration-300 ease-in-out">
+      <div [class.opacity-60]="loading()" [class.pointer-events-none]="loading()" class="w-full space-y-6 transition-opacity duration-300 ease-in-out">
       <!-- ═══════════════════════════════════════════════════════ -->
       <!-- MÓDULO 1: HERO BENTO — REVENUE OVERVIEW               -->
       <!-- Responsabilidad: Visión general financiera del período -->
@@ -192,7 +192,7 @@
       <!-- MÓDULO 2: MICRO-MÉTRICAS PILLS                         -->
       <!-- Responsabilidad: KPIs rápidos de un vistazo             -->
       <!-- ═══════════════════════════════════════════════════════ -->
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4">
         <!-- Productos Vendidos -->
         <div
           class="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-[2rem] p-5 flex items-center gap-4 hover:border-stone-300 dark:hover:border-stone-700 transition-colors shadow-xs group"
@@ -212,6 +212,52 @@
               class="text-2xl font-black text-stone-900 dark:text-stone-100 mt-0.5 tracking-tight leading-none"
             >
               {{ totalProductsSold() }}
+            </p>
+          </div>
+        </div>
+
+        <!-- Ventas Anuladas -->
+        <div
+          class="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-[2rem] p-5 flex items-center gap-4 hover:border-stone-300 dark:hover:border-stone-700 transition-colors shadow-xs group"
+        >
+          <div
+            class="w-12 h-12 rounded-2xl bg-rose-50 dark:bg-rose-900/20 flex items-center justify-center text-rose-600 dark:text-rose-400 group-hover:scale-105 transition-transform shrink-0"
+          >
+            <span class="material-symbols-outlined text-xl">cancel</span>
+          </div>
+          <div class="min-w-0">
+            <p
+              class="text-[10px] uppercase tracking-widest font-black text-rose-500 dark:text-rose-400 truncate"
+            >
+              Anuladas
+            </p>
+            <p
+              class="text-2xl font-black text-stone-900 dark:text-stone-100 mt-0.5 tracking-tight leading-none"
+            >
+              {{ reportData()?.ventasAnuladas || 0 }}
+            </p>
+          </div>
+        </div>
+
+        <!-- Total Descuentos -->
+        <div
+          class="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-[2rem] p-5 flex items-center gap-4 hover:border-stone-300 dark:hover:border-stone-700 transition-colors shadow-xs group"
+        >
+          <div
+            class="w-12 h-12 rounded-2xl bg-amber-50 dark:bg-amber-900/20 flex items-center justify-center text-amber-600 dark:text-amber-400 group-hover:scale-105 transition-transform shrink-0"
+          >
+            <span class="material-symbols-outlined text-xl">loyalty</span>
+          </div>
+          <div class="min-w-0">
+            <p
+              class="text-[10px] uppercase tracking-widest font-black text-amber-500 dark:text-amber-400 truncate"
+            >
+              Descuentos
+            </p>
+            <p
+              class="text-2xl font-black text-stone-900 dark:text-stone-100 mt-0.5 tracking-tight leading-none"
+            >
+              S/ {{ reportData()?.totalDescuentos || 0 | number: '1.0-0' }}
             </p>
           </div>
         </div>
@@ -426,6 +472,17 @@
             >
               ABC
             </button>
+            <button
+              (click)="activeAnalysisTab.set('pagos')"
+              [ngClass]="
+                activeAnalysisTab() === 'pagos'
+                  ? 'bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 shadow-sm'
+                  : 'text-stone-500 dark:text-stone-400 hover:text-stone-700'
+              "
+              class="flex-1 py-3 text-xs font-semibold uppercase tracking-wider rounded-xl transition-all"
+            >
+              Pagos
+            </button>
           </div>
 
           <div class="p-6 flex-1 overflow-y-auto bento-scroll">
@@ -572,6 +629,25 @@
                       </p>
                     </div>
                   }
+                </div>
+              </div>
+            }
+
+            <!-- TAB 4: MÉTODOS DE PAGO -->
+            @if (activeAnalysisTab() === 'pagos') {
+              <div class="flex flex-col h-full bento-tab-content">
+                <p class="text-sm text-stone-500 mb-4">Distribución de ingresos por método de pago.</p>
+                <div class="flex-1 flex flex-col justify-center min-h-[300px]">
+                  <apx-chart
+                    [series]="paymentMethodsChartOptions().series!"
+                    [chart]="paymentMethodsChartOptions().chart!"
+                    [labels]="paymentMethodsChartOptions().labels!"
+                    [colors]="paymentMethodsChartOptions().colors!"
+                    [plotOptions]="paymentMethodsChartOptions().plotOptions!"
+                    [dataLabels]="paymentMethodsChartOptions().dataLabels!"
+                    [stroke]="paymentMethodsChartOptions().stroke!"
+                    [tooltip]="paymentMethodsChartOptions().tooltip!"
+                  ></apx-chart>
                 </div>
               </div>
             }
@@ -754,11 +830,24 @@
                   </p>
                   <div class="flex items-center gap-2 mt-3">
                     <span
-                      class="text-xs px-2 py-0.5 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 rounded-full font-medium"
-                      >↗ Creciendo</span
+                      class="text-xs px-2 py-0.5 rounded-full font-medium flex items-center gap-1"
+                      [ngClass]="{
+                        'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400': nextFairPrediction().trend.includes('Crecimiento'),
+                        'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400': nextFairPrediction().trend.includes('Descenso'),
+                        'bg-stone-100 text-stone-700 dark:bg-stone-800 dark:text-stone-400': !nextFairPrediction().trend.includes('Crecimiento') && !nextFairPrediction().trend.includes('Descenso')
+                      }"
                     >
+                      <span class="material-symbols-outlined text-[12px]">
+                        {{ nextFairPrediction().trend.includes('Crecimiento') ? 'trending_up' : (nextFairPrediction().trend.includes('Descenso') ? 'trending_down' : 'trending_flat') }}
+                      </span>
+                      {{ nextFairPrediction().trend }}
+                    </span>
                     <span class="text-xs text-stone-500"
-                      >Confianza: {{ nextFairPrediction().confidence }}</span
+                      >Confianza: <strong [ngClass]="{
+                        'text-emerald-500': nextFairPrediction().confidence === 'Alta',
+                        'text-amber-500': nextFairPrediction().confidence === 'Media',
+                        'text-rose-500': nextFairPrediction().confidence === 'Baja'
+                      }">{{ nextFairPrediction().confidence }}</strong></span
                     >
                   </div>
                 </div>
@@ -773,7 +862,11 @@
                   </div>
                   <div class="p-4 rounded-2xl border border-stone-100 dark:border-stone-700">
                     <p class="text-xs text-stone-500 mb-1">Confianza</p>
-                    <p class="text-xl font-bold capitalize text-emerald-500">
+                    <p class="text-xl font-bold capitalize" [ngClass]="{
+                      'text-emerald-500': nextFairPrediction().confidence === 'Alta',
+                      'text-amber-500': nextFairPrediction().confidence === 'Media',
+                      'text-rose-500': nextFairPrediction().confidence === 'Baja'
+                    }">
                       {{ nextFairPrediction().confidence }}
                     </p>
                   </div>
@@ -811,9 +904,16 @@
                     </div>
                     <div class="flex items-center gap-2">
                       <span
-                        class="px-3 py-1 bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-400 rounded-full text-xs font-medium flex items-center gap-1"
+                        class="px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1"
+                        [ngClass]="{
+                          'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400': fairTrend().thursday.trend.includes('Crecimiento'),
+                          'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400': fairTrend().thursday.trend.includes('Descenso'),
+                          'bg-stone-100 text-stone-700 dark:bg-stone-800 dark:text-stone-400': !fairTrend().thursday.trend.includes('Crecimiento') && !fairTrend().thursday.trend.includes('Descenso')
+                        }"
                       >
-                        <span class="material-symbols-outlined text-sm">trending_flat</span>
+                        <span class="material-symbols-outlined text-[12px]">
+                          {{ fairTrend().thursday.trend.includes('Crecimiento') ? 'trending_up' : (fairTrend().thursday.trend.includes('Descenso') ? 'trending_down' : 'trending_flat') }}
+                        </span>
                         {{ fairTrend().thursday.trend }}
                       </span>
                     </div>
@@ -854,9 +954,16 @@
                     </div>
                     <div class="flex items-center gap-2">
                       <span
-                        class="px-3 py-1 bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-400 rounded-full text-xs font-medium flex items-center gap-1"
+                        class="px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1"
+                        [ngClass]="{
+                          'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400': fairTrend().sunday.trend.includes('Crecimiento'),
+                          'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400': fairTrend().sunday.trend.includes('Descenso'),
+                          'bg-stone-100 text-stone-700 dark:bg-stone-800 dark:text-stone-400': !fairTrend().sunday.trend.includes('Crecimiento') && !fairTrend().sunday.trend.includes('Descenso')
+                        }"
                       >
-                        <span class="material-symbols-outlined text-sm">trending_flat</span>
+                        <span class="material-symbols-outlined text-[12px]">
+                          {{ fairTrend().sunday.trend.includes('Crecimiento') ? 'trending_up' : (fairTrend().sunday.trend.includes('Descenso') ? 'trending_down' : 'trending_flat') }}
+                        </span>
                         {{ fairTrend().sunday.trend }}
                       </span>
                     </div>
@@ -870,6 +977,36 @@
           </div>
         </div>
       </div>
+
+      <!-- ══════════════════════════════════════════════════════════ -->
+      <!-- MÓDULO 5: MAPA DE CALOR (Full Width)                       -->
+      <!-- Responsabilidad: Horas Pico y Tráfico                      -->
+      <!-- ══════════════════════════════════════════════════════════ -->
+      <div class="bg-white dark:bg-stone-900 rounded-3xl border border-stone-200/60 dark:border-stone-800 shadow-sm overflow-hidden flex flex-col mt-6">
+        <div class="p-6 border-b border-stone-100 dark:border-stone-800 flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center">
+            <span class="material-symbols-outlined text-emerald-500">grid_on</span>
+          </div>
+          <div>
+            <h3 class="text-lg font-bold text-stone-900 dark:text-stone-100">Horas Pico de Venta</h3>
+            <p class="text-xs text-stone-500 dark:text-stone-400 mt-0.5">Intensidad de tráfico transaccional (Heatmap)</p>
+          </div>
+        </div>
+        <div class="p-6 overflow-x-auto">
+          <div class="min-w-[800px]">
+            <apx-chart
+              [series]="heatmapChartOptions().series!"
+              [chart]="heatmapChartOptions().chart!"
+              [colors]="heatmapChartOptions().colors!"
+              [plotOptions]="heatmapChartOptions().plotOptions!"
+              [dataLabels]="heatmapChartOptions().dataLabels!"
+              [xaxis]="heatmapChartOptions().xaxis!"
+              [yaxis]="heatmapChartOptions().yaxis!"
+            ></apx-chart>
+          </div>
+        </div>
+      </div>
+      
       </div> <!-- End fade container -->
     }
   </div>

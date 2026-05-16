@@ -2,11 +2,7 @@ import { Component, computed, signal, inject, ChangeDetectionStrategy, OnInit } 
 import { CommonModule, CurrencyPipe, DatePipe, DecimalPipe } from '@angular/common';
 import { NgApexchartsModule, ApexOptions } from 'ng-apexcharts';
 import { 
-  UiInputComponent,
-  UiButtonComponent,
   UiPageHeaderComponent,
-  UiKpiCardComponent,
-  UiExportMenuComponent,
   UiSkeletonComponent,
   PeriodSelectorComponent,
 } from '../../shared/ui';
@@ -20,13 +16,9 @@ import { ApexChartConfigService } from '../../core/services/apex-chart-config.se
   imports: [
     CommonModule,
     NgApexchartsModule,
-    UiInputComponent,
     UiPageHeaderComponent,
-    UiKpiCardComponent,
-    UiExportMenuComponent,
     UiSkeletonComponent,
-    PeriodSelectorComponent,
-    UiButtonComponent
+    PeriodSelectorComponent
   ],
   providers: [CurrencyPipe, DatePipe, DecimalPipe],
   templateUrl: './dashboard-page.component.html',

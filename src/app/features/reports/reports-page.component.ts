@@ -42,7 +42,7 @@ export class ReportsPageComponent implements OnInit {
   systemUsers = signal<UserDTO[]>([]);
 
   // Tabs para paneles Bento
-  activeAnalysisTab = signal<'topProductos' | 'categorias' | 'abc'>('topProductos');
+  activeAnalysisTab = signal<'topProductos' | 'categorias' | 'abc' | 'pagos'>('topProductos');
   activeInsightsTab = signal<'prediccion' | 'tendencia'>('prediccion');
 
   ngOnInit() {
@@ -153,23 +153,23 @@ export class ReportsPageComponent implements OnInit {
   fairTrend = computed(() => {
     const r = this.reportData();
     return {
-      thursday: { average: r?.promedioMovilJueves || 0, count: 4, trend: 'estable' },
-      sunday: { average: r?.promedioMovilDomingo || 0, count: 4, trend: 'estable' }
+      thursday: { average: r?.promedioMovilJueves || 0, count: 4, trend: r?.tendenciaJueves || 'Estable' },
+      sunday: { average: r?.promedioMovilDomingo || 0, count: 4, trend: r?.tendenciaDomingo || 'Estable' }
     };
   });
 
   nextFairPrediction = computed(() => {
     const r = this.reportData();
-    let isJueves = r?.proximaFeria?.toLowerCase().includes('acobamba');
+    let isJueves = r?.proximaFeria?.toLowerCase().includes('acobamba') || r?.proximaFeria?.toLowerCase() === 'jueves';
     return {
       day: isJueves ? 'Jueves' : 'Domingo',
       name: r?.proximaFeria || 'N/A',
       daysUntil: 2,
       date: new Date(),
       estimatedRevenue: r?.prediccionProximaFeria || 0,
-      trend: 'creciendo',
+      trend: r?.tendenciaProximaFeria || 'Estable',
       suggestedStock: Math.round((r?.prediccionProximaFeria || 0) / 40),
-      confidence: 'alta'
+      confidence: r?.confianzaProximaFeria || 'Baja'
     };
   });
 
@@ -371,6 +371,53 @@ export class ReportsPageComponent implements OnInit {
       series: [{ name: 'Ingresos', data: vendors.map(v => v.revenue) }],
       categories: vendors.map(v => v.name),
       height: 250
+    });
+  });
+
+  paymentMethodsChartOptions = computed<ApexOptions>(() => {
+    const methodsMap = this.reportData()?.ventasPorMetodoPago || {};
+    const labels = Object.keys(methodsMap);
+    const series = Object.values(methodsMap);
+
+    // Si no hay datos, mostrar un gráfico vacío bonito
+    if (series.length === 0) {
+        return this.apexConfigService.getDonutChartConfig({
+            series: [1],
+            labels: ['Sin datos'],
+            height: 280
+        });
+    }
+
+    return this.apexConfigService.getDonutChartConfig({
+      series: series,
+      labels: labels,
+      height: 280
+    });
+  });
+
+  heatmapChartOptions = computed<ApexOptions>(() => {
+    const data = this.reportData()?.ventasPorHora || [];
+    
+    // Generar matriz Días x Horas (Ej: Lunes a Domingo, 8am a 8pm)
+    // Para simplificar, ApexCharts Heatmap espera series: [{ name: 'Lunes', data: [{x: '8am', y: 10}, {x: '9am', y: 20}] }]
+    
+    const dias = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+    const horas = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
+    
+    const series = dias.map(dia => {
+        const dataForDay = horas.map(hora => {
+            const match = data.find(d => d.diaSemana === dia && d.hora === hora);
+            return {
+                x: `${hora}:00`,
+                y: match ? match.ingresos : 0
+            };
+        });
+        return { name: dia, data: dataForDay };
+    });
+
+    return this.apexConfigService.getHeatmapChartConfig({
+      series: series,
+      height: 350
     });
   });
 }

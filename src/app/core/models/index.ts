@@ -318,6 +318,7 @@ export interface ProyeccionResponse {
   ingresosEstimados: number;
   ventasEstimadas: number;
   confianza: string;
+  tendencia: string;
 }
 
 export interface DashboardResponse {

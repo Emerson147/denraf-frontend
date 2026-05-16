@@ -471,4 +471,59 @@ export class ApexChartConfigService {
       }
     };
   }
+
+  /**
+   * Configuración para mapa de calor (Heatmap)
+   */
+  getHeatmapChartConfig(options: {
+    series: any[];
+    height?: number;
+  }): ApexOptions {
+    const isDark = this.themeService.darkMode();
+    
+    return {
+      ...this.getBaseConfig(),
+      series: options.series,
+      chart: {
+        ...this.getBaseConfig().chart,
+        type: 'heatmap',
+        height: options.height || 350,
+      },
+      dataLabels: {
+        enabled: false
+      },
+      plotOptions: {
+        heatmap: {
+          shadeIntensity: 0.5,
+          radius: 8,
+          useFillColorAsStroke: false,
+          colorScale: {
+            ranges: [
+              { from: 0, to: 0, color: isDark ? '#1c1917' : '#f5f5f4', name: 'Sin Ventas' }, // stone-900 / stone-100
+              { from: 1, to: 500, color: isDark ? '#064e3b' : '#a7f3d0', name: 'Bajo' }, // emerald-900 / emerald-200
+              { from: 501, to: 2000, color: isDark ? '#047857' : '#34d399', name: 'Medio' }, // emerald-700 / emerald-400
+              { from: 2001, to: 100000, color: isDark ? '#10b981' : '#059669', name: 'Alto' } // emerald-500 / emerald-600
+            ]
+          }
+        }
+      },
+      xaxis: {
+        labels: {
+          style: {
+            colors: '#a8a29e', // stone-400
+            fontSize: '12px'
+          }
+        }
+      },
+      yaxis: {
+        labels: {
+          style: {
+            colors: '#a8a29e', // stone-400
+            fontSize: '12px',
+            fontWeight: 600
+          }
+        }
+      }
+    };
+  }
 }

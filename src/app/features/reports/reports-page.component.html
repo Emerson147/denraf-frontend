@@ -16,20 +16,18 @@
           class="flex-1 sm:flex-initial"
           (periodChange)="onPeriodChange($event)"
         />
-        <button
-          (click)="descargarExcel()"
-          class="bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 rounded-xl px-5 py-2.5 font-medium shadow-sm hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center gap-2"
-        >
-          <span class="material-symbols-outlined text-sm">download</span> Excel
-        </button>
-        <app-ui-export-menu [data]="exportData()" type="reports" />
+        <app-ui-export-menu 
+          [data]="exportData()" 
+          type="reports" 
+          (excelExport)="descargarExcel()"
+        />
       </div>
     </div>
 
     <!-- ═══════════════════════════════════════════ -->
-    <!-- SKELETON LOADING                            -->
+    <!-- SKELETON LOADING (Solo carga inicial)       -->
     <!-- ═══════════════════════════════════════════ -->
-    @if (loading()) {
+    @if (loading() && !reportData()) {
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
         <app-ui-skeleton variant="card" class="lg:col-span-8 h-96" />
         <div class="lg:col-span-4 space-y-6">
@@ -37,13 +35,14 @@
           <app-ui-skeleton variant="card" class="h-44" />
         </div>
       </div>
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
         <app-ui-skeleton variant="card" class="h-24" />
         <app-ui-skeleton variant="card" class="h-24" />
         <app-ui-skeleton variant="card" class="h-24" />
         <app-ui-skeleton variant="card" class="h-24" />
       </div>
     } @else {
+      <div [class.opacity-60]="loading()" [class.pointer-events-none]="loading()" class="transition-opacity duration-300 ease-in-out">
       <!-- ═══════════════════════════════════════════════════════ -->
       <!-- MÓDULO 1: HERO BENTO — REVENUE OVERVIEW               -->
       <!-- Responsabilidad: Visión general financiera del período -->
@@ -871,6 +870,7 @@
           </div>
         </div>
       </div>
+      </div> <!-- End fade container -->
     }
   </div>
 </div>

@@ -22,7 +22,7 @@ export class DashboardService {
    * Obtiene los datos del dashboard calculados por el backend.
    * @param periodo puede ser 'hoy', 'semana', 'mes', 'anio'
    */
-  async fetchDashboardData(periodo: string = 'semana'): Promise<void> {
+  async fetchDashboardData(periodo: string = 'semana', startDate?: string, endDate?: string): Promise<void> {
     this.isLoading.set(true);
 
     try {
@@ -34,6 +34,10 @@ export class DashboardService {
         requestUrl = `${this.baseUrl}/hoy`;
       } else {
         params = params.set('periodo', periodo);
+        if (startDate && endDate) {
+          params = params.set('fechaInicio', startDate);
+          params = params.set('fechaFin', endDate);
+        }
       }
 
       const request = this.http.get<DashboardResponse>(requestUrl, { params }).pipe(

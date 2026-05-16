@@ -24,6 +24,7 @@ export class UiExportMenuComponent {
   @Input() type: 'dashboard' | 'sales' | 'inventory' | 'clients' | 'reports' = 'sales';
   @Input() mini: boolean = false; // Modo compacto para botón flotante
   @Output() pdfExport = new EventEmitter<void>(); // Emitir para PDF personalizado
+  @Output() excelExport = new EventEmitter<void>(); // Emitir para Excel personalizado
 
   isOpen = signal(false);
   private exportService = new ExportService();
@@ -99,7 +100,9 @@ export class UiExportMenuComponent {
 
     switch (option.format) {
       case 'excel':
-        if (isMultiSectionReport) {
+        if (this.excelExport.observed) {
+          this.excelExport.emit();
+        } else if (isMultiSectionReport) {
           // Exportar con múltiples hojas
           this.exportMultiSectionToExcel(this.data, filename);
         } else {
@@ -317,449 +320,199 @@ export class UiExportMenuComponent {
     import('jspdf')
       .then(({ default: jsPDF }) => {
         import('jspdf-autotable').then((autoTable) => {
-          const doc = new jsPDF({
-            orientation: 'portrait',
-            unit: 'mm',
-            format: 'a4',
-          });
+          const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+          const pw = doc.internal.pageSize.width;
+          const ph = doc.internal.pageSize.height;
+          let y = 0;
 
-          const pageHeight = doc.internal.pageSize.height;
-          const pageWidth = doc.internal.pageSize.width;
+          // Paleta Zen Minimalista
+          const colors = {
+            stone950: [12, 10, 9] as [number, number, number],
+            stone900: [28, 25, 23] as [number, number, number],
+            stone700: [68, 64, 60] as [number, number, number],
+            stone600: [87, 83, 78] as [number, number, number],
+            stone500: [120, 113, 108] as [number, number, number],
+            stone400: [168, 162, 158] as [number, number, number],
+            stone300: [214, 211, 209] as [number, number, number],
+            stone200: [231, 229, 228] as [number, number, number],
+            stone100: [245, 245, 244] as [number, number, number],
+            stone50: [250, 250, 249] as [number, number, number],
+            teal700: [15, 118, 110] as [number, number, number],
+            teal600: [13, 148, 136] as [number, number, number],
+            amber600: [217, 119, 6] as [number, number, number],
+            emerald600: [5, 150, 105] as [number, number, number],
+            rose600: [225, 29, 72] as [number, number, number],
+            white: [255, 255, 255] as [number, number, number],
+          };
 
-          // ============= HEADER MINIMALISTA =============
-          doc.setFillColor(28, 25, 23); // stone-900
-          doc.rect(0, 0, pageWidth, 30, 'F');
+          const margin = { left: 16, right: 16, top: 20 };
+          const contentWidth = pw - margin.left - margin.right;
 
-          doc.setFontSize(20);
-          doc.setTextColor(255, 255, 255);
+          const drawLine = (yPos: number, color = colors.stone200, thickness = 0.3) => {
+            doc.setDrawColor(...color);
+            doc.setLineWidth(thickness);
+            doc.line(margin.left, yPos, pw - margin.right, yPos);
+          };
+
+          const drawSectionHeader = (title: string, yPos: number): number => {
+            doc.setFillColor(...colors.stone700);
+            doc.circle(margin.left + 2, yPos - 1.5, 1.5, 'F');
+            doc.setFontSize(11);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(...colors.stone900);
+            doc.text(title, margin.left + 8, yPos);
+            return yPos + 8;
+          };
+
+          const addPage = () => { doc.addPage(); y = margin.top; return y; };
+          const checkPageBreak = (neededSpace: number): number => {
+            if (y + neededSpace > ph - 25) return addPage();
+            return y;
+          };
+
+          // 📄 PÁGINA 1: PORTADA
+          y = 22;
+          doc.setFontSize(22);
           doc.setFont('helvetica', 'bold');
-          doc.text('DENRAF', 14, 15);
+          doc.setTextColor(...colors.stone900);
+          
+          let reportTitle = 'Reporte Ejecutivo';
+          if (this.type === 'sales') reportTitle = 'Historial de Ventas';
+          if (this.type === 'dashboard') reportTitle = 'Dashboard Analítico';
+          if (this.type === 'reports') reportTitle = 'Reporte Empresarial';
+
+          doc.text(reportTitle, margin.left, y);
+          y += 6;
+
+          doc.setFontSize(10);
+          doc.setFont('helvetica', 'normal');
+          doc.setTextColor(...colors.stone500);
+          doc.text('DenRaf · Reporte detallado de datos', margin.left, y);
+          y += 10;
+
+          drawLine(y, colors.stone300, 0.5);
+          y += 8;
 
           doc.setFontSize(9);
-          doc.setFont('helvetica', 'normal');
-          doc.text('Reporte de Analisis Empresarial', 14, 21);
-
-          const dateStr = new Date().toLocaleDateString('es-PE', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
+          doc.setTextColor(...colors.stone600);
+          const dateGenerated = new Date().toLocaleString('es-PE', {
+            weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
+            hour: '2-digit', minute: '2-digit',
           });
-          doc.setFontSize(7);
-          doc.setTextColor(214, 211, 209); // stone-300
-          doc.text(dateStr, 14, 26);
+          doc.text(`Generado: ${dateGenerated}`, margin.left, y);
+          doc.text(`Período: Dinámico / Filtrado`, pw / 2, y);
+          y += 12;
 
-          let startY = 38;
-
-          // ============= RESUMEN EJECUTIVO =============
+          // ============= RESUMEN EJECUTIVO (Cards Horizontales) =============
           const resumenData = data['Resumen Ejecutivo'];
           if (resumenData && resumenData.length > 0) {
-            doc.setFontSize(11);
-            doc.setTextColor(28, 25, 23); // stone-900
-            doc.setFont('helvetica', 'bold');
-            doc.text('RESUMEN EJECUTIVO', 14, startY);
-            startY += 2;
+            const numCards = Math.min(resumenData.length, 3);
+            const metricBoxWidth = (contentWidth - ((numCards - 1) * 5)) / numCards;
+            const metricBoxHeight = 28;
 
-            // Línea decorativa
-            doc.setDrawColor(214, 211, 209); // stone-300
-            doc.setLineWidth(0.3);
-            doc.line(14, startY, 60, startY);
-            startY += 6;
+            resumenData.slice(0, 3).forEach((kpi: any, idx: number) => {
+              const x = margin.left + idx * (metricBoxWidth + 5);
+              
+              doc.setFillColor(...colors.stone100);
+              doc.roundedRect(x, y, metricBoxWidth, metricBoxHeight, 3, 3, 'F');
 
-            // Grid de métricas (2 columnas, minimalista)
-            const cardWidth = (pageWidth - 38) / 2;
-            const cardHeight = 16;
-            let cardX = 14;
-            let cardY = startY;
-
-            resumenData.forEach((kpi: any, index: number) => {
-              if (index > 0 && index % 2 === 0) {
-                cardY += cardHeight + 2;
-                cardX = 14;
-              } else if (index > 0) {
-                cardX = 14 + cardWidth + 10;
-              }
-
-              // Borde sutil
-              doc.setDrawColor(231, 229, 228); // stone-200
-              doc.setLineWidth(0.2);
-              doc.rect(cardX, cardY, cardWidth, cardHeight);
-
-              // Contenido minimalista
-              doc.setFontSize(7);
-              doc.setTextColor(120, 113, 108); // stone-500
+              doc.setFontSize(8);
               doc.setFont('helvetica', 'normal');
-              doc.text(kpi.Métrica, cardX + 3, cardY + 4);
+              doc.setTextColor(...colors.stone500);
+              doc.text(kpi.Métrica.toUpperCase(), x + 5, y + 8);
 
               doc.setFontSize(14);
-              doc.setTextColor(28, 25, 23); // stone-900
               doc.setFont('helvetica', 'bold');
-              doc.text(String(kpi.Valor), cardX + 3, cardY + 11);
+              // Alternar colores por posición para seguir el estilo
+              let valColor = colors.stone700;
+              if (idx === 1) valColor = colors.amber600;
+              if (idx === 2) valColor = colors.teal600;
+
+              doc.setTextColor(...valColor);
+              doc.text(String(kpi.Valor), x + 5, y + 18);
             });
+            y += metricBoxHeight + 12;
 
-            startY = cardY + cardHeight + 8;
-          }
-
-          // ============= ANÁLISIS ABC (ZEN) =============
-          const abcData = data['Análisis ABC'];
-          if (abcData && abcData.length > 0) {
-            if (startY > pageHeight - 80) {
-              doc.addPage();
-              startY = 20;
+            // Extra KPIs si hay más de 3
+            if (resumenData.length > 3) {
+              y = drawSectionHeader('Métricas Adicionales', y);
+              const extraData = resumenData.slice(3).map((k: any) => [k.Métrica, String(k.Valor)]);
+              (autoTable as any).default(doc, {
+                startY: y,
+                body: extraData,
+                theme: 'plain',
+                styles: { fontSize: 8, cellPadding: 2, textColor: colors.stone700 },
+                columnStyles: { 0: { fontStyle: 'bold', cellWidth: 50 }, 1: { textColor: colors.teal700, fontStyle: 'bold' } },
+                margin: { left: margin.left }
+              });
+              y = (doc as any).lastAutoTable.finalY + 12;
             }
-
-            doc.setFontSize(11);
-            doc.setTextColor(28, 25, 23); // stone-900
-            doc.setFont('helvetica', 'bold');
-            doc.text('ANALISIS ABC', 14, startY);
-            startY += 2;
-
-            doc.setDrawColor(214, 211, 209); // stone-300
-            doc.setLineWidth(0.3);
-            doc.line(14, startY, 50, startY);
-            startY += 1;
-
-            doc.setFontSize(7);
-            doc.setTextColor(120, 113, 108); // stone-500
-            doc.setFont('helvetica', 'normal');
-            doc.text('Regla 80/20 · Productos por importancia', 14, startY + 3);
-            startY += 6;
-
-            const headers = Object.keys(abcData[0]);
-            const tableData = abcData.map((row: any) =>
-              headers.map((header) => String(row[header] || ''))
-            );
-
-            (autoTable as any).default(doc, {
-              startY: startY,
-              head: [headers],
-              body: tableData,
-              theme: 'plain',
-              headStyles: {
-                fillColor: [245, 245, 244], // stone-100
-                textColor: [28, 25, 23], // stone-900
-                fontStyle: 'bold',
-                fontSize: 6.5,
-                halign: 'left',
-                cellPadding: 2,
-                lineWidth: 0.1,
-                lineColor: [231, 229, 228], // stone-200
-              },
-              styles: {
-                fontSize: 6.5,
-                cellPadding: 1.5,
-                overflow: 'linebreak',
-                textColor: [68, 64, 60], // stone-700
-                lineWidth: 0.1,
-                lineColor: [245, 245, 244],
-              },
-              alternateRowStyles: {
-                fillColor: [250, 250, 249], // stone-50
-              },
-              // Colores sutiles por clasificación
-              didParseCell: function (data: any) {
-                if (data.column.index === 2 && data.section === 'body') {
-                  const value = data.cell.raw;
-                  if (value === 'A') {
-                    data.cell.styles.fillColor = [236, 253, 245]; // green-50 (muy sutil)
-                    data.cell.styles.textColor = [22, 101, 52]; // green-800
-                    data.cell.styles.fontStyle = 'bold';
-                  } else if (value === 'B') {
-                    data.cell.styles.fillColor = [254, 252, 232]; // yellow-50 (muy sutil)
-                    data.cell.styles.textColor = [161, 98, 7]; // yellow-800
-                  } else if (value === 'C') {
-                    data.cell.styles.fillColor = [250, 250, 249]; // stone-50
-                    data.cell.styles.textColor = [120, 113, 108]; // stone-500
-                  }
-                }
-              },
-              margin: { left: 14, right: 14 },
-              pageBreak: 'auto',
-              rowPageBreak: 'avoid',
-            });
-
-            startY = (doc as any).lastAutoTable.finalY + 8;
-          }
-
-          // ============= RESUMEN ABC =============
-          const resumenABC = data['Resumen ABC'];
-          if (resumenABC && resumenABC.length > 0) {
-            doc.setFontSize(9);
-            doc.setTextColor(28, 25, 23);
-            doc.setFont('helvetica', 'bold');
-            doc.text('Resumen por Clase', 14, startY);
-            startY += 5;
-
-            const headers = Object.keys(resumenABC[0]);
-            const tableData = resumenABC.map((row: any) =>
-              headers.map((header) => String(row[header] || ''))
-            );
-
-            (autoTable as any).default(doc, {
-              startY: startY,
-              head: [headers],
-              body: tableData,
-              theme: 'plain',
-              headStyles: {
-                fillColor: [245, 245, 244],
-                textColor: [28, 25, 23],
-                fontSize: 6.5,
-                cellPadding: 1.5,
-                fontStyle: 'bold',
-              },
-              styles: {
-                fontSize: 6.5,
-                cellPadding: 1.5,
-                textColor: [68, 64, 60],
-                lineWidth: 0.1,
-                lineColor: [231, 229, 228],
-              },
-              margin: { left: 14, right: 14 },
-            });
-
-            startY = (doc as any).lastAutoTable.finalY + 8;
-          }
-
-          // ============= TENDENCIA DE FERIAS =============
-          const tendenciaFerias = data['Tendencia Ferias'];
-          if (tendenciaFerias && tendenciaFerias.length > 0) {
-            if (startY > pageHeight - 60) {
-              doc.addPage();
-              startY = 20;
-            }
-
-            doc.setFontSize(11);
-            doc.setTextColor(28, 25, 23); // stone-900
-            doc.setFont('helvetica', 'bold');
-            doc.text('TENDENCIA DE FERIAS', 14, startY);
-            startY += 2;
-
-            doc.setDrawColor(214, 211, 209); // stone-300
-            doc.setLineWidth(0.3);
-            doc.line(14, startY, 60, startY);
-            startY += 1;
-
-            doc.setFontSize(7);
-            doc.setTextColor(120, 113, 108); // stone-500
-            doc.setFont('helvetica', 'normal');
-            doc.text('Promedio movil · Ultimas 4 ferias', 14, startY + 3);
-            startY += 6;
-
-            const headers = Object.keys(tendenciaFerias[0]);
-            const tableData = tendenciaFerias.map((row: any) =>
-              headers.map((header) => String(row[header] || ''))
-            );
-
-            (autoTable as any).default(doc, {
-              startY: startY,
-              head: [headers],
-              body: tableData,
-              theme: 'plain',
-              headStyles: {
-                fillColor: [245, 245, 244], // stone-100
-                textColor: [28, 25, 23], // stone-900
-                fontSize: 6.5,
-                cellPadding: 1.5,
-                fontStyle: 'bold',
-              },
-              styles: {
-                fontSize: 6.5,
-                cellPadding: 1.5,
-                textColor: [68, 64, 60],
-              },
-              didParseCell: function (data: any) {
-                if (data.column.index === 3 && data.section === 'body') {
-                  const value = data.cell.raw;
-                  if (value.includes('Creciendo')) {
-                    data.cell.styles.textColor = [22, 101, 52]; // green-800 (verde musgo)
-                    data.cell.styles.fontStyle = 'bold';
-                  } else if (value.includes('Bajando')) {
-                    data.cell.styles.textColor = [185, 28, 28]; // red-700
-                    data.cell.styles.fontStyle = 'bold';
-                  }
-                }
-              },
-              margin: { left: 14, right: 14 },
-            });
-
-            startY = (doc as any).lastAutoTable.finalY + 8;
-          }
-
-          // ============= PREDICCIÓN (MINIMALISTA) =============
-          const prediccion = data['Predicción'];
-          if (prediccion && prediccion.length > 0) {
-            if (startY > pageHeight - 50) {
-              doc.addPage();
-              startY = 20;
-            }
-
-            // Caja minimalista
-            doc.setDrawColor(214, 211, 209); // stone-300
-            doc.setLineWidth(0.5);
-            doc.rect(14, startY, pageWidth - 28, 32);
-
-            doc.setFontSize(10);
-            doc.setTextColor(28, 25, 23); // stone-900
-            doc.setFont('helvetica', 'bold');
-            doc.text('PREDICCION PROXIMA FERIA', 18, startY + 6);
-
-            const pred = prediccion[0];
-            doc.setFontSize(7.5);
-            doc.setFont('helvetica', 'normal');
-            doc.setTextColor(68, 64, 60); // stone-700
-
-            let predY = startY + 12;
-            doc.text(`Feria: ${pred['Próxima Feria']} - ${pred.Día}`, 18, predY);
-            predY += 4;
-            doc.text(`Dias restantes: ${pred['Días Restantes']}`, 18, predY);
-            predY += 4;
-            doc.text(`Ingreso estimado: ${pred['Ingreso Estimado']}`, 18, predY);
-            predY += 4;
-            doc.text(`Tendencia: ${pred.Tendencia}`, 18, predY);
-            predY += 4;
-            doc.text(`Stock sugerido: ${pred['Stock Sugerido']}`, 18, predY);
-            predY += 4;
-            doc.setFontSize(6.5);
-            doc.setTextColor(120, 113, 108); // stone-500
-            doc.text(`Nivel de confianza: ${pred.Confianza}`, 18, predY);
-
-            startY += 37;
           }
 
           // ============= OTRAS SECCIONES =============
-          const remainingSections = ['Ferias vs Tienda', 'Top Productos', 'Por Categoría'];
+          const specialSections = ['Resumen Ejecutivo'];
+          const remainingSections = Object.keys(data).filter(k => !specialSections.includes(k));
+
           remainingSections.forEach((sectionName) => {
             const sectionData = data[sectionName];
             if (!sectionData || sectionData.length === 0) return;
 
-            if (startY > pageHeight - 60) {
-              doc.addPage();
-              startY = 20;
-            }
-
-            doc.setFontSize(10);
-            doc.setTextColor(28, 25, 23);
-            doc.setFont('helvetica', 'bold');
-            doc.text(sectionName.toUpperCase(), 14, startY);
-            startY += 5;
+            y = checkPageBreak(40);
+            y = drawSectionHeader(sectionName, y);
 
             const headers = Object.keys(sectionData[0]);
             const tableData = sectionData.map((row: any) =>
               headers.map((header) => String(row[header] || ''))
             );
 
+            // Verificar si es una tabla muy ancha o estándar
+            const isSmallTable = headers.length <= 4;
+
             (autoTable as any).default(doc, {
-              startY: startY,
+              startY: y,
               head: [headers],
               body: tableData,
-              theme: 'plain',
+              theme: 'striped',
               headStyles: {
-                fillColor: [245, 245, 244],
-                textColor: [28, 25, 23],
-                fontSize: 6.5,
-                cellPadding: 1.5,
-                fontStyle: 'bold',
+                fillColor: colors.stone900,
+                textColor: colors.white,
+                fontSize: 8,
+                fontStyle: 'bold'
               },
               styles: {
-                fontSize: 6.5,
-                cellPadding: 1.5,
-                textColor: [68, 64, 60],
-                lineWidth: 0.1,
-                lineColor: [231, 229, 228],
+                fontSize: 8,
+                cellPadding: 2,
+                textColor: colors.stone700,
               },
               alternateRowStyles: {
-                fillColor: [250, 250, 249],
+                fillColor: colors.stone50,
               },
-              margin: { left: 14, right: 14 },
+              margin: { left: margin.left, right: margin.right },
+              tableWidth: isSmallTable ? contentWidth * 0.8 : contentWidth,
             });
 
-            startY = (doc as any).lastAutoTable.finalY + 8;
+            y = (doc as any).lastAutoTable.finalY + 12;
           });
-
-          // ============= RECOMENDACIONES (ZEN) =============
-          if (startY > pageHeight - 70) {
-            doc.addPage();
-            startY = 20;
-          }
-          // Caja minimalista
-          doc.setDrawColor(214, 211, 209); // stone-300
-          doc.setLineWidth(0.5);
-          doc.rect(14, startY, pageWidth - 28, 55);
-
-          doc.setFontSize(10);
-          doc.setTextColor(28, 25, 23); // stone-900
-          doc.setFont('helvetica', 'bold');
-          doc.text('RECOMENDACIONES ESTRATEGICAS', 18, startY + 6);
-
-          doc.setFontSize(7);
-          doc.setFont('helvetica', 'normal');
-          doc.setTextColor(68, 64, 60); // stone-700mal');
-          doc.setTextColor(68, 64, 60);
-
-          let recY = startY + 13;
-          const resumenABCData = data['Resumen ABC'];
-          if (resumenABCData) {
-            const claseA = resumenABCData.find((r: any) => r.Clase.includes('A'));
-            const claseC = resumenABCData.find((r: any) => r.Clase.includes('C'));
-
-            doc.setTextColor(68, 64, 60); // stone-700
-            doc.text(`· Productos Clase A: ${claseA?.Cantidad || 0}`, 20, recY);
-            recY += 4;
-            doc.setTextColor(87, 83, 78); // stone-600
-            doc.text('  Mantener stock permanente', 22, recY);
-            recY += 6;
-
-            doc.setTextColor(68, 64, 60); // stone-700
-            doc.text(`· Productos Clase C: ${claseC?.Cantidad || 0}`, 20, recY);
-            recY += 4;
-            doc.setTextColor(87, 83, 78); // stone-600
-            doc.text('  Considerar liquidacion en proxima feria', 22, recY);
-            recY += 6;
-          }
-
-          const tendenciaData = data['Tendencia Ferias'];
-          if (tendenciaData) {
-            tendenciaData.forEach((feria: any) => {
-              if (feria.Tendencia.includes('Creciendo')) {
-                doc.setTextColor(68, 64, 60);
-                doc.text(`· ${feria.Feria} en crecimiento`, 20, recY);
-                recY += 4;
-                doc.setTextColor(120, 113, 108);
-                doc.text('  Aumentar stock en 15-20%', 22, recY);
-                recY += 5;
-              } else if (feria.Tendencia.includes('Bajando')) {
-                doc.setTextColor(68, 64, 60);
-                doc.text(`· ${feria.Feria} en descenso`, 20, recY);
-                recY += 4;
-                doc.setTextColor(120, 113, 108);
-                doc.text('  Reducir compras, controlar gastos', 22, recY);
-                recY += 5;
-              }
-            });
-          }
 
           // ============= FOOTER MINIMALISTA =============
           const pageCount = (doc as any).internal.getNumberOfPages();
           for (let i = 1; i <= pageCount; i++) {
             doc.setPage(i);
             doc.setFontSize(6.5);
-            doc.setTextColor(168, 162, 158); // stone-400
+            doc.setTextColor(...colors.stone400);
             doc.setFont('helvetica', 'normal');
 
             // Línea decorativa sutil
-            doc.setDrawColor(231, 229, 228); // stone-200
+            doc.setDrawColor(...colors.stone200);
             doc.setLineWidth(0.2);
-            doc.line(14, pageHeight - 12, pageWidth - 14, pageHeight - 12);
+            doc.line(14, ph - 12, pw - 14, ph - 12);
 
-            doc.text(`DENRAF  ·  ${new Date().getFullYear()}`, 14, pageHeight - 8);
-            doc.setTextColor(168, 162, 158); // stone-400
-            doc.line(14, pageHeight - 12, pageWidth - 14, pageHeight - 12);
-
-            doc.text(`DENRAF  ·  ${new Date().getFullYear()}`, 14, pageHeight - 8);
-            doc.text(`Pagina ${i} de ${pageCount}`, pageWidth - 35, pageHeight - 8);
+            doc.text(`DenRaf - ${reportTitle} - Exportado`, 14, ph - 8);
+            doc.text(`Página ${i} de ${pageCount}`, pw - 35, ph - 8);
           }
 
           doc.save(`${filename}.pdf`);
-          console.log('✅ PDF Zen Garden exportado:', filename, `(${pageCount} paginas)`);
+          console.log('✅ PDF Zen Garden exportado:', filename, `(${pageCount} páginas)`);
         });
       })
       .catch((error) => {

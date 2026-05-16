@@ -1,5 +1,5 @@
 import { Component, OnInit, signal, computed, inject, ChangeDetectionStrategy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe, DecimalPipe } from '@angular/common';
 import { NgApexchartsModule, ApexOptions } from 'ng-apexcharts';
 import { ReportService } from '../../core/services/report.service';
 import { ApexChartConfigService } from '../../core/services/apex-chart-config.service';
@@ -56,13 +56,17 @@ export class ReportsPageComponent implements OnInit {
   }
 
   onPeriodChange(period: Period) {
-    let param: 'semana' | 'mes' | 'anio' = 'semana';
-    const diffTime = Math.abs(period.endDate.getTime() - period.startDate.getTime());
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    if (diffDays <= 7) param = 'semana';
-    else if (diffDays <= 31) param = 'mes';
-    else param = 'anio';
-    this.reportService.fetchReport(param);
+    if (period.option === 'today') {
+      this.reportService.fetchReport('hoy');
+    } else if (period.option === 'week') {
+      this.reportService.fetchReport('semana');
+    } else if (period.option === 'month') {
+      this.reportService.fetchReport('mes');
+    } else if (period.option === 'custom') {
+      const startStr = period.startDate.toISOString().split('T')[0];
+      const endStr = period.endDate.toISOString().split('T')[0];
+      this.reportService.fetchReport('custom', startStr, endStr);
+    }
   }
 
   descargarExcel() {
@@ -229,14 +233,92 @@ export class ReportsPageComponent implements OnInit {
   // Datos para exportar
   exportData = computed(() => {
     const rep = this.reportData();
-    const top = rep?.topProductos || [];
-    return top.map(p => ({
-      'Producto': p.nombre,
-      'Categoría': p.categoria,
-      'Unidades': p.unidadesVendidas,
-      'Ingresos': p.ingresos,
-      'Margen %': p.margen
+    if (!rep) return [];
+
+    const datePipe = new DatePipe('en-US');
+    const decimalPipe = new DecimalPipe('en-US');
+
+    // 1. Resumen Ejecutivo
+    const resumenEjecutivo = [
+      { Métrica: 'Ingresos Totales', Valor: `S/ ${decimalPipe.transform(rep.ingresosTotales, '1.2-2')}` },
+      { Métrica: 'Ganancia Neta', Valor: `S/ ${decimalPipe.transform(rep.gananciaNeta, '1.2-2')}` },
+      { Métrica: 'Ticket Promedio', Valor: `S/ ${decimalPipe.transform(rep.ticketPromedio, '1.2-2')}` },
+      { Métrica: 'Productos Vendidos', Valor: rep.productosVendidos.toString() },
+      { Métrica: 'Total de Ventas', Valor: rep.totalVentas.toString() },
+      { Métrica: 'Crecimiento Semanal', Valor: `${rep.crecimientoSemanal > 0 ? '+' : ''}${rep.crecimientoSemanal}%` },
+    ];
+
+    // 2. Análisis ABC
+    const abcA = (rep.productosA || []).map(p => ({ ...p, Clase: 'A' }));
+    const abcB = (rep.productosB || []).map(p => ({ ...p, Clase: 'B' }));
+    const abcC = (rep.productosC || []).map(p => ({ ...p, Clase: 'C' }));
+    const abcAll = [...abcA, ...abcB, ...abcC];
+    
+    const analisisABC = abcAll.map(p => ({
+      Producto: p.nombre,
+      Categoría: p.categoria,
+      Clasificación: p.Clase,
+      'Unidades': p.unidades,
+      'Ingresos': `S/ ${decimalPipe.transform(p.ingresos, '1.2-2')}`,
+      'Participación': `${p.porcentajeDelTotal}%`
     }));
+
+    // 3. Resumen ABC
+    const totalA = abcA.reduce((sum, p) => sum + p.ingresos, 0);
+    const totalB = abcB.reduce((sum, p) => sum + p.ingresos, 0);
+    const totalC = abcC.reduce((sum, p) => sum + p.ingresos, 0);
+    const totalIngresos = rep.ingresosTotales > 0 ? rep.ingresosTotales : 1;
+
+    const resumenABC = [
+      { Clase: 'A (Alto Valor)', Cantidad: abcA.length, Ingresos: `S/ ${decimalPipe.transform(totalA, '1.2-2')}`, '% Ingresos': `${((totalA/totalIngresos)*100).toFixed(1)}%` },
+      { Clase: 'B (Valor Medio)', Cantidad: abcB.length, Ingresos: `S/ ${decimalPipe.transform(totalB, '1.2-2')}`, '% Ingresos': `${((totalB/totalIngresos)*100).toFixed(1)}%` },
+      { Clase: 'C (Bajo Valor)', Cantidad: abcC.length, Ingresos: `S/ ${decimalPipe.transform(totalC, '1.2-2')}`, '% Ingresos': `${((totalC/totalIngresos)*100).toFixed(1)}%` },
+    ];
+
+    // 4. Tendencia Ferias
+    const tendenciaFerias = [
+      { Feria: rep.nombreFeriaJueves || 'Feria Jueves', Promedio: `S/ ${decimalPipe.transform(rep.promedioMovilJueves, '1.2-2')}`, Tendencia: rep.promedioMovilJueves > 0 ? 'Creciendo' : 'Estable' },
+      { Feria: rep.nombreFeriaDomingo || 'Feria Domingo', Promedio: `S/ ${decimalPipe.transform(rep.promedioMovilDomingo, '1.2-2')}`, Tendencia: rep.promedioMovilDomingo > 0 ? 'Creciendo' : 'Estable' }
+    ];
+
+    // 5. Ferias vs Tienda
+    const feriasVsTienda = [
+      { Canal: 'Ferias', Ingresos: `S/ ${decimalPipe.transform(rep.ventasFerias, '1.2-2')}`, Ganancia: `S/ ${decimalPipe.transform(rep.gananciaFerias, '1.2-2')}` },
+      { Canal: 'Tienda', Ingresos: `S/ ${decimalPipe.transform(rep.ventasTienda, '1.2-2')}`, Ganancia: `S/ ${decimalPipe.transform(rep.gananciaTienda, '1.2-2')}` }
+    ];
+
+    // 6. Top Productos
+    const topProductos = (rep.topProductos || []).map((p, i) => ({
+      '#': i + 1,
+      Producto: p.nombre,
+      Categoría: p.categoria,
+      'Unidades': p.unidadesVendidas,
+      'Ingresos': `S/ ${decimalPipe.transform(p.ingresos, '1.2-2')}`,
+      'Margen': `${p.margen.toFixed(1)}%`
+    }));
+
+    // 7. Predicción
+    const prediccion = [
+      {
+        'Próxima Feria': rep.proximaFeria || '-',
+        'Día': rep.proximaFeria === 'Jueves' ? 'Jueves' : 'Domingo',
+        'Días Restantes': '-',
+        'Ingreso Estimado': `S/ ${decimalPipe.transform(rep.prediccionProximaFeria, '1.2-2')}`,
+        'Tendencia': 'Positiva',
+        'Stock Sugerido': 'Abastecimiento Completo',
+        'Confianza': 'Media'
+      }
+    ];
+
+    return {
+      'Resumen Ejecutivo': resumenEjecutivo,
+      'Análisis ABC': analisisABC,
+      'Resumen ABC': resumenABC,
+      'Tendencia Ferias': tendenciaFerias,
+      'Predicción': prediccion,
+      'Ferias vs Tienda': feriasVsTienda,
+      'Top Productos': topProductos,
+    };
   });
 
   // Helpers

@@ -1,5 +1,5 @@
 import { Injectable, signal, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { ErrorHandlerService } from './error-handler.service';
@@ -56,22 +56,39 @@ export class ReportService {
   // Estado Central
   public reportData = signal<ReporteVentas | null>(null);
   public isLoading = signal<boolean>(true);
-  public currentPeriod = signal<'semana' | 'mes' | 'anio'>('semana');
+  public currentPeriod = signal<string>('semana');
+  public currentDesde = signal<string | null>(null);
+  public currentHasta = signal<string | null>(null);
 
   /**
    * Carga dinámica de las métricas desde Spring Boot
    */
-  async fetchReport(periodo: 'semana' | 'mes' | 'anio' = 'semana'): Promise<void> {
+  async fetchReport(periodo: string = 'semana', startDate?: string, endDate?: string): Promise<void> {
     this.isLoading.set(true);
     this.currentPeriod.set(periodo);
+    this.currentDesde.set(startDate || null);
+    this.currentHasta.set(endDate || null);
 
     try {
+      let params = new HttpParams();
+      let requestUrl = this.API_URL;
+
+      if (periodo === 'hoy') {
+        params = params.set('periodo', 'hoy');
+      } else {
+        params = params.set('periodo', periodo);
+        if (startDate && endDate) {
+          params = params.set('desde', startDate + 'T00:00:00');
+          params = params.set('hasta', endDate + 'T23:59:59');
+        }
+      }
+
       const response = await firstValueFrom(
-        this.http.get<ReporteVentas>(`${this.API_URL}?periodo=${periodo}`)
+        this.http.get<ReporteVentas>(requestUrl, { params })
       );
       this.reportData.set(response);
     } catch (error) {
-      this.errorHandler.handleError(error as any, 'Error cargando datos del dashboard');
+      this.errorHandler.handleError(error as any, 'Error cargando datos del reporte');
     } finally {
       this.isLoading.set(false);
     }
@@ -81,19 +98,23 @@ export class ReportService {
    * Dispara una solicitud directa para descargar el reporte en Excel.
    */
   descargarExcel() {
-    // Redirigir el navegador a la ruta protegida/no-protegida que escupa el Attachment.
-    // O utilizar un fetch() convertiendo a blob y descargando. Utilizaremos fetch con responseType blob.
     this.toastService.info('Generando Excel en el servidor...', 3000, { title: 'Exportar' });
-    this.http.get(`${this.API_URL}/exportar/excel?periodo=${this.currentPeriod()}`, { responseType: 'blob' })
+    
+    let url = `${this.API_URL}/exportar/excel?periodo=${this.currentPeriod()}`;
+    if (this.currentPeriod() === 'custom' && this.currentDesde() && this.currentHasta()) {
+      url += `&desde=${this.currentDesde()}T00:00:00&hasta=${this.currentHasta()}T23:59:59`;
+    }
+
+    this.http.get(url, { responseType: 'blob' })
       .subscribe({
         next: (blob) => {
-          const url = window.URL.createObjectURL(blob);
+          const dlUrl = window.URL.createObjectURL(blob);
           const a = document.createElement('a');
           a.style.display = 'none';
-          a.href = url;
+          a.href = dlUrl;
           a.download = `reporte-denraf-${this.currentPeriod()}.xlsx`;
           a.click();
-          window.URL.revokeObjectURL(url);
+          window.URL.revokeObjectURL(dlUrl);
           this.toastService.success('Excel descargado correctamente');
         },
         error: (err) => this.errorHandler.handleError(err?.message || 'Error desconocido', 'Error descargando Excel')

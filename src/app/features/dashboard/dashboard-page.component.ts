@@ -70,17 +70,75 @@ export class DashboardPageComponent implements OnInit {
     });
   });
 
-  // Datos formateados para exportación de Actividad Reciente
+  // Datos formateados para exportación
   exportData = computed(() => {
-    const act = this.dashboardData()?.actividadReciente || [];
-    return act.map(sale => ({
+    const data = this.dashboardData();
+    if (!data) return {};
+
+    const decimalPipe = new DecimalPipe('en-US');
+
+    // 1. Resumen Ejecutivo
+    const resumenEjecutivo = [
+      { Métrica: 'Ingresos Totales', Valor: `S/ ${decimalPipe.transform(data.ingresosSemana || 0, '1.2-2')}` },
+      { Métrica: 'Ganancia Neta', Valor: `S/ ${decimalPipe.transform(data.gananciaNeta || 0, '1.2-2')}` },
+      { Métrica: 'Ticket Promedio', Valor: `S/ ${decimalPipe.transform(data.ticketPromedio || 0, '1.2-2')}` },
+      { Métrica: 'Retorno de Inversión (ROI)', Valor: `${decimalPipe.transform(data.roi || 0, '1.1-1')}%` },
+      { Métrica: 'Crecimiento Semanal', Valor: `${(data.crecimientoSemanal || 0) > 0 ? '+' : ''}${data.crecimientoSemanal || 0}%` },
+    ];
+
+    // 2. Ventas por Día
+    const ventasPorDia = Object.entries(data.ventasPorDia || {}).map(([dia, monto]) => ({
+      Día: dia,
+      'Ingresos Generados': `S/ ${decimalPipe.transform(monto as number, '1.2-2')}`
+    }));
+
+    // 3. Top Productos
+    const topProductos = (data.topProductos || []).map((p, i) => ({
+      '#': i + 1,
+      Producto: p.nombre,
+      'Categoría': p.categoria,
+      'Unidades': p.unidadesVendidas,
+      'Ingresos': `S/ ${decimalPipe.transform(p.ingresos, '1.2-2')}`
+    }));
+
+    // 4. Stock Crítico
+    const stockCritico = (data.productosStockBajo || []).map((p, i) => ({
+      '#': i + 1,
+      Producto: p.nombre,
+      'Stock Actual': p.stock,
+      'Mínimo Requerido': p.minStock
+    }));
+
+    // 5. Predicción
+    const prediccion = [
+      {
+        'Próxima Feria': 'Pronóstico General',
+        'Día': '-',
+        'Ingreso Estimado': `S/ ${decimalPipe.transform(data.proyeccion?.ingresosEstimados || 0, '1.2-2')}`,
+        'Ventas Estimadas': data.proyeccion?.ventasEstimadas || 0,
+        'Stock Sugerido': 'Basado en proyecciones',
+        'Confianza': data.proyeccion?.confianza === 'high' ? 'Alta' : data.proyeccion?.confianza === 'medium' ? 'Media' : 'Baja'
+      }
+    ];
+
+    // 6. Actividad Reciente
+    const actividadReciente = (data.actividadReciente || []).map(sale => ({
       'Nº Venta': sale.saleNumber,
       'Fecha': sale.createdAt,
-      'Producto Principal': sale.productoPrincipal || 'Varios / No especificado',
-      'Metodo de Pago': sale.paymentMethod,
-      'Estado': sale.status,
-      'Monto Total': sale.total
+      'Producto Principal': sale.productoPrincipal || 'Varios',
+      'Método de Pago': sale.paymentMethod,
+      'Estado': sale.status === 'completed' ? 'Completada' : sale.status === 'cancelled' ? 'Anulada' : 'Pendiente',
+      'Monto Total': `S/ ${decimalPipe.transform(sale.total, '1.2-2')}`
     }));
+
+    return {
+      'Resumen Ejecutivo': resumenEjecutivo,
+      'Ingresos por Día': ventasPorDia,
+      'Predicción': prediccion,
+      'Top Productos': topProductos,
+      'Stock Crítico': stockCritico,
+      'Actividad Reciente': actividadReciente
+    };
   });
 
   /**
@@ -88,15 +146,16 @@ export class DashboardPageComponent implements OnInit {
    * Adaptado para soportar los endpoints de backend.
    */
   onPeriodChange(period: Period) {
-    let param = 'semana';
-    
-    const diffTime = Math.abs(period.endDate.getTime() - period.startDate.getTime());
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
-    if (diffDays <= 1) param = 'hoy';
-    else if (diffDays <= 7) param = 'semana';
-    else param = 'mes';
-
-    this.dashboardService.fetchDashboardData(param);
+    if (period.option === 'today') {
+      this.dashboardService.fetchDashboardData('hoy');
+    } else if (period.option === 'week') {
+      this.dashboardService.fetchDashboardData('semana');
+    } else if (period.option === 'month') {
+      this.dashboardService.fetchDashboardData('mes');
+    } else if (period.option === 'custom') {
+      const startStr = period.startDate.toISOString().split('T')[0];
+      const endStr = period.endDate.toISOString().split('T')[0];
+      this.dashboardService.fetchDashboardData('custom', startStr, endStr);
+    }
   }
 }

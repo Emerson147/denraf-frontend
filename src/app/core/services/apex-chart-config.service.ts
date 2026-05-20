@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+  import { Injectable, inject } from '@angular/core';
 import { ApexOptions } from 'ng-apexcharts';
 import { ThemeService } from '../theme/theme.service';
 

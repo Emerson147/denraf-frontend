@@ -7,7 +7,7 @@ import { catchError, map } from 'rxjs/operators';
 import { of } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class GamificationService {
   private api = inject(ApiService);
@@ -27,7 +27,7 @@ export class GamificationService {
     longestStreak: 0,
     totalSalesCompleted: 0,
     totalRevenueGenerated: 0,
-    joinedAt: new Date()
+    joinedAt: new Date(),
   });
 
   // Públicos (readonly)
@@ -37,21 +37,13 @@ export class GamificationService {
   readonly stats = this.userStats.asReadonly();
 
   // Computados
-  readonly unlockedAchievements = computed(() => 
-    this.achievements().filter(a => a.unlocked)
-  );
+  readonly unlockedAchievements = computed(() => this.achievements().filter((a) => a.unlocked));
 
-  readonly lockedAchievements = computed(() => 
-    this.achievements().filter(a => !a.unlocked)
-  );
+  readonly lockedAchievements = computed(() => this.achievements().filter((a) => !a.unlocked));
 
-  readonly activeGoals = computed(() => 
-    this.goals().filter(g => g.status === 'active')
-  );
+  readonly activeGoals = computed(() => this.goals().filter((g) => g.status === 'active'));
 
-  readonly completedGoals = computed(() => 
-    this.goals().filter(g => g.status === 'completed')
-  );
+  readonly completedGoals = computed(() => this.goals().filter((g) => g.status === 'completed'));
 
   readonly currentLevel = computed(() => {
     return this.userStats().level || 1;
@@ -88,11 +80,11 @@ export class GamificationService {
         if (stats) {
           this.userStats.set({
             ...stats,
-            joinedAt: new Date(stats.joinedAt || new Date())
+            joinedAt: new Date(stats.joinedAt || new Date()),
           });
         }
       },
-      error: (err) => console.error('Error cargando stats', err)
+      error: (err) => console.error('Error cargando stats', err),
     });
   }
 
@@ -101,7 +93,7 @@ export class GamificationService {
       next: (achievements) => {
         if (achievements && achievements.length > 0) {
           // Mapeo básico si es necesario
-          const mappedAchievements: Achievement[] = achievements.map(a => ({
+          const mappedAchievements: Achievement[] = achievements.map((a) => ({
             id: a.achievementKey || a.id,
             title: a.title,
             description: a.description,
@@ -112,7 +104,7 @@ export class GamificationService {
             progress: a.progress,
             unlocked: a.unlocked,
             unlockedAt: a.unlockedAt ? new Date(a.unlockedAt) : undefined,
-            points: a.points
+            points: a.points,
           }));
           this.achievements.set(mappedAchievements);
         } else {
@@ -120,7 +112,7 @@ export class GamificationService {
           this.initializeAchievements();
         }
       },
-      error: (err) => console.error('Error cargando logros', err)
+      error: (err) => console.error('Error cargando logros', err),
     });
   }
 
@@ -128,15 +120,15 @@ export class GamificationService {
     this.api.get<any[]>('gamification/me/goals').subscribe({
       next: (goalsData) => {
         if (goalsData) {
-          const goals = goalsData.map(g => ({
+          const goals = goalsData.map((g) => ({
             ...g,
             startDate: new Date(g.startDate),
-            endDate: new Date(g.endDate)
+            endDate: new Date(g.endDate),
           }));
           this.goals.set(goals);
         }
       },
-      error: (err) => console.error('Error cargando metas', err)
+      error: (err) => console.error('Error cargando metas', err),
     });
   }
 
@@ -150,20 +142,20 @@ export class GamificationService {
           const mapped = data.map((d, index) => {
             return {
               userId: d.userId,
-              userName: d.userName || 'Usuario', 
+              userName: d.userName || 'Usuario',
               totalSales: d.totalSales,
               totalRevenue: d.totalRevenue || 0,
               achievementsCount: d.achievementsCount,
               points: d.totalPoints,
               rank: index + 1,
               streak: d.currentStreak,
-              badge: this.getBadgeForRank(index, d.currentStreak)
+              badge: this.getBadgeForRank(index, d.currentStreak),
             } as LeaderboardEntry;
           });
           this.leaderboard.set(mapped);
         }
       },
-      error: (err) => console.error('Error cargando leaderboard', err)
+      error: (err) => console.error('Error cargando leaderboard', err),
     });
   }
 
@@ -172,11 +164,14 @@ export class GamificationService {
       next: () => {
         this.loadUserAchievements();
       },
-      error: (err) => console.error('Error inicializando logros', err)
+      error: (err) => console.error('Error inicializando logros', err),
     });
   }
 
-  private getBadgeForRank(index: number, streak: number): 'champion'|'top_seller'|'consistent'|'rising_star' {
+  private getBadgeForRank(
+    index: number,
+    streak: number,
+  ): 'champion' | 'top_seller' | 'consistent' | 'rising_star' {
     if (index === 0) return 'champion';
     if (index === 1) return 'top_seller';
     if (streak >= 7) return 'consistent';
@@ -188,20 +183,21 @@ export class GamificationService {
   // ============================================
 
   assignAdminGoal(goalData: any) {
-    return this.api.post<Goal>('gamification/admin/goals', goalData).pipe( // POST on admin/goals
-       map(res => {
-         this.toastService.success('¡Meta asignada exitosamente!');
-         // Recargamos silenciosamente el leaderboard o metas si es a nosotros mismos
-         if (goalData.userId === this.backendAuthService.currentUser()?.id) {
-            this.loadUserGoals();
-         }
-         return res;
-       })
+    return this.api.post<Goal>('gamification/admin/goals', goalData).pipe(
+      // POST on admin/goals
+      map((res) => {
+        this.toastService.success('¡Meta asignada exitosamente!');
+        // Recargamos silenciosamente el leaderboard o metas si es a nosotros mismos
+        if (goalData.userId === this.backendAuthService.currentUser()?.id) {
+          this.loadUserGoals();
+        }
+        return res;
+      }),
     );
   }
 
   deleteGoal(goalId: string) {
-    this.goals.update(goals => goals.filter(g => g.id !== goalId));
+    this.goals.update((goals) => goals.filter((g) => g.id !== goalId));
   }
 
   resetProgress() {
